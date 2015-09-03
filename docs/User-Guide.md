@@ -1,12 +1,5 @@
-Table of Content
-Quick Start
-Feature Details
-Marking code
-Collating
-Omitting sub folders
-Collating only certain types of files
-Viewing an author's statistics
-Viewing the summary
-Exiting
-Using the Text UI
-Cheatsheet
+<h2>Table of Content</h2></br>
+<h2>Quick Start</h2></br>
+<h2>Feature Details</h2></br>
+<h2>Command Format</h2></br>
+<h2>Cheatsheet</h2></br>
