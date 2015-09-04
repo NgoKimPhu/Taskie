@@ -25,10 +25,15 @@
 2. **display** :
   1. **display** :
   2. **display {-op: value/values}** :
+  3. **display [kewords]** :
 3. **delete [index] / - [index]** :
 4. **delete [keywords] / - [keywords]** :
 5. **done [index]** :
 6. **done [kewords]** :
+7. **update [index] [value] <new value>** :
+8. **free slot / fs**:
+9. **what to do**: randomly find a task for user.
+
 ## Advances Commands
 
 # Cheatsheet
