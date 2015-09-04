@@ -31,9 +31,14 @@
 5. **done [index]** :
 6. **done [kewords]** :
 7. **update [index] [value] <new value>** :
-8. **free slot / fs**:
-9. **what to do**: randomly find a task for user.
+8. **undo** : 
+
 
 ## Advances Commands
+1. **free slot / fs**:
+2. **what to do**: randomly find a task for user.
+3. **change path <new path>** :
+4. ****
+
 
 # Cheatsheet
