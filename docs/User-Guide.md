@@ -17,6 +17,13 @@
 3. **Create your own account and specify data storage path**:
 
 # Feature Details
+1. **Support three task types**: event(task with start time and end time), deadline task(task with only deadline), floating task(task without start time or end time).
+2. **CRUD fuctions**: create tasks, read tasks, update tasks, delete tasks. 
+3. **Undo function**: undo the most recent action.
+4. **Command line input**: edit the task list by tying in command line.
+5. **Free-slot work recommendation**: if user want to add time specification to a floating task, Taskie is able to suggest free-slot to user.
+6. **Mark tasks**: user is able to make a task as completed.
+7. 
 
 # Command Format
 ## Basic Commands
@@ -34,7 +41,7 @@
 8. **undo** : 
 
 
-## Advances Commands
+## Advanced Commands
 1. **free slot / fs**:
 2. **what to do**: randomly find a task for user.
 3. **change path <new path>** :
