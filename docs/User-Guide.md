@@ -69,7 +69,7 @@ If the task type is "event", user is required to type in start time and end time
 # Cheatsheet
 Command | Description
 --------| ------------
-`add [task] [type] [-op:start time] [-op:end time] [-op:priority]` </br> `+ [task] [type] [-op:start time] [-op:end time] [-op:priority]:` | Add a task into task list
+`add [task] [type] [-op:start time] [-op:end time] [-op:priority]` </br> `+ [task] [type] [-op:start time] [-op:end time] [-op:priority]` | Add a task into task list
 `display` </br>`display {-op: value/values}`</br>`display [kewords]`| Display the tasks
 `delete [index] / - [index]**`</br>`delete f [index] / - f [index]**`</br>`delete [keywords] / - [keywords]` | Delete a task
 `done [index]`</br>`done f [index]`</br>`done [kewords]` | Mark a task as done
