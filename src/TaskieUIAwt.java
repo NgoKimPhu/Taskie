@@ -1,7 +1,7 @@
 import java.awt.*;   
 
-public class TaskieUI extends Frame {
-	public TaskieUI() {
+public class TaskieUIAwt extends Frame {
+	public TaskieUIAwt() {
 		setLayout(new GridLayout(0, 1, 0, 0));
 		add(new Label("Today's task(s):"));
 		add(new Label("Order pizza at 7pm"));
@@ -15,6 +15,6 @@ public class TaskieUI extends Frame {
 		setVisible(true);
 	}
 	public static void main(String[] args) {
-        new TaskieUI();
+        new TaskieUIAwt();
     }
 }
