@@ -67,3 +67,16 @@ If the task type is "event", user is required to type in start time and end time
 
 
 # Cheatsheet
+Command | Description
+--------| ------------
+`add [task] [type] [-op:start time] [-op:end time] [-op:priority]` </br> `+ [task] [type] [-op:start time] [-op:end time] [-op:priority]:` | Add a task into task list
+`display` </br>`display {-op: value/values}`</br>`display [kewords]`| Display the tasks
+`delete [index] / - [index]**`</br>`delete f [index] / - f [index]**`</br>`delete [keywords] / - [keywords]` | Delete a task
+`done [index]`</br>`done f [index]`</br>`done [kewords]` | Mark a task as done
+`update [index] [value] <new value>`</br>`update f [index] [value] <new value>` | Update the information of a task.
+`undo` | Undo the most recent action
+`help` | Ask for help
+`exit` | Exit Taskie
+`free slot / fs` | Find free slot
+`what to do` | Recommand user what to do next
+`change path <new path>` | Move the data file to a new path
