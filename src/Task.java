@@ -111,7 +111,7 @@ public class Task {
 		this.endTime = endTime;
 		this.type = TaskType.EVENT;
 	}
-	public boolean changeStartTime(Date startTime){
+	public boolean setStartTime(Date startTime){
 		// only reasonable to change the start time of an event;
 		if(this.type.equals(TaskType.EVENT)){
 			this.startTime = startTime;
@@ -123,7 +123,7 @@ public class Task {
 			return false;
 		}
 	}
-	public boolean changeEndTime(Date endTime){
+	public boolean setEndTime(Date endTime){
 		if(this.type.equals(TaskType.EVENT) || this.type.equals(TaskType.DEADLINE)){
 			this.endTime = endTime;
 			return true;
