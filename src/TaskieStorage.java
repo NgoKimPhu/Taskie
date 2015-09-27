@@ -7,6 +7,7 @@ import java.util.*;
 import java.io.*;
 import java.util.regex.*;
 import java.text.*;
+
 import org.json.*;
 
 public class TaskieStorage {
@@ -144,6 +145,46 @@ public class TaskieStorage {
 			this.floatPriorityMap.get(task.getPriority()).remove(task);
 			if(this.floatPriorityMap.get(task.getPriority()).size()==0){
 				this.floatPriorityMap.remove(task.getPriority());
+			}
+			return this.floatTaskList;
+		}
+	}
+	public ArrayList deleteTask(String keyWord, TaskType type){
+		keyWord = keyWord.toUpperCase();
+		if(type.equals(TaskType.EVENT) || type.equals(TaskType.DEADLINE)){
+			for(Task task: this.eventDeadlineTaskList){
+				String stringForCompare = new String(task.getTitle());
+				if(stringForCompare.toUpperCase().contains(keyWord)){
+					this.eventDeadlineTaskList.remove(task);
+					this.eventDeadlineStartDateMap.get(task.getStartTime()).remove(task);
+					if(this.eventDeadlineStartDateMap.get(task.getStartTime()).size()==0){
+						this.eventDeadlineStartDateMap.remove(task.getStartTime());
+					}
+					this.eventDeadlineEndDateMap.get(task.getEndTime()).remove(task);
+					if(this.eventDeadlineEndDateMap.get(task.getEndTime()).size()==0){
+						this.eventDeadlineEndDateMap.remove(task.getEndTime());
+					}
+					this.eventDeadlinePriorityMap.get(task.getPriority()).remove(task);
+					if(this.eventDeadlinePriorityMap.get(task.getPriority()).size()==0){
+						this.eventDeadlinePriorityMap.remove(task.getPriority());
+					}
+				}
+			}
+			return this.eventDeadlineTaskList;
+		}
+		else{
+			for(Task task: this.floatTaskList){
+				String stringForCompare = new String(task.getTitle());
+				if(stringForCompare.toUpperCase().contains(keyWord)){
+					this.floatTaskList.remove(task);
+					if(this.floatDateMap.get(task.getStartTime()).size()==0){
+						this.floatDateMap.remove(task.getStartTime());
+					}
+					this.floatPriorityMap.get(task.getPriority()).remove(task);
+					if(this.floatPriorityMap.get(task.getPriority()).size()==0){
+						this.floatPriorityMap.remove(task.getPriority());
+					}
+				}
 			}
 			return this.floatTaskList;
 		}
