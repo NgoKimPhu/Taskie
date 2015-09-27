@@ -41,6 +41,23 @@ public class TaskieStorage {
 	public void load(){
 		
 	}
+	// use to modify command stack after processing each command.
+	public Stack<HashMap<String, Object>> getCommandStack(){
+		return this.commandStack;
+	}
+	public boolean clearCommandStack(){
+		this.commandStack.clear();
+		return this.commandStack.isEmpty();
+	}
+	public void pushCommand(HashMap<String, Object> reverseCommandAndContent){
+		this.commandStack.push(reverseCommandAndContent);
+	}
+	public HashMap<String, Object> popCommand(){
+		return this.commandStack.pop();
+	}
+	public HashMap<String, Object> peekCommand(){
+		return this.commandStack.peek();
+	}
 	
 	public ArrayList<Task> displayEventDeadline(){
 		return this.eventDeadlineTaskList;
@@ -48,6 +65,7 @@ public class TaskieStorage {
 	public ArrayList<Task> displayFloatTask(){
 		return this.floatTaskList;
 	}
+	
 	public ArrayList<Task> addEventDeadline(Task task){
 		this.eventDeadlineTaskList.add(task);
 		Collections.sort(this.eventDeadlineTaskList, tc);
@@ -95,6 +113,34 @@ public class TaskieStorage {
 		}
 		else{
 			this.floatPriorityMap.get(task.getPriority()).add(task);
+		}
+		return this.floatTaskList;
+	}
+	public ArrayList<Task> deleteEventDeadline(int index){
+		Task task = this.eventDeadlineTaskList.remove(index);
+		this.eventDeadlineStartDateMap.get(task.getStartTime()).remove(task);
+		if(this.eventDeadlineStartDateMap.get(task.getStartTime()).size()==0){
+			this.eventDeadlineStartDateMap.remove(task.getStartTime());
+		}
+		this.eventDeadlineEndDateMap.get(task.getEndTime()).remove(task);
+		if(this.eventDeadlineEndDateMap.get(task.getEndTime()).size()==0){
+			this.eventDeadlineEndDateMap.remove(task.getEndTime());
+		}
+		this.eventDeadlinePriorityMap.get(task.getPriority()).remove(task);
+		if(this.eventDeadlinePriorityMap.get(task.getPriority()).size()==0){
+			this.eventDeadlinePriorityMap.remove(task.getPriority());
+		}
+		return this.eventDeadlineTaskList;
+	}
+	public ArrayList<Task> deleteFloat(int index){
+		Task task = this.floatTaskList.get(index);
+		this.floatDateMap.get(task.getStartTime()).remove(task);
+		if(this.floatDateMap.get(task.getStartTime()).size()==0){
+			this.floatDateMap.remove(task.getStartTime());
+		}
+		this.floatPriorityMap.get(task.getPriority()).remove(task);
+		if(this.floatPriorityMap.get(task.getPriority()).size()==0){
+			this.floatPriorityMap.remove(task.getPriority());
 		}
 		return this.floatTaskList;
 	}
