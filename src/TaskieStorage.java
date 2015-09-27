@@ -77,6 +77,27 @@ public class TaskieStorage {
 		}
 		return this.eventDeadlineTaskList;
 	}
+	public ArrayList<Task> addFloat(Task task){
+		this.floatTaskList.add(task);
+		Collections.sort(this.floatTaskList, tc);
+		if(!this.floatDateMap.containsKey(task.getStartTime())){
+			ArrayList<Task> tasks = new ArrayList<Task>();
+			tasks.add(task);
+			this.floatDateMap.put(task.getStartTime(), tasks);
+		}
+		else{
+			this.floatDateMap.get(task.getStartTime()).add(task);
+		}
+		if(!this.floatPriorityMap.containsKey(task.getPriority())){
+			ArrayList<Task> tasks = new ArrayList<Task>();
+			tasks.add(task);
+			this.floatPriorityMap.put(task.getPriority(), tasks);
+		}
+		else{
+			this.floatPriorityMap.get(task.getPriority()).add(task);
+		}
+		return this.floatTaskList;
+	}
 }
 
 class FileHandler{	
