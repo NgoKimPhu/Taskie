@@ -138,7 +138,7 @@ public class Task {
 	public void setDescription(String description){
 		this.description = description;
 	}
-	public TaskType getTyte(){
+	public TaskType getType(){
 		return this.type;
 	}
 	public String getTitle(){
