@@ -65,85 +65,90 @@ public class TaskieStorage {
 	public ArrayList<Task> displayFloatTask(){
 		return this.floatTaskList;
 	}
+	public ArrayList<Task> addTask(Task task, TaskType type){
+		if(type.equals(TaskType.EVENT)||type.equals(TaskType.DEADLINE)){
+			this.eventDeadlineTaskList.add(task);
+			Collections.sort(this.eventDeadlineTaskList, tc);
+			if(!this.eventDeadlineStartDateMap.containsKey(task.getStartTime())){
+				ArrayList<Task> tasks = new ArrayList<Task>();
+				tasks.add(task);
+				this.eventDeadlineStartDateMap.put(task.getStartTime(), tasks);
+			}
+			else{
+				this.eventDeadlineStartDateMap.get(task.getStartTime()).add(task);
+			}
+			if(!this.eventDeadlineEndDateMap.containsKey(task.getEndTime())){
+				ArrayList<Task> tasks = new ArrayList<Task>();
+				tasks.add(task);
+				this.eventDeadlineEndDateMap.put(task.getEndTime(), tasks);
+			}
+			else{
+				this.eventDeadlineEndDateMap.get(task.getEndTime()).add(task);
+			}
+			if(!this.eventDeadlinePriorityMap.containsKey(task.getPriority())){
+				ArrayList<Task> tasks = new ArrayList<Task>();
+				tasks.add(task);
+				this.eventDeadlinePriorityMap.put(task.getPriority(), tasks);
+			}
+			else{
+				this.eventDeadlinePriorityMap.get(task.getPriority()).add(task);
+			}
+			return this.eventDeadlineTaskList;
+		}
+		else{
+			this.floatTaskList.add(task);
+			Collections.sort(this.floatTaskList, tc);
+			if(!this.floatDateMap.containsKey(task.getStartTime())){
+				ArrayList<Task> tasks = new ArrayList<Task>();
+				tasks.add(task);
+				this.floatDateMap.put(task.getStartTime(), tasks);
+			}
+			else{
+				this.floatDateMap.get(task.getStartTime()).add(task);
+			}
+			if(!this.floatPriorityMap.containsKey(task.getPriority())){
+				ArrayList<Task> tasks = new ArrayList<Task>();
+				tasks.add(task);
+				this.floatPriorityMap.put(task.getPriority(), tasks);
+			}
+			else{
+				this.floatPriorityMap.get(task.getPriority()).add(task);
+			}
+			return this.floatTaskList;
+		}
+	}
 	
-	public ArrayList<Task> addEventDeadline(Task task){
-		this.eventDeadlineTaskList.add(task);
-		Collections.sort(this.eventDeadlineTaskList, tc);
-		if(!this.eventDeadlineStartDateMap.containsKey(task.getStartTime())){
-			ArrayList<Task> tasks = new ArrayList<Task>();
-			tasks.add(task);
-			this.eventDeadlineStartDateMap.put(task.getStartTime(), tasks);
+	public ArrayList<Task> deleteTask(int index, TaskType type){
+		if(type.equals(TaskType.EVENT) || type.equals(TaskType.DEADLINE)){
+			Task task = this.eventDeadlineTaskList.remove(index);
+			this.eventDeadlineStartDateMap.get(task.getStartTime()).remove(task);
+			if(this.eventDeadlineStartDateMap.get(task.getStartTime()).size()==0){
+				this.eventDeadlineStartDateMap.remove(task.getStartTime());
+			}
+			this.eventDeadlineEndDateMap.get(task.getEndTime()).remove(task);
+			if(this.eventDeadlineEndDateMap.get(task.getEndTime()).size()==0){
+				this.eventDeadlineEndDateMap.remove(task.getEndTime());
+			}
+			this.eventDeadlinePriorityMap.get(task.getPriority()).remove(task);
+			if(this.eventDeadlinePriorityMap.get(task.getPriority()).size()==0){
+				this.eventDeadlinePriorityMap.remove(task.getPriority());
+			}
+			return this.eventDeadlineTaskList;
 		}
 		else{
-			this.eventDeadlineStartDateMap.get(task.getStartTime()).add(task);
+			Task task = this.floatTaskList.get(index);
+			this.floatDateMap.get(task.getStartTime()).remove(task);
+			if(this.floatDateMap.get(task.getStartTime()).size()==0){
+				this.floatDateMap.remove(task.getStartTime());
+			}
+			this.floatPriorityMap.get(task.getPriority()).remove(task);
+			if(this.floatPriorityMap.get(task.getPriority()).size()==0){
+				this.floatPriorityMap.remove(task.getPriority());
+			}
+			return this.floatTaskList;
 		}
-		if(!this.eventDeadlineEndDateMap.containsKey(task.getEndTime())){
-			ArrayList<Task> tasks = new ArrayList<Task>();
-			tasks.add(task);
-			this.eventDeadlineEndDateMap.put(task.getEndTime(), tasks);
-		}
-		else{
-			this.eventDeadlineEndDateMap.get(task.getEndTime()).add(task);
-		}
-		if(!this.eventDeadlinePriorityMap.containsKey(task.getPriority())){
-			ArrayList<Task> tasks = new ArrayList<Task>();
-			tasks.add(task);
-			this.eventDeadlinePriorityMap.put(task.getPriority(), tasks);
-		}
-		else{
-			this.eventDeadlinePriorityMap.get(task.getPriority()).add(task);
-		}
-		return this.eventDeadlineTaskList;
 	}
-	public ArrayList<Task> addFloat(Task task){
-		this.floatTaskList.add(task);
-		Collections.sort(this.floatTaskList, tc);
-		if(!this.floatDateMap.containsKey(task.getStartTime())){
-			ArrayList<Task> tasks = new ArrayList<Task>();
-			tasks.add(task);
-			this.floatDateMap.put(task.getStartTime(), tasks);
-		}
-		else{
-			this.floatDateMap.get(task.getStartTime()).add(task);
-		}
-		if(!this.floatPriorityMap.containsKey(task.getPriority())){
-			ArrayList<Task> tasks = new ArrayList<Task>();
-			tasks.add(task);
-			this.floatPriorityMap.put(task.getPriority(), tasks);
-		}
-		else{
-			this.floatPriorityMap.get(task.getPriority()).add(task);
-		}
-		return this.floatTaskList;
-	}
-	public ArrayList<Task> deleteEventDeadline(int index){
-		Task task = this.eventDeadlineTaskList.remove(index);
-		this.eventDeadlineStartDateMap.get(task.getStartTime()).remove(task);
-		if(this.eventDeadlineStartDateMap.get(task.getStartTime()).size()==0){
-			this.eventDeadlineStartDateMap.remove(task.getStartTime());
-		}
-		this.eventDeadlineEndDateMap.get(task.getEndTime()).remove(task);
-		if(this.eventDeadlineEndDateMap.get(task.getEndTime()).size()==0){
-			this.eventDeadlineEndDateMap.remove(task.getEndTime());
-		}
-		this.eventDeadlinePriorityMap.get(task.getPriority()).remove(task);
-		if(this.eventDeadlinePriorityMap.get(task.getPriority()).size()==0){
-			this.eventDeadlinePriorityMap.remove(task.getPriority());
-		}
-		return this.eventDeadlineTaskList;
-	}
-	public ArrayList<Task> deleteFloat(int index){
-		Task task = this.floatTaskList.get(index);
-		this.floatDateMap.get(task.getStartTime()).remove(task);
-		if(this.floatDateMap.get(task.getStartTime()).size()==0){
-			this.floatDateMap.remove(task.getStartTime());
-		}
-		this.floatPriorityMap.get(task.getPriority()).remove(task);
-		if(this.floatPriorityMap.get(task.getPriority()).size()==0){
-			this.floatPriorityMap.remove(task.getPriority());
-		}
-		return this.floatTaskList;
-	}
+	
 }
 
 class FileHandler{	
