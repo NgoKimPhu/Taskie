@@ -170,3 +170,59 @@ enum TaskType{
 enum TaskPriority{
 	VERY_HIGH, HIGH, MEDIUM, LOW, VERY_LOW;
 }
+
+class TaskComparator implements Comparator<Task> {
+	public int compare(Task task1, Task task2){
+		if(task1.getType().equals(TaskType.FLOAT)){
+			if(!task2.getType().equals(TaskType.FLOAT)){
+				return 1;
+			}
+			else{
+				if(task1.getPriority().compareTo(task2.getPriority())==0){
+					if(task1.getStartTime().before(task2.getStartTime())){
+						return -1;
+					}
+					else if(task1.getStartTime().after(task2.getStartTime())){
+						return 1;
+					}
+					else{
+						return task1.getTitle().compareTo(task2.getTitle());
+					}
+				}
+				else{
+					return task1.getPriority().compareTo(task2.getPriority());
+				}
+			}
+		}
+		else{
+			if(task2.getType().equals(TaskType.FLOAT)){
+				return -1;
+			}
+			else{
+				if(task1.getEndTime().before(task2.getEndTime())){
+					return -1;
+				}
+				else if(task1.getEndTime().after(task2.getEndTime())){
+					return 1;
+				}
+				else{
+					if(task1.getPriority().compareTo(task2.getPriority())==0){
+						if(task1.getStartTime().before(task2.getStartTime())){
+							return -1;
+						}
+						else if(task1.getStartTime().after(task2.getStartTime())){
+							return 1;
+						}
+						else{
+							return task1.getTitle().compareTo(task2.getTitle());
+						}
+					}
+					else{
+						return task1.getPriority().compareTo(task2.getPriority());
+					}
+				}
+			}
+		}
+		}
+	
+}
