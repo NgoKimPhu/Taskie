@@ -8,7 +8,7 @@ import java.util.*;
 public class Task {
 	private TaskType type;
 	private String title;
-	private long id;
+	//private long id;
 	private String description;
 	private Date startTime;
 	private Date endTime;
@@ -17,13 +17,11 @@ public class Task {
 	// true==done, false==haven't done;
 	private boolean status;
 	// keep counting the no. of tasks create and be used as the task id.
-	private static long count = 0;	
+	//private static long count = 0;	
 	// create float task.
 	public Task(String title){
-		this.count+=1;
 		this.type = TaskType.FLOAT;
 		this.title = title;
-		this.id = this.count;
 		this.description = new String();
 		// start from the moment it is created
 		this.startTime = new Date();
@@ -34,22 +32,39 @@ public class Task {
 	}
 	// create float task with specific priority.
 	public Task(String title, TaskPriority priority){
-		this.count+=1;
+		//this.count+=1;
 		this.type = TaskType.FLOAT;
 		this.title = title;
-		this.id = this.count;
+		//this.id = this.count;
 		this.description = new String();
 		this.startTime = new Date();
 		this.endTime = null;
 		this.priority = priority;
 		this.status = false;
 	}
+	// load existing float task
+	public Task(String title, TaskType type, TaskPriority priority, Date startTime, boolean status, String description) throws Exception{
+		//this.count+=1;
+		if(!type.equals(TaskType.FLOAT)){
+			throw new Exception("Task type not match.");
+		}
+		else{
+			this.type = TaskType.FLOAT;
+			this.title = title;
+			//this.id = this.count;
+			this.description = description;
+			this.startTime = startTime;
+			this.endTime = null;
+			this.priority = priority;
+			this.status = status;
+		}
+	}
 	// create deadline task.
 	public Task(String title, Date endTime){
-		this.count+=1;
+		//this.count+=1;
 		this.type = TaskType.DEADLINE;
 		this.title = title;
-		this.id = this.count;
+		//this.id = this.count;
 		this.description = new String();
 		this.startTime = new Date();
 		this.endTime = endTime;
@@ -58,10 +73,10 @@ public class Task {
 	}
 	// create deadline task with specific priority.
 	public Task(String title, Date endTime, TaskPriority priority){
-		this.count+=1;
+		//this.count+=1;
 		this.type = TaskType.DEADLINE;
 		this.title = title;
-		this.id = this.count;
+		//this.id = this.count;
 		this.description = new String();
 		this.startTime = new Date();
 		this.endTime = endTime;
@@ -70,10 +85,10 @@ public class Task {
 	}
 	// create event.
 	public Task(String title, Date startTime, Date endTime){
-		this.count+=1;
+		//this.count+=1;
 		this.type = TaskType.EVENT;
 		this.title = title;
-		this.id = this.count;
+		//this.id = this.count;
 		this.description = new String();
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -82,15 +97,31 @@ public class Task {
 	}
 	// create event with specific priority.
 	public Task(String title, Date startTime, Date endTime, TaskPriority priority){
-		this.count+=1;
+		//this.count+=1;
 		this.type = TaskType.EVENT;
 		this.title = title;
-		this.id = this.count;
+		//this.id = this.count;
 		this.description = new String();
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.priority = priority;
 		this.status = false;
+	}
+	// load deadline task or event
+	public Task(String title, TaskType type, Date startTime, Date endTime, TaskPriority priority, boolean status, String description) throws Exception{
+		if(type.equals(TaskType.FLOAT)){
+			throw new Exception("Task type not match.");
+		}
+		else{
+			this.type = type;
+			this.title = title;
+			//this.id = this.count;
+			this.description = description;
+			this.startTime = startTime;
+			this.endTime = endTime;
+			this.priority = priority;
+			this.status = status;
+		}
 	}
 	public void setTitle(String title){
 		this.title = title;
@@ -144,9 +175,11 @@ public class Task {
 	public String getTitle(){
 		return this.title;
 	}
+	/*
 	public long getId(){
 		return this.id;
 	}
+	*/
 	public String getDescription(){
 		return this.description;
 	}
@@ -223,6 +256,6 @@ class TaskComparator implements Comparator<Task> {
 				}
 			}
 		}
-		}
+	}
 	
 }

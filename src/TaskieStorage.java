@@ -6,6 +6,8 @@
 import java.util.*;
 import java.io.*;
 import java.util.regex.*;
+import java.text.*;
+import org.json.*;
 
 public class TaskieStorage {
 	private File eventDeadlineTask;
@@ -19,12 +21,12 @@ public class TaskieStorage {
 	private HashMap<TaskPriority, ArrayList<Task>> floatPriorityMap;
 	private Stack<HashMap<String, Object>> commandStack;
 	private TaskComparator tc = new TaskComparator();
-	private static final Pattern TASK_LINE_PATTERN = Pattern.compile("^(EVENT|DEADLINE|FLOAT)\\s(.+)\\s(.+)\\s(.+)\\s([12345])");
+	
 	
 	
 	public TaskieStorage(String pathName){
-		eventDeadlineTask = new File(pathName + "/eventDeadline");
-		floatTask = new File(pathName + "/floatTask");
+		eventDeadlineTask = new File(pathName + "/eventDeadline.json");
+		floatTask = new File(pathName + "/floatTask.json");
 		eventDeadlineTaskList = new ArrayList<Task>();
 		floatTaskList = new ArrayList<Task>();
 		eventDeadlineStartDateMap = new HashMap<Date, ArrayList<Task>>();
@@ -75,5 +77,112 @@ public class TaskieStorage {
 		}
 		return this.eventDeadlineTaskList;
 	}
+}
+
+class FileHandler{	
+	private static final Pattern EVENT_DEADLINE_TASK_LINE_PATTERN = Pattern.compile("^(EVENT|DEADLINE)\\s(.+)\\s(.+)\\s(.+)\\s([01234])\\s\\([01])\\n$");
+	private static final Pattern FLOAT_TASK_LINE_PATTERN = Pattern.compile("^(FLOAT)\\s(.+)\\s(.+)\\s(.+)\\s([01234])\\s\\([01])\\n$");
+	private static final SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+	public static ArrayList<Task> readFile(File file) {
+		String fileName = file.getName();
+		String line = new String();
+		ArrayList<Task> fileContent = new ArrayList<Task>();
+		try {
+			BufferedReader in = new BufferedReader(new FileReader(fileName));
+			line = in.readLine();
+			while (line != null) {
+				Matcher matcher1 = EVENT_DEADLINE_TASK_LINE_PATTERN.matcher(line);
+				Task task = null;
+				if(matcher1.matches()){
+					System.out.println("true");
+					TaskType taskType = getTaskType(matcher1.group(1));
+					String taskTitle = matcher1.group(2);
+					Date startTime = getDate(matcher1.group(3));
+					Date endTime = getDate(matcher1.group(4));
+					TaskPriority priority = getTaskPriority(matcher1.group(5));
+					//task = new Task(); 
+				}
+				line = in.readLine();
+			}
+			in.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return fileContent;
+	}
 	
+	// Write content in to a file.
+	public static void writeFile(File file, int fileSize, String content) {
+		String fileName = file.getName();
+		try {
+			FileWriter writer = new FileWriter(fileName, true);
+			// If it is an empty file, write into it directly.
+			if(fileSize == 0){
+				writer.write(content);
+			}
+			// If it is not an empty file, begin with a new line.
+			else{
+				writer.write("\n" + content);
+			}
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	private static boolean isValidDate(String string){
+		boolean isValid = true;
+		return isValid;
+	}
+	private static Date getDate(String string){
+		Date date = null;
+		Calendar calendar = Calendar.getInstance();
+		String[] splitString= string.split(" ");
+		String[] dayMonthYear = splitString[0].split("-");
+		String[] hourMinute = splitString[1].split(":");
+		int day = Integer.valueOf(dayMonthYear[0]);
+		int month = Integer.valueOf(dayMonthYear[1]);
+		int year = Integer.valueOf(dayMonthYear[2]);
+		int hour = Integer.valueOf(hourMinute[0]);
+		int minute = Integer.valueOf(hourMinute[1]);
+		calendar.set(year, month, day, hour, minute);
+		date = calendar.getTime();
+		return date;
+	}
+	private static TaskType getTaskType(String string){
+		if(isEvent(string)){
+			return TaskType.EVENT;
+		}
+		else if(isDeadline(string)){
+			return TaskType.DEADLINE;
+		}
+		else{
+			return TaskType.FLOAT;
+		}
+	}
+	private static boolean isEvent(String string){
+		return string.equalsIgnoreCase("EVENT");
+	}
+	private static boolean isDeadline(String string){
+		return string.equalsIgnoreCase("DEADLINE");
+	}
+	private static boolean isFloat(String string){
+		return string.equalsIgnoreCase("FLOAT");
+	}
+	private static TaskPriority getTaskPriority(String string) {
+		if(string.equals("0")){
+			return TaskPriority.VERY_HIGH;
+		}
+		else if(string.equals("1")){
+			return TaskPriority.HIGH;
+		}
+		else if(string.equals("2")){
+			return TaskPriority.MEDIUM;
+		}
+		else if(string.equals("3")){
+			return TaskPriority.LOW;
+		}
+		else{
+			return TaskPriority.VERY_LOW;
+		}
+	}
 }
