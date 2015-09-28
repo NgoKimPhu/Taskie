@@ -65,8 +65,8 @@ public class TaskieStorage {
 	public ArrayList<Task> displayFloatTask(){
 		return this.floatTaskList;
 	}
-	public ArrayList<Task> addTask(Task task, TaskType type){
-		if(type.equals(TaskType.EVENT)||type.equals(TaskType.DEADLINE)){
+	public ArrayList<Task> addTask(Task task){
+		if(task.getType().equals(TaskType.EVENT)||task.getType().equals(TaskType.DEADLINE)){
 			this.eventDeadlineTaskList.add(task);
 			Collections.sort(this.eventDeadlineTaskList, tc);
 			if(!this.eventDeadlineStartDateMap.containsKey(task.getStartTime())){
