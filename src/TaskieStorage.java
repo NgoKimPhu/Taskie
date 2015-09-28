@@ -10,17 +10,17 @@ import java.text.*;
 import org.json.*;
 
 public class TaskieStorage {
-	private File eventDeadlineTask;
-	private File floatTask;
-	private ArrayList<Task> eventDeadlineTaskList;
-	private ArrayList<Task> floatTaskList;
-	private HashMap<Date, ArrayList<Task>> eventDeadlineStartDateMap;
-	private HashMap<Date, ArrayList<Task>> eventDeadlineEndDateMap;
-	private HashMap<Date, ArrayList<Task>> floatDateMap;
-	private HashMap<TaskPriority, ArrayList<Task>> eventDeadlinePriorityMap;
-	private HashMap<TaskPriority, ArrayList<Task>> floatPriorityMap;
-	private Stack<HashMap<String, Object>> commandStack;
-	private TaskComparator tc = new TaskComparator();
+	private static File eventDeadlineTask;
+	private static File floatTask;
+	private static ArrayList<Task> eventDeadlineTaskList;
+	private static ArrayList<Task> floatTaskList;
+	private static HashMap<Date, ArrayList<Task>> eventDeadlineStartDateMap;
+	private static HashMap<Date, ArrayList<Task>> eventDeadlineEndDateMap;
+	private static HashMap<Date, ArrayList<Task>> floatDateMap;
+	private static HashMap<TaskPriority, ArrayList<Task>> eventDeadlinePriorityMap;
+	private static HashMap<TaskPriority, ArrayList<Task>> floatPriorityMap;
+	private static Stack<HashMap<String, Object>> commandStack;
+	private static TaskComparator tc = new TaskComparator();
 	
 	
 	
@@ -35,157 +35,159 @@ public class TaskieStorage {
 		eventDeadlinePriorityMap = new HashMap<TaskPriority, ArrayList<Task>>();
 		floatPriorityMap = new HashMap<TaskPriority, ArrayList<Task>>();
 		commandStack = new Stack<HashMap<String, Object>>();
-		
+		load();
 	}
 	
 	public void load(){
 		
 	}
 	// use to modify command stack after processing each command.
-	public Stack<HashMap<String, Object>> getCommandStack(){
-		return this.commandStack;
+	public static Stack<HashMap<String, Object>> getCommandStack(){
+		return commandStack;
 	}
-	public boolean clearCommandStack(){
-		this.commandStack.clear();
-		return this.commandStack.isEmpty();
+	public static boolean clearCommandStack(){
+		commandStack.clear();
+		return commandStack.isEmpty();
 	}
-	public void pushCommand(HashMap<String, Object> reverseCommandAndContent){
-		this.commandStack.push(reverseCommandAndContent);
+	public static void pushCommand(HashMap<String, Object> reverseCommandAndContent){
+		commandStack.push(reverseCommandAndContent);
 	}
-	public HashMap<String, Object> popCommand(){
-		return this.commandStack.pop();
+	public static HashMap<String, Object> popCommand(){
+		return commandStack.pop();
 	}
-	public HashMap<String, Object> peekCommand(){
-		return this.commandStack.peek();
+	public static HashMap<String, Object> peekCommand(){
+		return commandStack.peek();
 	}
 	
-	public ArrayList<Task> displayEventDeadline(){
-		return this.eventDeadlineTaskList;
+	public static ArrayList<Task> displayEventDeadline(){
+		return eventDeadlineTaskList;
 	}
-	public ArrayList<Task> displayFloatTask(){
-		return this.floatTaskList;
+	public static ArrayList<Task> displayFloatTask(){
+		return floatTaskList;
 	}
-	public ArrayList<Task> addTask(Task task){
+	public static ArrayList<Task> addTask(Task task){
 		if(task.getType().equals(TaskType.EVENT)||task.getType().equals(TaskType.DEADLINE)){
-			this.eventDeadlineTaskList.add(task);
-			Collections.sort(this.eventDeadlineTaskList, tc);
-			if(!this.eventDeadlineStartDateMap.containsKey(task.getStartTime())){
+			eventDeadlineTaskList.add(task);
+			Collections.sort(eventDeadlineTaskList, tc);
+			if(!eventDeadlineStartDateMap.containsKey(task.getStartTime())){
 				ArrayList<Task> tasks = new ArrayList<Task>();
 				tasks.add(task);
-				this.eventDeadlineStartDateMap.put(task.getStartTime(), tasks);
+				eventDeadlineStartDateMap.put(task.getStartTime(), tasks);
 			}
 			else{
-				this.eventDeadlineStartDateMap.get(task.getStartTime()).add(task);
+				eventDeadlineStartDateMap.get(task.getStartTime()).add(task);
 			}
-			if(!this.eventDeadlineEndDateMap.containsKey(task.getEndTime())){
+			if(!eventDeadlineEndDateMap.containsKey(task.getEndTime())){
 				ArrayList<Task> tasks = new ArrayList<Task>();
 				tasks.add(task);
-				this.eventDeadlineEndDateMap.put(task.getEndTime(), tasks);
+				eventDeadlineEndDateMap.put(task.getEndTime(), tasks);
 			}
 			else{
-				this.eventDeadlineEndDateMap.get(task.getEndTime()).add(task);
+				eventDeadlineEndDateMap.get(task.getEndTime()).add(task);
 			}
-			if(!this.eventDeadlinePriorityMap.containsKey(task.getPriority())){
+			if(!eventDeadlinePriorityMap.containsKey(task.getPriority())){
 				ArrayList<Task> tasks = new ArrayList<Task>();
 				tasks.add(task);
-				this.eventDeadlinePriorityMap.put(task.getPriority(), tasks);
+				eventDeadlinePriorityMap.put(task.getPriority(), tasks);
 			}
 			else{
-				this.eventDeadlinePriorityMap.get(task.getPriority()).add(task);
+				eventDeadlinePriorityMap.get(task.getPriority()).add(task);
 			}
-			return this.eventDeadlineTaskList;
+			return eventDeadlineTaskList;
 		}
 		else{
-			this.floatTaskList.add(task);
-			Collections.sort(this.floatTaskList, tc);
-			if(!this.floatDateMap.containsKey(task.getStartTime())){
+			floatTaskList.add(task);
+			Collections.sort(floatTaskList, tc);
+			if(!floatDateMap.containsKey(task.getStartTime())){
 				ArrayList<Task> tasks = new ArrayList<Task>();
 				tasks.add(task);
-				this.floatDateMap.put(task.getStartTime(), tasks);
+				floatDateMap.put(task.getStartTime(), tasks);
 			}
 			else{
-				this.floatDateMap.get(task.getStartTime()).add(task);
+				floatDateMap.get(task.getStartTime()).add(task);
 			}
-			if(!this.floatPriorityMap.containsKey(task.getPriority())){
+			if(!floatPriorityMap.containsKey(task.getPriority())){
 				ArrayList<Task> tasks = new ArrayList<Task>();
 				tasks.add(task);
-				this.floatPriorityMap.put(task.getPriority(), tasks);
+				floatPriorityMap.put(task.getPriority(), tasks);
 			}
 			else{
-				this.floatPriorityMap.get(task.getPriority()).add(task);
+				floatPriorityMap.get(task.getPriority()).add(task);
 			}
-			return this.floatTaskList;
+			return floatTaskList;
 		}
 	}
 	
-	public ArrayList<Task> deleteTask(int index, TaskType type){
+	public static ArrayList<Task> deleteTask(int index, TaskType type){
 		if(type.equals(TaskType.EVENT) || type.equals(TaskType.DEADLINE)){
-			Task task = this.eventDeadlineTaskList.remove(index);
-			this.eventDeadlineStartDateMap.get(task.getStartTime()).remove(task);
-			if(this.eventDeadlineStartDateMap.get(task.getStartTime()).size()==0){
-				this.eventDeadlineStartDateMap.remove(task.getStartTime());
+			Task task = eventDeadlineTaskList.remove(index);
+			eventDeadlineStartDateMap.get(task.getStartTime()).remove(task);
+			if(eventDeadlineStartDateMap.get(task.getStartTime()).size()==0){
+				eventDeadlineStartDateMap.remove(task.getStartTime());
 			}
-			this.eventDeadlineEndDateMap.get(task.getEndTime()).remove(task);
-			if(this.eventDeadlineEndDateMap.get(task.getEndTime()).size()==0){
-				this.eventDeadlineEndDateMap.remove(task.getEndTime());
+			eventDeadlineEndDateMap.get(task.getEndTime()).remove(task);
+			if(eventDeadlineEndDateMap.get(task.getEndTime()).size()==0){
+				eventDeadlineEndDateMap.remove(task.getEndTime());
 			}
-			this.eventDeadlinePriorityMap.get(task.getPriority()).remove(task);
-			if(this.eventDeadlinePriorityMap.get(task.getPriority()).size()==0){
-				this.eventDeadlinePriorityMap.remove(task.getPriority());
+			eventDeadlinePriorityMap.get(task.getPriority()).remove(task);
+			if(eventDeadlinePriorityMap.get(task.getPriority()).size()==0){
+				eventDeadlinePriorityMap.remove(task.getPriority());
 			}
-			return this.eventDeadlineTaskList;
+			return eventDeadlineTaskList;
 		}
 		else{
-			Task task = this.floatTaskList.get(index);
-			this.floatDateMap.get(task.getStartTime()).remove(task);
-			if(this.floatDateMap.get(task.getStartTime()).size()==0){
-				this.floatDateMap.remove(task.getStartTime());
+			Task task = floatTaskList.get(index);
+			floatDateMap.get(task.getStartTime()).remove(task);
+			if(floatDateMap.get(task.getStartTime()).size()==0){
+				floatDateMap.remove(task.getStartTime());
 			}
-			this.floatPriorityMap.get(task.getPriority()).remove(task);
-			if(this.floatPriorityMap.get(task.getPriority()).size()==0){
-				this.floatPriorityMap.remove(task.getPriority());
+			floatPriorityMap.get(task.getPriority()).remove(task);
+			if(floatPriorityMap.get(task.getPriority()).size()==0){
+				floatPriorityMap.remove(task.getPriority());
 			}
-			return this.floatTaskList;
+			return floatTaskList;
 		}
 	}
-	public ArrayList<Task> deleteTask(String keyWord, TaskType type){
+	
+	/*
+	public static ArrayList<Task> deleteTask(String keyWord, TaskType type){
 		keyWord = keyWord.toUpperCase();
 		if(type.equals(TaskType.EVENT) || type.equals(TaskType.DEADLINE)){
-			for(Task task: this.eventDeadlineTaskList){
+			for(Task task: eventDeadlineTaskList){
 				String stringForCompare = new String(task.getTitle());
 				if(stringForCompare.toUpperCase().contains(keyWord)){
-					this.eventDeadlineTaskList.remove(task);
-					this.eventDeadlineStartDateMap.get(task.getStartTime()).remove(task);
-					if(this.eventDeadlineStartDateMap.get(task.getStartTime()).size()==0){
-						this.eventDeadlineStartDateMap.remove(task.getStartTime());
+					eventDeadlineTaskList.remove(task);
+					eventDeadlineStartDateMap.get(task.getStartTime()).remove(task);
+					if(eventDeadlineStartDateMap.get(task.getStartTime()).size()==0){
+						eventDeadlineStartDateMap.remove(task.getStartTime());
 					}
-					this.eventDeadlineEndDateMap.get(task.getEndTime()).remove(task);
-					if(this.eventDeadlineEndDateMap.get(task.getEndTime()).size()==0){
-						this.eventDeadlineEndDateMap.remove(task.getEndTime());
+					eventDeadlineEndDateMap.get(task.getEndTime()).remove(task);
+					if(eventDeadlineEndDateMap.get(task.getEndTime()).size()==0){
+						eventDeadlineEndDateMap.remove(task.getEndTime());
 					}
-					this.eventDeadlinePriorityMap.get(task.getPriority()).remove(task);
-					if(this.eventDeadlinePriorityMap.get(task.getPriority()).size()==0){
-						this.eventDeadlinePriorityMap.remove(task.getPriority());
+					eventDeadlinePriorityMap.get(task.getPriority()).remove(task);
+					if(eventDeadlinePriorityMap.get(task.getPriority()).size()==0){
+						eventDeadlinePriorityMap.remove(task.getPriority());
 					}
 				}
 			}
-			return this.eventDeadlineTaskList;
+			return eventDeadlineTaskList;
 		}
 		else{
-			for(Task task: this.floatTaskList){
+			for(Task task: floatTaskList){
 				String stringForCompare = new String(task.getTitle());
 				if(stringForCompare.toUpperCase().contains(keyWord)){
-					this.floatTaskList.remove(task);
-					if(this.floatDateMap.get(task.getStartTime()).size()==0){
-						this.floatDateMap.remove(task.getStartTime());
+					floatTaskList.remove(task);
+					if(floatDateMap.get(task.getStartTime()).size()==0){
+						floatDateMap.remove(task.getStartTime());
 					}
-					this.floatPriorityMap.get(task.getPriority()).remove(task);
-					if(this.floatPriorityMap.get(task.getPriority()).size()==0){
-						this.floatPriorityMap.remove(task.getPriority());
+					floatPriorityMap.get(task.getPriority()).remove(task);
+					if(floatPriorityMap.get(task.getPriority()).size()==0){
+						floatPriorityMap.remove(task.getPriority());
 					}
 				}
 			}
-			return this.floatTaskList;
+			return floatTaskList;
 		}
 	}
 	public ArrayList<Task> deleteTask(TaskPriority priority, TaskType type){
@@ -206,15 +208,16 @@ public class TaskieStorage {
 			return this.floatTaskList;
 		}
 	}
+	*/
 	
 	// if you want to search all the tasks contains the key words, search twice
-	public ArrayList<IndexTaskPair> searchTask(ArrayList<String> keyWords, TaskType type){
+	public static ArrayList<IndexTaskPair> searchTask(ArrayList<String> keyWords, TaskType type){
 		for(String keyWord: keyWords){
 			keyWord = keyWord.toUpperCase();
 		}
 		if(type.equals(TaskType.EVENT) || type.equals(TaskType.DEADLINE)){
 			ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
-			for(Task task: this.eventDeadlineTaskList){
+			for(Task task: eventDeadlineTaskList){
 				boolean check = true;
 				String stringForCompare = new String(task.getTitle());
 				for(String keyWord: keyWords){
@@ -223,7 +226,7 @@ public class TaskieStorage {
 					}
 				}
 				if(check == true){
-					IndexTaskPair pair = new IndexTaskPair(this.eventDeadlineTaskList.indexOf(task), task);
+					IndexTaskPair pair = new IndexTaskPair(eventDeadlineTaskList.indexOf(task), task);
 					searchResult.add(pair);
 				}
 			}
@@ -231,7 +234,7 @@ public class TaskieStorage {
 		}
 		else{
 			ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
-			for(Task task: this.floatTaskList){
+			for(Task task: floatTaskList){
 				boolean check = true;
 				String stringForCompare = new String(task.getTitle());
 				for(String keyWord: keyWords){
@@ -240,19 +243,19 @@ public class TaskieStorage {
 					}
 				}
 				if(check == true){
-					IndexTaskPair pair = new IndexTaskPair(this.floatTaskList.indexOf(task), task);
+					IndexTaskPair pair = new IndexTaskPair(floatTaskList.indexOf(task), task);
 					searchResult.add(pair);
 				}
 			}
 			return searchResult;
 		}
 	}
-	public void markDown(int index, TaskType type){
+	public static void markDown(int index, TaskType type){
 		if(type.equals(TaskType.EVENT) || type.equals(TaskType.DEADLINE)){
-			this.eventDeadlineTaskList.get(index).setStatus(true);
+			eventDeadlineTaskList.get(index).setStatus(true);
 		} 
 		else{
-			this.floatTaskList.get(index).setStatus(true);
+			floatTaskList.get(index).setStatus(true);
 		}
 	}
 	public void update(){
