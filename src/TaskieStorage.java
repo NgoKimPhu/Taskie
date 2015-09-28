@@ -207,7 +207,59 @@ public class TaskieStorage {
 		}
 	}
 	
+	// if you want to search all the tasks contains the key words, search twice
+	public ArrayList<IndexTaskPair> searchTask(ArrayList<String> keyWords, TaskType type){
+		for(String keyWord: keyWords){
+			keyWord = keyWord.toUpperCase();
+		}
+		if(type.equals(TaskType.EVENT) || type.equals(TaskType.DEADLINE)){
+			ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
+			for(Task task: this.eventDeadlineTaskList){
+				boolean check = true;
+				String stringForCompare = new String(task.getTitle());
+				for(String keyWord: keyWords){
+					if(!stringForCompare.toUpperCase().contains(keyWord)){
+						check = false;
+					}
+				}
+				if(check == true){
+					IndexTaskPair pair = new IndexTaskPair(this.eventDeadlineTaskList.indexOf(task), task);
+					searchResult.add(pair);
+				}
+			}
+			return searchResult;
+		}
+		else{
+			ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
+			for(Task task: this.floatTaskList){
+				boolean check = true;
+				String stringForCompare = new String(task.getTitle());
+				for(String keyWord: keyWords){
+					if(!stringForCompare.toUpperCase().contains(keyWord)){
+						check = false;
+					}
+				}
+				if(check == true){
+					IndexTaskPair pair = new IndexTaskPair(this.floatTaskList.indexOf(task), task);
+					searchResult.add(pair);
+				}
+			}
+			return searchResult;
+		}
+	}
+	public void markDown(int index, TaskType type){
+		if(type.equals(TaskType.EVENT) || type.equals(TaskType.DEADLINE)){
+			this.eventDeadlineTaskList.get(index).setStatus(true);
+		} 
+		else{
+			this.floatTaskList.get(index).setStatus(true);
+		}
+	}
+	public void update(){
+		
+	}
 }
+
 
 class FileHandler{	
 	private static final Pattern EVENT_DEADLINE_TASK_LINE_PATTERN = Pattern.compile("^(EVENT|DEADLINE)\\s(.+)\\s(.+)\\s(.+)\\s([01234])\\s\\([01])\\n$");

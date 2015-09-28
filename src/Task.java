@@ -260,3 +260,24 @@ class TaskComparator implements Comparator<Task> {
 	}
 	
 }
+
+class IndexTaskPair{
+	private int index;
+	private Task task;
+	public IndexTaskPair(int index, Task task){
+		this.index = index;
+		this.task = task;
+	}
+	public int getIndex(){
+		return this.index;
+	}
+	public Task getTask(){
+		return this.task;
+	}
+	public void setIndex(int index){
+		this.index = index;
+	}
+	public void setTask(Task task){
+		this.task = task;
+	}
+}
