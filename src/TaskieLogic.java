@@ -8,20 +8,18 @@ public class TaskieLogic {
 	
 	public static String[] execute(String str) {
 		TaskieAction action = TaskieParser.parse(str);
-		Collection<TaskieTask> taskList = dispatch(action);
+		Collection<TaskieTask> taskList = takeAction(action);
 		// To read the taskList and return a String array
 	}
 	
 	
 
-	private static Collection<TaskieTask> dispatch(TaskieAction action) {
+	private static Collection<TaskieTask> takeAction(TaskieAction action) {
 		switch (action.getType()) {
 			case ADD:
-				add(action.getTask());
-				break;
+				return add(action.getTask());
 			default:
-				System.out.println("What are you looking for?");
-				break;
+				return add(action.getTask()); // Will be changed to final message
 		}
 	}
 	
