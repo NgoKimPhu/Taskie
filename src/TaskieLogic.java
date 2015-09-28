@@ -3,11 +3,13 @@ import java.util.Collection;
 
 public class TaskieLogic {
 	
-	//private static TaskieAction action;
+	public TaskieLogic() {
+	}
 	
 	public static String[] execute(String str) {
 		TaskieAction action = TaskieParser.parse(str);
-		Collection<Task> taskList = dispatch(action);
+		Collection<TaskieTask> taskList = dispatch(action);
+		// To read the taskList and return a String array
 	}
 	
 	

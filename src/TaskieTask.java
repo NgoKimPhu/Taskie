@@ -1,3 +1,4 @@
+package src;
 /** 
  * This the the Task class for this project.
  * @author Qin Xueying
@@ -5,7 +6,7 @@
  */
 import java.util.*;
 
-public class Task {
+public class TaskieTask {
 	private TaskType type;
 	private String title;
 	//private long id;
@@ -19,7 +20,7 @@ public class Task {
 	// keep counting the no. of tasks create and be used as the task id.
 	//private static long count = 0;	
 	// create float task.
-	public Task(String title){
+	public TaskieTask(String title){
 		this.type = TaskType.FLOAT;
 		this.title = title;
 		this.description = new String();
@@ -31,7 +32,7 @@ public class Task {
 		this.status = false;
 	}
 	// create float task with specific priority.
-	public Task(String title, TaskPriority priority){
+	public TaskieTask(String title, TaskPriority priority){
 		//this.count+=1;
 		this.type = TaskType.FLOAT;
 		this.title = title;
@@ -43,7 +44,7 @@ public class Task {
 		this.status = false;
 	}
 	// load existing float task
-	public Task(String title, TaskType type, TaskPriority priority, Date startTime, boolean status, String description) throws Exception{
+	public TaskieTask(String title, TaskType type, TaskPriority priority, Date startTime, boolean status, String description) throws Exception{
 		//this.count+=1;
 		if(!type.equals(TaskType.FLOAT)){
 			throw new Exception("Task type not match.");
@@ -60,7 +61,7 @@ public class Task {
 		}
 	}
 	// create deadline task.
-	public Task(String title, Date endTime){
+	public TaskieTask(String title, Date endTime){
 		//this.count+=1;
 		this.type = TaskType.DEADLINE;
 		this.title = title;
@@ -72,7 +73,7 @@ public class Task {
 		this.status = false;
 	}
 	// create deadline task with specific priority.
-	public Task(String title, Date endTime, TaskPriority priority){
+	public TaskieTask(String title, Date endTime, TaskPriority priority){
 		//this.count+=1;
 		this.type = TaskType.DEADLINE;
 		this.title = title;
@@ -84,7 +85,7 @@ public class Task {
 		this.status = false;
 	}
 	// create event.
-	public Task(String title, Date startTime, Date endTime){
+	public TaskieTask(String title, Date startTime, Date endTime){
 		//this.count+=1;
 		this.type = TaskType.EVENT;
 		this.title = title;
@@ -96,7 +97,7 @@ public class Task {
 		this.status = false;
 	}
 	// create event with specific priority.
-	public Task(String title, Date startTime, Date endTime, TaskPriority priority){
+	public TaskieTask(String title, Date startTime, Date endTime, TaskPriority priority){
 		//this.count+=1;
 		this.type = TaskType.EVENT;
 		this.title = title;
@@ -108,7 +109,7 @@ public class Task {
 		this.status = false;
 	}
 	// load deadline task or event
-	public Task(String title, TaskType type, Date startTime, Date endTime, TaskPriority priority, boolean status, String description) throws Exception{
+	public TaskieTask(String title, TaskType type, Date startTime, Date endTime, TaskPriority priority, boolean status, String description) throws Exception{
 		if(type.equals(TaskType.FLOAT)){
 			throw new Exception("Task type not match.");
 		}
@@ -204,8 +205,8 @@ enum TaskPriority{
 	VERY_HIGH, HIGH, MEDIUM, LOW, VERY_LOW;
 }
 
-class TaskComparator implements Comparator<Task> {
-	public int compare(Task task1, Task task2){
+class TaskComparator implements Comparator<TaskieTask> {
+	public int compare(TaskieTask task1, TaskieTask task2){
 		if(task1.getType().equals(TaskType.FLOAT)){
 			if(!task2.getType().equals(TaskType.FLOAT)){
 				return 1;
