@@ -7,7 +7,6 @@ import java.util.*;
 import java.io.*;
 import java.util.regex.*;
 import java.text.*;
-
 import org.json.*;
 
 public class TaskieStorage {
@@ -149,7 +148,7 @@ public class TaskieStorage {
 			return this.floatTaskList;
 		}
 	}
-	public ArrayList deleteTask(String keyWord, TaskType type){
+	public ArrayList<Task> deleteTask(String keyWord, TaskType type){
 		keyWord = keyWord.toUpperCase();
 		if(type.equals(TaskType.EVENT) || type.equals(TaskType.DEADLINE)){
 			for(Task task: this.eventDeadlineTaskList){
@@ -185,6 +184,24 @@ public class TaskieStorage {
 						this.floatPriorityMap.remove(task.getPriority());
 					}
 				}
+			}
+			return this.floatTaskList;
+		}
+	}
+	public ArrayList<Task> deleteTask(TaskPriority priority, TaskType type){
+		if(type.equals(TaskType.EVENT) || type.equals(TaskType.DEADLINE)){
+			ArrayList<Task> taskListToDelete = this.eventDeadlinePriorityMap.get(priority);
+			this.eventDeadlinePriorityMap.remove(priority, taskListToDelete);
+			for(Task task: taskListToDelete){
+				this.eventDeadlineTaskList.remove(task);
+			}
+			return this.eventDeadlineTaskList;
+		}
+		else{
+			ArrayList<Task> taskListToDelete = this.floatPriorityMap.get(priority);
+			this.floatPriorityMap.remove(priority, taskListToDelete);
+			for(Task task: taskListToDelete){
+				this.floatTaskList.remove(task);
 			}
 			return this.floatTaskList;
 		}

@@ -201,6 +201,7 @@ enum TaskType{
 	EVENT, DEADLINE, FLOAT;
 }
 enum TaskPriority{
+	//from 0 to 4
 	VERY_HIGH, HIGH, MEDIUM, LOW, VERY_LOW;
 }
 
