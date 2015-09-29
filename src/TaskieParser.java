@@ -44,7 +44,7 @@ public final class TaskieParser {
 				if (matcher.find()) {
 					
 				}
-				return new TaskieAction(actionType, null);
+				return new TaskieAction(actionType, new TaskieTask(commandData));
 				
 			default:
 				return new TaskieAction(TaskieEnum.Actions.INVALID, null);
