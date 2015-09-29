@@ -1,4 +1,4 @@
-package src;
+
 /** 
  * This the the Task class for this project.
  * @author Qin Xueying
