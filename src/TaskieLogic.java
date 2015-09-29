@@ -9,7 +9,11 @@ import java.util.Collection;
 public class TaskieLogic {
 	
 	public static void initialise() {
-		TaskieStorage.load("");
+		try {
+			TaskieStorage.load("");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static String[][] execute(String str) {

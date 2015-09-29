@@ -19,8 +19,8 @@ public class TaskieStorage {
 	private static HashMap<Date, ArrayList<TaskieTask>> eventDeadlineStartDateMap;
 	private static HashMap<Date, ArrayList<TaskieTask>> eventDeadlineEndDateMap;
 	private static HashMap<Date, ArrayList<TaskieTask>> floatDateMap;
-	private static HashMap<TaskPriority, ArrayList<TaskieTask>> eventDeadlinePriorityMap;
-	private static HashMap<TaskPriority, ArrayList<TaskieTask>> floatPriorityMap;
+	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> eventDeadlinePriorityMap;
+	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> floatPriorityMap;
 	private static Stack<HashMap<String, Object>> commandStack;
 	private static TaskComparator tc = new TaskComparator();
 
@@ -42,8 +42,8 @@ public class TaskieStorage {
 		eventDeadlineStartDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
 		eventDeadlineEndDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
 		floatDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
-		eventDeadlinePriorityMap = new HashMap<TaskPriority, ArrayList<TaskieTask>>();
-		floatPriorityMap = new HashMap<TaskPriority, ArrayList<TaskieTask>>();
+		eventDeadlinePriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
+		floatPriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
 		commandStack = new Stack<HashMap<String, Object>>();
 	}
 
@@ -79,8 +79,8 @@ public class TaskieStorage {
 	}
 
 	public static ArrayList<TaskieTask> addTask(TaskieTask task) {
-		if (task.getType().equals(TaskType.EVENT)
-				|| task.getType().equals(TaskType.DEADLINE)) {
+		if (task.getType().equals(TaskieEnum.TaskType.EVENT)
+				|| task.getType().equals(TaskieEnum.TaskType.DEADLINE)) {
 			eventDeadlineTaskList.add(task);
 			Collections.sort(eventDeadlineTaskList, tc);
 			for(TaskieTask t: eventDeadlineTaskList){
@@ -143,8 +143,8 @@ public class TaskieStorage {
 		}
 	}
 
-	public static ArrayList<TaskieTask> deleteTask(int index, TaskType type) {
-		if (type.equals(TaskType.EVENT) || type.equals(TaskType.DEADLINE)) {
+	public static ArrayList<TaskieTask> deleteTask(int index, TaskieEnum.TaskType type) {
+		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
 			TaskieTask task = eventDeadlineTaskList.remove(index);
 			eventDeadlineStartDateMap.get(task.getStartTime()).remove(task);
 			if (eventDeadlineStartDateMap.get(task.getStartTime()).size() == 0) {
@@ -178,11 +178,11 @@ public class TaskieStorage {
 
 	// if you want to search all the tasks contains the key words, search twice
 	public static ArrayList<IndexTaskPair> searchTask(
-			ArrayList<String> keyWords, TaskType type) {
+			ArrayList<String> keyWords, TaskieEnum.TaskType type) {
 		for (String keyWord : keyWords) {
 			keyWord = keyWord.toUpperCase();
 		}
-		if (type.equals(TaskType.EVENT) || type.equals(TaskType.DEADLINE)) {
+		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
 			ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 			for (TaskieTask task : eventDeadlineTaskList) {
 				boolean check = true;
@@ -219,8 +219,8 @@ public class TaskieStorage {
 		}
 	}
 
-	public static void markDown(int index, TaskType type) {
-		if (type.equals(TaskType.EVENT) || type.equals(TaskType.DEADLINE)) {
+	public static void markDown(int index, TaskieEnum.TaskType type) {
+		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
 			eventDeadlineTaskList.get(index).setStatus(true);
 		} else {
 			floatTaskList.get(index).setStatus(true);
@@ -253,10 +253,10 @@ class FileHandler {
 				JSONObject taskLine= new JSONObject(line);
 				JSONObject taskData = taskLine.getJSONObject("task");
 				String title= taskData.getString("title");
-				TaskType type = getTaskType(taskData.getInt("type"));
+				TaskieEnum.TaskType type = getTaskType(taskData.getInt("type"));
 				Date start = getDate(taskData.getString("start-time"));
 				Date end = getDate(taskData.getString("end-time"));
-				TaskPriority priority = getTaskPriority(taskData.getInt("priority"));
+				TaskieEnum.TaskPriority priority = getTaskPriority(taskData.getInt("priority"));
 				boolean status = taskData.getBoolean("status");
 				String description = taskData.getString("description");
 				TaskieTask task = new TaskieTask(title, type, start, end, priority, status, description);
@@ -280,9 +280,9 @@ class FileHandler {
 				JSONObject taskLine= new JSONObject(line);
 				JSONObject taskData = taskLine.getJSONObject("task");
 				String title= taskData.getString("title");
-				TaskType type = getTaskType(taskData.getInt("type"));
+				TaskieEnum.TaskType type = getTaskType(taskData.getInt("type"));
 				Date start = getDate(taskData.getString("start-time"));
-				TaskPriority priority = getTaskPriority(taskData.getInt("priority"));
+				TaskieEnum.TaskPriority priority = getTaskPriority(taskData.getInt("priority"));
 				boolean status = taskData.getBoolean("status");
 				String description = taskData.getString("description");
 				TaskieTask task = new TaskieTask(title, type,  priority, start, status, description);
@@ -297,9 +297,9 @@ class FileHandler {
 	}
 
 	// Write content in to a file.
-	public static void writeFile(File file, TaskieTask task, TaskType type) {
+	public static void writeFile(File file, TaskieTask task, TaskieEnum.TaskType type) {
 		String fileName = file.getName();
-		if (type.equals(TaskType.EVENT) || type.equals(TaskType.DEADLINE)) {
+		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
 			try {
 				FileWriter writer = new FileWriter(fileName, true);
 				JSONWriter jWriter = new JSONWriter(writer);
@@ -394,13 +394,13 @@ class FileHandler {
 		return date;
 	}
 
-	private static TaskType getTaskType(int type) {
+	private static TaskieEnum.TaskType getTaskType(int type) {
 		if (isEvent(type)) {
-			return TaskType.EVENT;
+			return TaskieEnum.TaskType.EVENT;
 		} else if (isDeadline(type)) {
-			return TaskType.DEADLINE;
+			return TaskieEnum.TaskType.DEADLINE;
 		} else {
-			return TaskType.FLOAT;
+			return TaskieEnum.TaskType.FLOAT;
 		}
 	}
 
@@ -416,17 +416,17 @@ class FileHandler {
 		return type == 2;
 	}
 
-	private static TaskPriority getTaskPriority(int priority) {
+	private static TaskieEnum.TaskPriority getTaskPriority(int priority) {
 		if (priority==0) {
-			return TaskPriority.VERY_HIGH;
+			return TaskieEnum.TaskPriority.VERY_HIGH;
 		} else if (priority==1) {
-			return TaskPriority.HIGH;
+			return TaskieEnum.TaskPriority.HIGH;
 		} else if (priority==2) {
-			return TaskPriority.MEDIUM;
+			return TaskieEnum.TaskPriority.MEDIUM;
 		} else if (priority==3) {
-			return TaskPriority.LOW;
+			return TaskieEnum.TaskPriority.LOW;
 		} else {
-			return TaskPriority.VERY_LOW;
+			return TaskieEnum.TaskPriority.VERY_LOW;
 		}
 	}
 }
