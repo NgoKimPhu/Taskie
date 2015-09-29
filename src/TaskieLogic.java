@@ -1,6 +1,5 @@
 import java.util.Collection;
 
-
 public class TaskieLogic {
 	
 	public TaskieLogic() {
@@ -9,7 +8,17 @@ public class TaskieLogic {
 	public static String[] execute(String str) {
 		TaskieAction action = TaskieParser.parse(str);
 		Collection<TaskieTask> taskList = takeAction(action);
-		// To read the taskList and return a String array
+		String[] screen = display(taskList);
+		return screen;
+	}
+	
+	public static String[] display(Collection<TaskieTask> taskList) {
+		String[] screen = new String[taskList.size()];
+		int index = 0;
+		for (TaskieTask task : taskList) {
+			screen[index] = task.getTitle();
+		}
+		return screen;
 	}
 	
 	
