@@ -16,7 +16,7 @@ public final class TaskieParser {
 	
 	private static ArrayList<String>[] commandStrings;
 	
-	private TaskieParser() {
+	public TaskieParser() {
 		commandStrings = new ArrayList[TaskieEnum.Actions.values().length];
 		for (int i = 0; i < commandStrings.length; i++){
 			commandStrings[i] = new ArrayList<>();
