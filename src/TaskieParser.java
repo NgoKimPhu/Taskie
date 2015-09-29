@@ -38,7 +38,14 @@ public final class TaskieParser {
 		String actionTypeString = getFirstWord(command);
 
 		TaskieEnum.Actions actionType = determineTaskieAction(actionTypeString);
-		String commandData = (actionType == TaskieEnum.Actions.INVALID) ? command : removeFirstWord(command);
+		
+		String commandData;
+		if (actionType == TaskieEnum.Actions.INVALID) {
+			actionType = TaskieEnum.Actions.ADD;
+			commandData = command;
+		} else {
+			commandData = removeFirstWord(command);
+		}
 
 		switch (actionType) {
 			case ADD:
