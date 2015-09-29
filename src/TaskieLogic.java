@@ -37,7 +37,7 @@ public class TaskieLogic {
 		String[] screen = new String[taskList.size()];
 		int index = 0;
 		for (TaskieTask task : taskList) {
-			screen[index] = index + ". " + task.getTitle();
+			screen[index] = index + 1 + ". " + task.getTitle();
 		}
 		return screen;
 	}
