@@ -7,34 +7,34 @@
 import java.util.*;
 
 public class TaskieTask {
-	private TaskType type;
+	private TaskieEnum.TaskType type;
 	private String title;
 	//private long id;
 	private String description;
 	private Date startTime;
 	private Date endTime;
 	// we provide 5 levels of priorities;
-	private TaskPriority priority;
+	private TaskieEnum.TaskPriority priority;
 	// true==done, false==haven't done;
 	private boolean status;
 	// keep counting the no. of tasks create and be used as the task id.
 	//private static long count = 0;	
 	// create float task.
 	public TaskieTask(String title){
-		this.type = TaskType.FLOAT;
+		this.type = TaskieEnum.TaskType.FLOAT;
 		this.title = title;
 		this.description = new String();
 		// start from the moment it is created
 		this.startTime = new Date();
 		this.endTime = null;
 		// the new task's priority is the lowest
-		this.priority = TaskPriority.VERY_LOW;
+		this.priority = TaskieEnum.TaskPriority.VERY_LOW;
 		this.status = false;
 	}
 	// create float task with specific priority.
-	public TaskieTask(String title, TaskPriority priority){
+	public TaskieTask(String title, TaskieEnum.TaskPriority priority){
 		//this.count+=1;
-		this.type = TaskType.FLOAT;
+		this.type = TaskieEnum.TaskType.FLOAT;
 		this.title = title;
 		//this.id = this.count;
 		this.description = new String();
@@ -44,13 +44,13 @@ public class TaskieTask {
 		this.status = false;
 	}
 	// load existing float task
-	public TaskieTask(String title, TaskType type, TaskPriority priority, Date startTime, boolean status, String description) throws Exception{
+	public TaskieTask(String title, TaskieEnum.TaskType type, TaskieEnum.TaskPriority priority, Date startTime, boolean status, String description) throws Exception{
 		//this.count+=1;
-		if(!type.equals(TaskType.FLOAT)){
+		if(!type.equals(TaskieEnum.TaskType.FLOAT)){
 			throw new Exception("Task type not match.");
 		}
 		else{
-			this.type = TaskType.FLOAT;
+			this.type = TaskieEnum.TaskType.FLOAT;
 			this.title = title;
 			//this.id = this.count;
 			this.description = description;
@@ -63,19 +63,19 @@ public class TaskieTask {
 	// create deadline task.
 	public TaskieTask(String title, Date endTime){
 		//this.count+=1;
-		this.type = TaskType.DEADLINE;
+		this.type = TaskieEnum.TaskType.DEADLINE;
 		this.title = title;
 		//this.id = this.count;
 		this.description = new String();
 		this.startTime = new Date();
 		this.endTime = endTime;
-		this.priority = TaskPriority.VERY_LOW;
+		this.priority = TaskieEnum.TaskPriority.VERY_LOW;
 		this.status = false;
 	}
 	// create deadline task with specific priority.
-	public TaskieTask(String title, Date endTime, TaskPriority priority){
+	public TaskieTask(String title, Date endTime, TaskieEnum.TaskPriority priority){
 		//this.count+=1;
-		this.type = TaskType.DEADLINE;
+		this.type = TaskieEnum.TaskType.DEADLINE;
 		this.title = title;
 		//this.id = this.count;
 		this.description = new String();
@@ -87,19 +87,19 @@ public class TaskieTask {
 	// create event.
 	public TaskieTask(String title, Date startTime, Date endTime){
 		//this.count+=1;
-		this.type = TaskType.EVENT;
+		this.type = TaskieEnum.TaskType.EVENT;
 		this.title = title;
 		//this.id = this.count;
 		this.description = new String();
 		this.startTime = startTime;
 		this.endTime = endTime;
-		this.priority = TaskPriority.VERY_LOW;
+		this.priority = TaskieEnum.TaskPriority.VERY_LOW;
 		this.status = false;
 	}
 	// create event with specific priority.
-	public TaskieTask(String title, Date startTime, Date endTime, TaskPriority priority){
+	public TaskieTask(String title, Date startTime, Date endTime, TaskieEnum.TaskPriority priority){
 		//this.count+=1;
-		this.type = TaskType.EVENT;
+		this.type = TaskieEnum.TaskType.EVENT;
 		this.title = title;
 		//this.id = this.count;
 		this.description = new String();
@@ -109,8 +109,8 @@ public class TaskieTask {
 		this.status = false;
 	}
 	// load deadline task or event
-	public TaskieTask(String title, TaskType type, Date startTime, Date endTime, TaskPriority priority, boolean status, String description) throws Exception{
-		if(type.equals(TaskType.FLOAT)){
+	public TaskieTask(String title, TaskieEnum.TaskType type, Date startTime, Date endTime, TaskieEnum.TaskPriority priority, boolean status, String description) throws Exception{
+		if(type.equals(TaskieEnum.TaskType.FLOAT)){
 			throw new Exception("Task type not match.");
 		}
 		else{
@@ -127,25 +127,25 @@ public class TaskieTask {
 	public void setTitle(String title){
 		this.title = title;
 	}
-	public void setPriority(TaskPriority priority){
+	public void setPriority(TaskieEnum.TaskPriority priority){
 		this.priority = priority;
 	}
 	public void setToFloat(){
 		this.endTime = null;
-		this.type = TaskType.FLOAT;
+		this.type = TaskieEnum.TaskType.FLOAT;
 	}
 	public void setToDeadline(Date endTime){
 		this.endTime = endTime;
-		this.type = TaskType.DEADLINE;
+		this.type = TaskieEnum.TaskType.DEADLINE;
 	}
 	public void setToEvent(Date startTime, Date endTime){
 		this.startTime = startTime;
 		this.endTime = endTime;
-		this.type = TaskType.EVENT;
+		this.type = TaskieEnum.TaskType.EVENT;
 	}
 	public boolean setStartTime(Date startTime){
 		// only reasonable to change the start time of an event;
-		if(this.type.equals(TaskType.EVENT)){
+		if(this.type.equals(TaskieEnum.TaskType.EVENT)){
 			this.startTime = startTime;
 			return true;
 		}
@@ -156,7 +156,7 @@ public class TaskieTask {
 		}
 	}
 	public boolean setEndTime(Date endTime){
-		if(this.type.equals(TaskType.EVENT) || this.type.equals(TaskType.DEADLINE)){
+		if(this.type.equals(TaskieEnum.TaskType.EVENT) || this.type.equals(TaskieEnum.TaskType.DEADLINE)){
 			this.endTime = endTime;
 			return true;
 		}
@@ -170,7 +170,7 @@ public class TaskieTask {
 	public void setDescription(String description){
 		this.description = description;
 	}
-	public TaskType getType(){
+	public TaskieEnum.TaskType getType(){
 		return this.type;
 	}
 	public String getTitle(){
@@ -193,23 +193,15 @@ public class TaskieTask {
 	public boolean getStatus(){
 		return this.status;
 	}
-	public TaskPriority getPriority(){
+	public TaskieEnum.TaskPriority getPriority(){
 		return this.priority;
 	}
 }
 
-enum TaskType{
-	EVENT, DEADLINE, FLOAT;
-}
-enum TaskPriority{
-	//from 0 to 4
-	VERY_HIGH, HIGH, MEDIUM, LOW, VERY_LOW;
-}
-
 class TaskComparator implements Comparator<TaskieTask> {
 	public int compare(TaskieTask task1, TaskieTask task2){
-		if(task1.getType().equals(TaskType.FLOAT)){
-			if(!task2.getType().equals(TaskType.FLOAT)){
+		if(task1.getType().equals(TaskieEnum.TaskType.FLOAT)){
+			if(!task2.getType().equals(TaskieEnum.TaskType.FLOAT)){
 				return 1;
 			}
 			else{
@@ -230,7 +222,7 @@ class TaskComparator implements Comparator<TaskieTask> {
 			}
 		}
 		else{
-			if(task2.getType().equals(TaskType.FLOAT)){
+			if(task2.getType().equals(TaskieEnum.TaskType.FLOAT)){
 				return -1;
 			}
 			else{
