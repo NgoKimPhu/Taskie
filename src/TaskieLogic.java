@@ -24,7 +24,7 @@ public class TaskieLogic {
 	}
 	
 	private static Collection<TaskieTask> add(TaskieTask task) {
-		return TaskieStorage.add(task);
+		return TaskieStorage.addTask(task);
 	}
 	
 }

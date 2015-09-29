@@ -13,13 +13,13 @@ public class TaskieStorage {
 <<<<<<< HEAD
 	private static File eventDeadlineTask;
 	private static File floatTask;
-	private static ArrayList<Task> eventDeadlineTaskList;
-	private static ArrayList<Task> floatTaskList;
-	private static HashMap<Date, ArrayList<Task>> eventDeadlineStartDateMap;
-	private static HashMap<Date, ArrayList<Task>> eventDeadlineEndDateMap;
-	private static HashMap<Date, ArrayList<Task>> floatDateMap;
-	private static HashMap<TaskPriority, ArrayList<Task>> eventDeadlinePriorityMap;
-	private static HashMap<TaskPriority, ArrayList<Task>> floatPriorityMap;
+	private static ArrayList<TaskieTask> eventDeadlineTaskList;
+	private static ArrayList<TaskieTask> floatTaskList;
+	private static HashMap<Date, ArrayList<TaskieTask>> eventDeadlineStartDateMap;
+	private static HashMap<Date, ArrayList<TaskieTask>> eventDeadlineEndDateMap;
+	private static HashMap<Date, ArrayList<TaskieTask>> floatDateMap;
+	private static HashMap<TaskPriority, ArrayList<TaskieTask>> eventDeadlinePriorityMap;
+	private static HashMap<TaskPriority, ArrayList<TaskieTask>> floatPriorityMap;
 	private static Stack<HashMap<String, Object>> commandStack;
 	private static TaskComparator tc = new TaskComparator();
 =======
@@ -74,18 +74,18 @@ public class TaskieStorage {
 	}
 	
 <<<<<<< HEAD
-	public static ArrayList<Task> displayEventDeadline(){
+	public static ArrayList<TaskieTask> displayEventDeadline(){
 		return eventDeadlineTaskList;
 	}
-	public static ArrayList<Task> displayFloatTask(){
+	public static ArrayList<TaskieTask> displayFloatTask(){
 		return floatTaskList;
 	}
-	public static ArrayList<Task> addTask(Task task){
+	public static ArrayList<TaskieTask> addTask(TaskieTask task){
 		if(task.getType().equals(TaskType.EVENT)||task.getType().equals(TaskType.DEADLINE)){
 			eventDeadlineTaskList.add(task);
 			Collections.sort(eventDeadlineTaskList, tc);
 			if(!eventDeadlineStartDateMap.containsKey(task.getStartTime())){
-				ArrayList<Task> tasks = new ArrayList<Task>();
+				ArrayList<TaskieTask> tasks = new ArrayList<TaskieTask>();
 =======
 	public ArrayList<TaskieTask> displayEventDeadline(){
 		return this.eventDeadlineTaskList;
@@ -108,7 +108,7 @@ public class TaskieStorage {
 			}
 <<<<<<< HEAD
 			if(!eventDeadlineEndDateMap.containsKey(task.getEndTime())){
-				ArrayList<Task> tasks = new ArrayList<Task>();
+				ArrayList<TaskieTask> tasks = new ArrayList<TaskieTask>();
 =======
 			if(!this.eventDeadlineEndDateMap.containsKey(task.getEndTime())){
 				ArrayList<TaskieTask> tasks = new ArrayList<TaskieTask>();
@@ -121,7 +121,7 @@ public class TaskieStorage {
 			}
 <<<<<<< HEAD
 			if(!eventDeadlinePriorityMap.containsKey(task.getPriority())){
-				ArrayList<Task> tasks = new ArrayList<Task>();
+				ArrayList<TaskieTask> tasks = new ArrayList<TaskieTask>();
 =======
 			if(!this.eventDeadlinePriorityMap.containsKey(task.getPriority())){
 				ArrayList<TaskieTask> tasks = new ArrayList<TaskieTask>();
@@ -139,7 +139,7 @@ public class TaskieStorage {
 			floatTaskList.add(task);
 			Collections.sort(floatTaskList, tc);
 			if(!floatDateMap.containsKey(task.getStartTime())){
-				ArrayList<Task> tasks = new ArrayList<Task>();
+				ArrayList<TaskieTask> tasks = new ArrayList<TaskieTask>();
 =======
 			this.floatTaskList.add(task);
 			Collections.sort(this.floatTaskList, tc);
@@ -154,7 +154,7 @@ public class TaskieStorage {
 			}
 <<<<<<< HEAD
 			if(!floatPriorityMap.containsKey(task.getPriority())){
-				ArrayList<Task> tasks = new ArrayList<Task>();
+				ArrayList<TaskieTask> tasks = new ArrayList<TaskieTask>();
 =======
 			if(!this.floatPriorityMap.containsKey(task.getPriority())){
 				ArrayList<TaskieTask> tasks = new ArrayList<TaskieTask>();
@@ -170,7 +170,7 @@ public class TaskieStorage {
 	}
 	
 <<<<<<< HEAD
-	public static ArrayList<Task> deleteTask(int index, TaskType type){
+	public static ArrayList<TaskieTask> deleteTask(int index, TaskType type){
 		if(type.equals(TaskType.EVENT) || type.equals(TaskType.DEADLINE)){
 			Task task = eventDeadlineTaskList.remove(index);
 			eventDeadlineStartDateMap.get(task.getStartTime()).remove(task);
@@ -217,7 +217,7 @@ public class TaskieStorage {
 	}
 	
 	/*
-	public static ArrayList<Task> deleteTask(String keyWord, TaskType type){
+	public static ArrayList<TaskieTask> deleteTask(String keyWord, TaskType type){
 		keyWord = keyWord.toUpperCase();
 		if(type.equals(TaskType.EVENT) || type.equals(TaskType.DEADLINE)){
 <<<<<<< HEAD
@@ -265,9 +265,9 @@ public class TaskieStorage {
 			return floatTaskList;
 		}
 	}
-	public ArrayList<Task> deleteTask(TaskPriority priority, TaskType type){
+	public ArrayList<TaskieTask> deleteTask(TaskPriority priority, TaskType type){
 		if(type.equals(TaskType.EVENT) || type.equals(TaskType.DEADLINE)){
-			ArrayList<Task> taskListToDelete = this.eventDeadlinePriorityMap.get(priority);
+			ArrayList<TaskieTask> taskListToDelete = this.eventDeadlinePriorityMap.get(priority);
 			this.eventDeadlinePriorityMap.remove(priority, taskListToDelete);
 			for(Task task: taskListToDelete){
 				this.eventDeadlineTaskList.remove(task);
@@ -275,7 +275,7 @@ public class TaskieStorage {
 			return this.eventDeadlineTaskList;
 		}
 		else{
-			ArrayList<Task> taskListToDelete = this.floatPriorityMap.get(priority);
+			ArrayList<TaskieTask> taskListToDelete = this.floatPriorityMap.get(priority);
 			this.floatPriorityMap.remove(priority, taskListToDelete);
 			for(Task task: taskListToDelete){
 				this.floatTaskList.remove(task);
