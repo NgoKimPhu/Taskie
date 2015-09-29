@@ -1,8 +1,6 @@
 import java.util.*;
-
-import TextBuddy.CommandType;
-import TextBuddy.TaskieAction;
-import TextBuddy.TaskieEnum.Actions;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Ngo Kim Phu
@@ -10,6 +8,11 @@ import TextBuddy.TaskieEnum.Actions;
  */
 public final class TaskieParser {
 	private static final String MESSAGE_INVALID_COMMAND_FORMAT = "invalid command format : %1$s";
+	private static final String timeRangePatternString = 
+			"^\\d{1,2}\\s?(am|pm|([.:h ]\\s?\\d{1,2}\\s?m?)?)\\s?"
+			+ "(-|~|to|till|until)\\s?"
+			+ "\\d{1,2}\\s?(am|pm|([.:h ]\\s?\\d{1,2}\\s?m?)?)$";
+	private static final String timePatternString = "^\\d{1,2}\\s?(am|pm|([.:h ]\\s?\\d{1,2}\\s?m?)?)$";
 	
 	private static ArrayList<String>[] commandStrings;
 	
@@ -19,37 +22,55 @@ public final class TaskieParser {
 			commandStrings[i] = new ArrayList<>();
 	    }
 		// TODO load values from raw text files
-		commandStrings[TaskieEnum.Actions.ADD].add("add");
+		commandStrings[TaskieEnum.Actions.ADD.ordinal()].add("add");
 	}
 	
 	protected static TaskieAction parse (String inputString) {
 		String command = inputString.trim();
 		
 		if (command.isEmpty()) {
-			return String.format(MESSAGE_INVALID_COMMAND_FORMAT, command);
+			return new TaskieAction(TaskieEnum.Actions.INVALID, null);
 		}
 
 		String actionTypeString = getFirstWord(command);
 
-		TaskieEnum.Actions actionType = determineCommandType(actionTypeString);
+		TaskieEnum.Actions actionType = determineTaskieAction(actionTypeString);
+		String commandData = (actionType != TaskieEnum.Actions.INVALID) ? command : removeFirstWord(command);
 
-		return new TaskieAction(actionType, null);
+		switch (actionType) {
+			case ADD:
+				Pattern timeRangePattern = Pattern.compile(timeRangePatternString);
+				Matcher matcher = timeRangePattern.matcher(commandData);
+				if (matcher.find()) {
+					
+				}
+				return new TaskieAction(actionType, null);
+				
+			default:
+				return new TaskieAction(TaskieEnum.Actions.INVALID, null);
+		}
+		
 	}
 	
 	private static TaskieEnum.Actions determineTaskieAction(String actionTypeString) {
-		if (TaskieActionString == null) {
+		if (actionTypeString == null) {
 			throw new Error("command type string cannot be null!");
 		}
 
 		for (TaskieEnum.Actions action : TaskieEnum.Actions.values()) {
-			if commandStrings[action].contains(actionTypeString) {
+			if (commandStrings[action.ordinal()].contains(actionTypeString)) {
 				return action;
+			}
 		}
 		
-		return TaskieAction.INVALID;
+		return TaskieEnum.Actions.INVALID;
 	}
 	
 	private static String getFirstWord (String inputString) {
 		return inputString.split("\\s+")[0];
+	}
+	
+	private static String removeFirstWord(String inputString) {
+		return inputString.substring(getFirstWord(inputString).length()).trim();
 	}
 }
