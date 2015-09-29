@@ -19,7 +19,7 @@ public class TaskieLogic {
 			case ADD:
 				return add(action.getTask());
 			default:
-				return add(action.getTask()); // Will be changed to final message
+				return add(action.getTask());
 		}
 	}
 	
