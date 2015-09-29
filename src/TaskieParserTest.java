@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TaskieTaskTest {
+public class TaskieParserTest {
 
 	@Before
 	public void setUp() throws Exception {
