@@ -1,4 +1,7 @@
-
+/**
+ * @author Qin_ShiHuang
+ *
+ */
 public class TaskieEnum {
 	
 	public static enum Actions {

@@ -1,4 +1,7 @@
-
+/**
+ * @author Qin_ShiHuang
+ *
+ */
 public class TaskieAction {
 	
 	private TaskieEnum.Actions type;
