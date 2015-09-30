@@ -1,8 +1,4 @@
 package fancy4.taskie.view;
-/**
- * JavaFx view controller
- * @author Lu_Yu
- */
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
