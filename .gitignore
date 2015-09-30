@@ -1,7 +1,8 @@
 /bin/
 
-.classpath
+*.classpath
 *.class
-
+*.json
+.gitignore
 
 .DS_Store
