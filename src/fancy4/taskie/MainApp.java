@@ -3,7 +3,7 @@ package fancy4.taskie;
 import java.io.IOException;
 import java.util.Date;
 
-import fancy4.taskie.model.TaskieLogic;
+import fancy4.taskie.model.*;
 import fancy4.taskie.view.TaskieOverviewController;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -19,9 +19,14 @@ public class MainApp extends Application {
     private Stage primaryStage;
     private BorderPane rootLayout;
     public static ObservableList<String> taskData = FXCollections.observableArrayList();
+    
     public static String[] data = {};
     public MainApp() {
-    	data = TaskieLogic.execute("")[0];
+    	//data = TaskieLogic.execute("add order a pizza")[0];
+    	TaskieLogic.initialise();
+    	String command = "add dummy line for testing";
+    	String[][] screen = TaskieLogic.execute(command);
+    	data = screen[0];
     	System.out.println(data.length);
     	taskData.addAll(data);
    

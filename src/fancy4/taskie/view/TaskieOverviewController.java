@@ -56,9 +56,9 @@ public class TaskieOverviewController {
 			ObservableList<String> taskData = FXCollections.observableArrayList();
 		
 			input = textInput.getText();
-			String[] d;
+			String[] d ;
 			d = TaskieLogic.execute(input)[0];
-			//taskData.addAll(d);
+			taskData.addAll(d);
 			mainTaskTable.getItems().removeAll(MainApp.taskData);
 			mainTaskTable.getItems().addAll(d);
 			
