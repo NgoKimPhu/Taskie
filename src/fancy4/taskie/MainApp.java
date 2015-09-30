@@ -1,8 +1,6 @@
 package fancy4.taskie;
 
 import java.io.IOException;
-import java.util.Date;
-
 import fancy4.taskie.model.*;
 import fancy4.taskie.view.TaskieOverviewController;
 import javafx.application.Application;
