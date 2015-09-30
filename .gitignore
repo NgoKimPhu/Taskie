@@ -1,7 +1,10 @@
-
+.classpath
 *.classpath
 *.class
 *.json
-.gitignore
 *.project
+bin/
+.settings/
+
+
 
