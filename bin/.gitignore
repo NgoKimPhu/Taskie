@@ -1,2 +1,4 @@
 /fancy4/
 *.class
+*.classpath
+*.project
