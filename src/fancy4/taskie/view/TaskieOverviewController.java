@@ -1,4 +1,7 @@
 package fancy4.taskie.view;
+/*
+ * @author Lu Yu
+ */
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -31,17 +34,17 @@ public class TaskieOverviewController {
 	private TextField textInput;
 	@FXML
 	private TextArea textOutput;
+
 	private MainApp mainApp;
 
-
-
+    private String textOutputResponse = "";
+    
 	public TaskieOverviewController() {
 
 	}
 
 	@FXML
 	private void initialize() {
-
 		TaskieLogic.initialise();
 		taskColumn.setCellValueFactory(new Callback<CellDataFeatures<String, String>, ObservableValue<String>>() {
 			public ObservableValue<String> call(CellDataFeatures<String, String> p) {
@@ -50,20 +53,25 @@ public class TaskieOverviewController {
 		});
 	}
 
+
 	public void inputEnter(KeyEvent event) {
 		String input;
 		if (event.getCode() == KeyCode.ENTER) {
 			ObservableList<String> taskData = FXCollections.observableArrayList();
-		
+
 			input = textInput.getText();
-			String[] d ;
-			d = TaskieLogic.execute(input)[0];
-			taskData.addAll(d);
+			String[][] fromLogic = TaskieLogic.execute(input);
+			String[] data;
+			data = fromLogic[0];
+			String response =  fromLogic[1][0];
+			taskData.addAll(data);
 			mainTaskTable.getItems().removeAll(MainApp.taskData);
-			mainTaskTable.getItems().addAll(d);
-			
-			System.out.println(d.length);
-			
+			mainTaskTable.getItems().addAll(data);
+			textOutputResponse += "input: " + input + "\n" + "response: " + response + "\n";
+			textOutput.setText(textOutputResponse);
+			//System.out.println(d.length);
+			textOutput.selectPositionCaret(textOutput.getLength()); 
+			textOutput.deselect();
 			textInput.clear();
 		}
 

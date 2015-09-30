@@ -1,8 +1,11 @@
-/bin/
 
 *.classpath
 *.class
 *.json
 .gitignore
 
-.DS_Store
+
+*.class
+*.classpath
+*.project
+>>>>>>> origin/master
