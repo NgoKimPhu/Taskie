@@ -84,6 +84,9 @@ public class TaskieStorage {
 				|| task.getType().equals(TaskieEnum.TaskType.DEADLINE)) {
 			eventDeadlineTaskList.add(task);
 			Collections.sort(eventDeadlineTaskList, tc);
+			if(eventDeadlineTask.exists()){
+				FileHandler.clear(eventDeadlineTask);
+			}
 			for(TaskieTask t: eventDeadlineTaskList){
 				//System.out.println(t.getTitle());
 				FileHandler.writeFile(eventDeadlineTask, t, t.getType());
@@ -118,7 +121,9 @@ public class TaskieStorage {
 		} else {
 			floatTaskList.add(task);
 			Collections.sort(floatTaskList, tc);
-			Collections.sort(eventDeadlineTaskList, tc);
+			
+				FileHandler.clear(floatTask);
+			
 			for(TaskieTask t: floatTaskList){
 				//System.out.println(t.getTitle());
 				FileHandler.writeFile(floatTask, t, t.getType());
@@ -302,7 +307,7 @@ class FileHandler {
 		String fileName = file.getName();
 		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
 			try {
-				FileWriter writer = new FileWriter(fileName, true);
+				FileWriter writer = new FileWriter(fileName,true);
 				JSONWriter jWriter = new JSONWriter(writer);
 				jWriter.object();
 				jWriter.key("task");
@@ -339,7 +344,7 @@ class FileHandler {
 		}
 		else{
 			try {
-				FileWriter writer = new FileWriter(fileName, true);
+				FileWriter writer = new FileWriter(fileName,true);
 				JSONWriter jWriter = new JSONWriter(writer);
 				jWriter.object();
 				jWriter.key("task");
@@ -371,6 +376,17 @@ class FileHandler {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	public static void clear(File file){
+		String fileName = file.getName();
+		try {
+			FileWriter writer = new FileWriter(fileName);
+			writer.write("");
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
