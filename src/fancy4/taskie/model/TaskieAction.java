@@ -1,14 +1,11 @@
 package fancy4.taskie.model;
-
-import fancy4.taskie.model.TaskieEnum.Actions;
-
 /**
  * @author Qin_ShiHuang
  *
  */
 public class TaskieAction {
 	
-	private Actions type;
+	private TaskieEnum.Actions type;
 	private TaskieTask task;
 	private	int index;
 	
@@ -22,7 +19,7 @@ public class TaskieAction {
 		this.index = index;
 	}
 	
-	public Actions getType() {
+	public TaskieEnum.Actions getType() {
 		return type;
 	}
 	

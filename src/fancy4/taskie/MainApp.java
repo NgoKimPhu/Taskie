@@ -1,4 +1,4 @@
-package src.fancy4.taskie;
+package fancy4.taskie;
 
 import java.io.IOException;
 import java.util.Date;
