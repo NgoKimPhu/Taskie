@@ -67,7 +67,8 @@ public class TaskieOverviewController {
 			textOutputResponse += "input: " + input + "\n" + "response: " + response + "\n";
 			textOutput.setText(textOutputResponse);
 			//System.out.println(d.length);
-
+			textOutput.selectPositionCaret(textOutput.getLength()); 
+			textOutput.deselect();
 			textInput.clear();
 		}
 
