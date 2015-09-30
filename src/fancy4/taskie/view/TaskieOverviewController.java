@@ -1,4 +1,7 @@
 package fancy4.taskie.view;
+/*
+ * @author Lu Yu
+ */
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
