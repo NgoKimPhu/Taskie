@@ -3,9 +3,5 @@
 *.class
 *.json
 .gitignore
-
-
-*.class
-*.classpath
 *.project
->>>>>>> origin/master
+
