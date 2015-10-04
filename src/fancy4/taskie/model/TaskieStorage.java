@@ -17,9 +17,9 @@ public class TaskieStorage {
 	private static File floatTask;
 	private static ArrayList<TaskieTask> eventDeadlineTaskList;
 	private static ArrayList<TaskieTask> floatTaskList;
-	private static HashMap<Date, ArrayList<TaskieTask>> eventDeadlineStartDateMap;
+	private static HashMap<Date, ArrayList<TaskieTask>> eventStartDateMap;
 	private static HashMap<Date, ArrayList<TaskieTask>> eventDeadlineEndDateMap;
-	private static HashMap<Date, ArrayList<TaskieTask>> floatDateMap;
+	//private static HashMap<Date, ArrayList<TaskieTask>> floatDateMap;
 	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> eventDeadlinePriorityMap;
 	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> floatPriorityMap;
 	private static Stack<HashMap<String, Object>> commandStack;
@@ -28,24 +28,74 @@ public class TaskieStorage {
 	public static void load(String pathName) throws Exception {
 		eventDeadlineTask = new File(pathName +"/eventDeadline.json");
 		floatTask = new File(pathName+"/floatTask.json");
+		eventStartDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
+		eventDeadlineEndDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
+		eventDeadlinePriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
+		floatPriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
+		commandStack = new Stack<HashMap<String, Object>>();
 		if(eventDeadlineTask.exists()){
 			eventDeadlineTaskList = FileHandler.readFile(eventDeadlineTask);
+			for(TaskieTask task: eventDeadlineTaskList){
+				// deal with event start time
+				if(TaskieTask.isEvent(task)){
+					//keep two copies of date-task pair in map, one with specific time one without
+					Date start = task.getStartTime();
+					Date startKey = createDateKey(start);
+					if(!eventStartDateMap.containsKey(start)){
+						eventStartDateMap.put(start, new ArrayList<TaskieTask>());
+					}
+					eventStartDateMap.get(start).add(task);
+					if(!eventStartDateMap.containsKey(startKey)){
+						eventStartDateMap.put(startKey, new ArrayList<TaskieTask>());
+					}
+					eventStartDateMap.get(startKey).add(task);	
+				}
+				//deal with end time
+				Date end = task.getEndTime();
+				Date endKey = createDateKey(end);
+				if(!eventDeadlineEndDateMap.containsKey(end)){
+					eventDeadlineEndDateMap.put(end, new ArrayList<TaskieTask>());
+				}
+				eventDeadlineEndDateMap.get(end).add(task);
+				if(!eventDeadlineEndDateMap.containsKey(endKey)){
+					eventDeadlineEndDateMap.put(endKey, new ArrayList<TaskieTask>());
+				}
+				eventDeadlineEndDateMap.get(endKey).add(task);
+				//deal with priority
+				TaskieEnum.TaskPriority priority = task.getPriority();
+				if(!eventDeadlinePriorityMap.containsKey(priority)){
+					eventDeadlinePriorityMap.put(priority, new ArrayList<TaskieTask>());
+				}
+				eventDeadlinePriorityMap.get(priority).add(task);
+			}
+			
 		}
 		else{
 			eventDeadlineTaskList = new ArrayList<TaskieTask>();
 		}
 		if(floatTask.exists()){
 			floatTaskList = FileHandler.readFile(floatTask);
+			for(TaskieTask task: floatTaskList){
+				TaskieEnum.TaskPriority priority = task.getPriority();
+				if(!floatPriorityMap.containsKey(priority)){
+					floatPriorityMap.put(priority, new ArrayList<TaskieTask>());
+				}
+				floatPriorityMap.get(priority).add(task);
+			}
 		}
 		else{
 			floatTaskList = new ArrayList<TaskieTask>();
 		}
-		eventDeadlineStartDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
-		eventDeadlineEndDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
-		floatDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
-		eventDeadlinePriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
-		floatPriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
-		commandStack = new Stack<HashMap<String, Object>>();
+	}
+	private static Date createDateKey(Date date){
+		Calendar calendar = Calendar.getInstance();
+		Calendar calendarForKey = Calendar.getInstance();
+		calendar.setTime(date);
+		calendarForKey.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
+		calendarForKey.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
+		calendarForKey.set(Calendar.DATE, calendar.get(Calendar.DATE));
+		Date key = calendarForKey.getTime();
+		return key;
 	}
 
 	// use to modify command stack after processing each command.
@@ -78,23 +128,27 @@ public class TaskieStorage {
 	public static ArrayList<TaskieTask> displayFloatTask() {
 		return floatTaskList;
 	}
-
+	
+	// add task
 	public static ArrayList<TaskieTask> addTask(TaskieTask task) {
-		if (task.getType().equals(TaskieEnum.TaskType.EVENT)
-				|| task.getType().equals(TaskieEnum.TaskType.DEADLINE)) {
+		if (TaskieTask.isEvent(task)
+				|| TaskieTask.isDeadline(task)) {
 			eventDeadlineTaskList.add(task);
 			Collections.sort(eventDeadlineTaskList, tc);
+			FileHandler.clearFile(eventDeadlineTask);
 			for(TaskieTask t: eventDeadlineTaskList){
 				//System.out.println(t.getTitle());
 				FileHandler.writeFile(eventDeadlineTask, t, t.getType());
 			}
-			if (!eventDeadlineStartDateMap.containsKey(task.getStartTime())) {
-				ArrayList<TaskieTask> tasks = new ArrayList<TaskieTask>();
+			if(TaskieTask.isEvent(task)){
+				if (!eventStartDateMap.containsKey(task.getStartTime())) {
+					ArrayList<TaskieTask> tasks = new ArrayList<TaskieTask>();
 
-				tasks.add(task);
-				eventDeadlineStartDateMap.put(task.getStartTime(), tasks);
-			} else {
-				eventDeadlineStartDateMap.get(task.getStartTime()).add(task);
+					tasks.add(task);
+					eventStartDateMap.put(task.getStartTime(), tasks);
+				} else {
+					eventStartDateMap.get(task.getStartTime()).add(task);
+				}
 			}
 
 			if (!eventDeadlineEndDateMap.containsKey(task.getEndTime())) {
@@ -117,19 +171,7 @@ public class TaskieStorage {
 			return eventDeadlineTaskList;
 		} else {
 			floatTaskList.add(task);
-			Collections.sort(floatTaskList, tc);
-			for(TaskieTask t: floatTaskList){
-				//System.out.println(t.getTitle());
-				FileHandler.writeFile(floatTask, t, t.getType());
-			}
-			if (!floatDateMap.containsKey(task.getStartTime())) {
-				ArrayList<TaskieTask> tasks = new ArrayList<TaskieTask>();
-
-				tasks.add(task);
-				floatDateMap.put(task.getStartTime(), tasks);
-			} else {
-				floatDateMap.get(task.getStartTime()).add(task);
-			}
+			FileHandler.writeFile(floatTask, task, task.getType());
 
 			if (!floatPriorityMap.containsKey(task.getPriority())) {
 				ArrayList<TaskieTask> tasks = new ArrayList<TaskieTask>();
@@ -146,9 +188,17 @@ public class TaskieStorage {
 	public static ArrayList<TaskieTask> deleteTask(int index, TaskieEnum.TaskType type) {
 		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
 			TaskieTask task = eventDeadlineTaskList.remove(index);
+<<<<<<< HEAD
 			eventDeadlineStartDateMap.get(task.getStartTime()).remove(task);
 			if (eventDeadlineStartDateMap.get(task.getStartTime()).size() == 0) {
 				eventDeadlineStartDateMap.remove(task.getStartTime());
+=======
+			if(TaskieTask.isEvent(task)){
+				eventStartDateMap.get(task.getStartTime()).remove(task);
+				if (eventStartDateMap.get(task.getStartTime()).size() == 0) {
+					eventStartDateMap.remove(task.getStartTime());
+				}
+>>>>>>> 1b703a4... edit load
 			}
 			eventDeadlineEndDateMap.get(task.getEndTime()).remove(task);
 			if (eventDeadlineEndDateMap.get(task.getEndTime()).size() == 0) {
@@ -162,11 +212,6 @@ public class TaskieStorage {
 		} else {
 
 			TaskieTask task = floatTaskList.get(index);
-			floatDateMap.get(task.getStartTime()).remove(task);
-			if (floatDateMap.get(task.getStartTime()).size() == 0) {
-				floatDateMap.remove(task.getStartTime());
-
-			}
 			floatPriorityMap.get(task.getPriority()).remove(task);
 			if (floatPriorityMap.get(task.getPriority()).size() == 0) {
 				floatPriorityMap.remove(task.getPriority());
@@ -232,12 +277,6 @@ public class TaskieStorage {
 }
 
 class FileHandler {
-	/*
-	private static final Pattern EVENT_DEADLINE_TASK_LINE_PATTERN = Pattern
-			.compile("^(EVENT|DEADLINE)\\s(.+)\\s(.+)\\s(.+)\\s([01234])\\s\\([01])\\n$");
-	private static final Pattern FLOAT_TASK_LINE_PATTERN = Pattern
-			.compile("^(FLOAT)\\s(.+)\\s(.+)\\s(.+)\\s([01234])\\s\\([01])\\n$");
-	*/
 	private static final SimpleDateFormat sdf = new SimpleDateFormat(
 			"dd-MM-yyyy HH:mm");
 
@@ -253,7 +292,7 @@ class FileHandler {
 				JSONObject taskData = taskLine.getJSONObject("task");
 				String title= taskData.getString("title");
 				TaskieEnum.TaskType type = getTaskType(taskData.getInt("type"));
-				Date start = getDate(taskData.getString("start-time"));
+				Date start = type.equals(TaskieEnum.TaskType.DEADLINE)? null:getDate(taskData.getString("start-time"));
 				Date end = getDate(taskData.getString("end-time"));
 				TaskieEnum.TaskPriority priority = getTaskPriority(taskData.getInt("priority"));
 				boolean status = taskData.getBoolean("status");
@@ -312,7 +351,7 @@ class FileHandler {
 				jWriter.value(task.getType().ordinal());
 				
 				jWriter.key("start-time");
-				jWriter.value(sdf.format(task.getStartTime()));
+				jWriter.value(type.equals(TaskieEnum.TaskType.DEADLINE)? "null": sdf.format(task.getStartTime()));
 				
 				jWriter.key("end-time");
 				jWriter.value(sdf.format(task.getEndTime()));
@@ -369,6 +408,17 @@ class FileHandler {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	public static void clearFile(File file){
+		String fileName = file.getName();
+		try {
+			FileWriter writer = new FileWriter(fileName);
+			writer.write("");
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
