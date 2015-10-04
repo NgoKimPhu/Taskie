@@ -8,6 +8,7 @@ public class TaskieAction {
 	private TaskieEnum.Actions type;
 	private TaskieTask task;
 	private	int index;
+	private Object keyword;
 	
 	public TaskieAction(TaskieEnum.Actions type, TaskieTask task) {
 		this.type = type;
@@ -17,6 +18,11 @@ public class TaskieAction {
 	public TaskieAction(TaskieEnum.Actions type, TaskieTask task, int index) {
 		this(type, task);
 		this.index = index;
+	}
+	
+	public TaskieAction(TaskieEnum.Actions type, String keyword) {
+		this.type = type;
+		this.keyword = keyword;
 	}
 	
 	public TaskieEnum.Actions getType() {
@@ -30,5 +36,10 @@ public class TaskieAction {
 	public TaskieTask getTask() {
 		return task;
 	}
-
+	
+	public Object getSearch() {
+		return this.keyword;
+	}
+	
+	
 }
