@@ -27,7 +27,9 @@ public class TaskieLogic {
 			case ADD:
 				return add(action.getTask());
 			case DELETE:
-//				return delete(action.getIndex());
+				return delete(action.getIndex(), action.getTask().getType());
+			case UPDATE:
+				return update();
 			default:
 				return add(action.getTask());
 		}
@@ -48,9 +50,16 @@ public class TaskieLogic {
 		String[] feedback = new String[] {task.getTitle() + " is added"};
 		return new String[][] {tasks, feedback};
 	}
-/*	
-	private static Collection<TaskieTask> delete(int index) {
-		return TaskieStorage.deleteTask(index, );
+	
+	private static String[][] delete(int index, TaskieEnum.TaskType type) {
+		Collection<TaskieTask> taskList = TaskieStorage.deleteTask(index, type);
+		String[] tasks = display(taskList);
+		String[] feedback = new String[] {task.getTitle() + " is added"};
+		return new String[][] {tasks, feedback};
 	}
-*/	
+	
+	private static String[][] update(int index, TaskieEnum.TaskType type) {
+		
+	}
+	
 }

@@ -149,7 +149,6 @@ public class TaskieStorage {
 			eventDeadlineStartDateMap.get(task.getStartTime()).remove(task);
 			if (eventDeadlineStartDateMap.get(task.getStartTime()).size() == 0) {
 				eventDeadlineStartDateMap.remove(task.getStartTime());
-
 			}
 			eventDeadlineEndDateMap.get(task.getEndTime()).remove(task);
 			if (eventDeadlineEndDateMap.get(task.getEndTime()).size() == 0) {

@@ -5,7 +5,7 @@
 public class TaskieEnum {
 	
 	public static enum Actions {
-		ADD, DELETE, UNDO, CLEAR, SEARCH, SORT, INVALID
+		ADD, DELETE, UNDO, CLEAR, SEARCH, SORT, UPDATE, INVALID
 	}
 	
 	public static enum TaskType {
