@@ -1,3 +1,4 @@
+package fancy4.taskie.model;
 
 /** 
  * This the the Task class for this project.

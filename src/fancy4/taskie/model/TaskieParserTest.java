@@ -1,3 +1,4 @@
+package fancy4.taskie.model;
 import static org.junit.Assert.*;
 
 import org.junit.After;

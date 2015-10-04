@@ -1,3 +1,4 @@
+package fancy4.taskie.model;
 /**
  * The Taskie storage component
  * @author Qin Xueying

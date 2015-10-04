@@ -1,3 +1,4 @@
+package fancy4.taskie.model;
 /**
  * @author Qin_ShiHuang 
  *

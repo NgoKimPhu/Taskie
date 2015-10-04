@@ -1,3 +1,4 @@
+package fancy4.taskie.model;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

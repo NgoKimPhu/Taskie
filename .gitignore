@@ -1,7 +1,10 @@
-/bin/
-
 .classpath
+*.classpath
 *.class
+*.json
+*.project
+bin/
+.settings/
 
 
-.DS_Store
+
