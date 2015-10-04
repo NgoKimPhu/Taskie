@@ -8,6 +8,6 @@ CS2103 project team w13-1j
    * git status
    * git commit -m "..."
    * git fetch
-   * git rebuse -i origin/master
-     * git rebuse --continue
+   * git rebase -i origin/master
+     * git rebase --continue
    * git push
