@@ -26,7 +26,7 @@ public class TaskieTask {
 		this.title = title;
 		this.description = new String();
 		// start from the moment it is created
-		this.startTime = new Date();
+		this.startTime = null;
 		this.endTime = null;
 		// the new task's priority is the lowest
 		this.priority = TaskieEnum.TaskPriority.VERY_LOW;
@@ -39,13 +39,13 @@ public class TaskieTask {
 		this.title = title;
 		//this.id = this.count;
 		this.description = new String();
-		this.startTime = new Date();
+		this.startTime = null;
 		this.endTime = null;
 		this.priority = priority;
 		this.status = false;
 	}
 	// load existing float task
-	public TaskieTask(String title, TaskieEnum.TaskType type, TaskieEnum.TaskPriority priority, Date startTime, boolean status, String description) throws Exception{
+	public TaskieTask(String title, TaskieEnum.TaskType type, TaskieEnum.TaskPriority priority, boolean status, String description) throws Exception{
 		//this.count+=1;
 		if(!type.equals(TaskieEnum.TaskType.FLOAT)){
 			throw new Exception("Task type not match.");
@@ -55,7 +55,7 @@ public class TaskieTask {
 			this.title = title;
 			//this.id = this.count;
 			this.description = description;
-			this.startTime = startTime;
+			this.startTime = null;
 			this.endTime = null;
 			this.priority = priority;
 			this.status = status;
