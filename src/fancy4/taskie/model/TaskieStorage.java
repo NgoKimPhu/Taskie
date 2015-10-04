@@ -118,7 +118,6 @@ public class TaskieStorage {
 		} else {
 			floatTaskList.add(task);
 			Collections.sort(floatTaskList, tc);
-			Collections.sort(eventDeadlineTaskList, tc);
 			for(TaskieTask t: floatTaskList){
 				//System.out.println(t.getTitle());
 				FileHandler.writeFile(floatTask, t, t.getType());
@@ -281,11 +280,11 @@ class FileHandler {
 				JSONObject taskData = taskLine.getJSONObject("task");
 				String title= taskData.getString("title");
 				TaskieEnum.TaskType type = getTaskType(taskData.getInt("type"));
-				Date start = getDate(taskData.getString("start-time"));
+				//Date start = getDate(taskData.getString("start-time"));
 				TaskieEnum.TaskPriority priority = getTaskPriority(taskData.getInt("priority"));
 				boolean status = taskData.getBoolean("status");
 				String description = taskData.getString("description");
-				TaskieTask task = new TaskieTask(title, type,  priority, start, status, description);
+				TaskieTask task = new TaskieTask(title, type,  priority, status, description);
 				fileContent.add(task);
 				line = in.readLine();
 			}
@@ -350,8 +349,8 @@ class FileHandler {
 				jWriter.key("type");
 				jWriter.value(task.getType().ordinal());
 				
-				jWriter.key("start-time");
-				jWriter.value(sdf.format(task.getStartTime()));
+				//jWriter.key("start-time");
+				//jWriter.value(sdf.format(task.getStartTime()));
 				
 				jWriter.key("priority");
 				jWriter.value(task.getPriority().ordinal());

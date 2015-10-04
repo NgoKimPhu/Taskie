@@ -57,15 +57,15 @@ public class TaskieOverviewController {
 	public void inputEnter(KeyEvent event) {
 		String input;
 		if (event.getCode() == KeyCode.ENTER) {
-			ObservableList<String> taskData = FXCollections.observableArrayList();
+			//ObservableList<String> taskData = FXCollections.observableArrayList();
 
 			input = textInput.getText();
 			String[][] fromLogic = TaskieLogic.execute(input);
 			String[] data;
 			data = fromLogic[0];
 			String response =  fromLogic[1][0];
-			taskData.addAll(data);
-			mainTaskTable.getItems().removeAll(MainApp.taskData);
+			//taskData.addAll(data);
+			//mainTaskTable.getItems().removeAll(MainApp.taskData);
 			mainTaskTable.getItems().addAll(data);
 			textOutputResponse += "input: " + input + "\n" + "response: " + response + "\n";
 			textOutput.setText(textOutputResponse);
