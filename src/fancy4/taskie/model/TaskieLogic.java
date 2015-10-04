@@ -16,6 +16,8 @@ public class TaskieLogic {
 	public static void initialise() {
 		try {
 			TaskieStorage.load("");
+			searchResult = new ArrayList<TaskieTask>();
+			indexSave = new ArrayList<Integer>();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -36,7 +38,7 @@ public class TaskieLogic {
 			case SEARCH:
 				Object searchKey = action.getSearch(); 
 				if (searchKey instanceof String)
-					return search((ArrayList<String>) action.getSearch(), action.getTask().getType());
+					return search((ArrayList<String>)action.getSearch(), action.getTask().getType());
 				//else if 
 			case UPDATE:
 				//return update();
@@ -77,12 +79,17 @@ public class TaskieLogic {
 	 * @return
 	 */
 	
-	//private static String[][] update(int index, TaskieEnum.TaskType type) {
-	//}
-	
 	private static String[][] search(ArrayList<String> keyword, TaskieEnum.TaskType type) {
 		Collection<IndexTaskPair> taskList = TaskieStorage.searchTask(keyword, type);
-		return null;
+		searchResult.clear();
+		indexSave.clear();
+		for (IndexTaskPair pair : taskList) {
+			searchResult.add(pair.getTask());
+			indexSave.add(pair.getIndex());
+		}
+		String[] tasks = display(searchResult);
+		String[] feedback = new String[] {"Search finished in 0.00019 seconds."};
+		return new String[][] {tasks, feedback};
 	}
 /*
 	private static String[][] search(Date date, TaskieEnum.TaskType type) {
