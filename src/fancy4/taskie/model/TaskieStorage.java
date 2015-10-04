@@ -188,17 +188,11 @@ public class TaskieStorage {
 	public static ArrayList<TaskieTask> deleteTask(int index, TaskieEnum.TaskType type) {
 		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
 			TaskieTask task = eventDeadlineTaskList.remove(index);
-<<<<<<< HEAD
-			eventDeadlineStartDateMap.get(task.getStartTime()).remove(task);
-			if (eventDeadlineStartDateMap.get(task.getStartTime()).size() == 0) {
-				eventDeadlineStartDateMap.remove(task.getStartTime());
-=======
 			if(TaskieTask.isEvent(task)){
 				eventStartDateMap.get(task.getStartTime()).remove(task);
 				if (eventStartDateMap.get(task.getStartTime()).size() == 0) {
 					eventStartDateMap.remove(task.getStartTime());
 				}
->>>>>>> 1b703a4... edit load
 			}
 			eventDeadlineEndDateMap.get(task.getEndTime()).remove(task);
 			if (eventDeadlineEndDateMap.get(task.getEndTime()).size() == 0) {
