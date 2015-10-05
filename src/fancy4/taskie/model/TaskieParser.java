@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
  */
 public final class TaskieParser {
 	private static final String MESSAGE_INVALID_COMMAND_FORMAT = "invalid command format : %1$s";
+	private static final String datePatternString = "^\\d{1,2}\\s?(/|.|-)?\\d{1,2}$";
 	private static final String timeRangePatternString = 
 			"^\\d{1,2}\\s?(am|pm|([.:h ]\\s?\\d{1,2}\\s?m?)?)\\s?"
 			+ "(-|~|to|till|until)\\s?"
@@ -33,7 +34,7 @@ public final class TaskieParser {
 		String command = inputString.trim();
 		
 		if (command.isEmpty()) {
-			return new TaskieAction(TaskieEnum.Actions.INVALID, null);
+			return new TaskieAction(TaskieEnum.Actions.INVALID, (TaskieTask) null);
 		}
 
 		String actionTypeString = getFirstWord(command);
@@ -58,7 +59,7 @@ public final class TaskieParser {
 				return new TaskieAction(actionType, new TaskieTask(commandData));
 				
 			default:
-				return new TaskieAction(TaskieEnum.Actions.INVALID, null);
+				return new TaskieAction(TaskieEnum.Actions.INVALID, (TaskieTask) null);
 		}
 		
 	}
