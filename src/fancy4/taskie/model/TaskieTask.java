@@ -203,6 +203,9 @@ public class TaskieTask {
 	public static boolean isFloat(TaskieTask task){
 		return task.getType().equals(TaskieEnum.TaskType.FLOAT);
 	}
+	public static boolean isDone(TaskieTask task){
+		return task.getStatus()==true;
+	}
 }
 
 // This comparator will only be used when we sorting event and float tasks
@@ -284,8 +287,17 @@ class TaskComparator implements Comparator<TaskieTask> {
 				}
 			}
 		}
+		// float
 		else{
-			return task1.getTitle().compareTo(task2.getTitle());
+			if(!task1.getStatus() && task2.getStatus()){
+				return -1;
+			}
+			else if(task1.getStatus() && !task2.getStatus()){
+				return 1;
+			} 
+			else{
+				return task1.getTitle().compareTo(task2.getTitle());
+			}
 		}
 	}
 	
