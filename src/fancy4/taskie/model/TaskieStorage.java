@@ -195,28 +195,31 @@ public class TaskieStorage {
 
 	public static ArrayList<TaskieTask> deleteTask(int index, TaskieEnum.TaskType type) {
 		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
-			TaskieTask task = eventDeadlineTaskList.remove(index);
-			FileHandler.clearFile(eventDeadlineTask);
-			for(TaskieTask remainingTask: eventDeadlineTaskList){
-				FileHandler.writeFile(eventDeadlineTask, remainingTask);
-			}
-			if(TaskieTask.isEvent(task)){
-				eventStartDateMap.get(task.getStartTime()).remove(task);
-				if (eventStartDateMap.get(task.getStartTime()).size() == 0) {
-					eventStartDateMap.remove(task.getStartTime());
+			TaskieTask task = eventDeadlineTaskList.get(index);
+			if(task.getType().equals(type)){
+				task = eventDeadlineTaskList.remove(index);
+				FileHandler.clearFile(eventDeadlineTask);
+				for(TaskieTask remainingTask: eventDeadlineTaskList){
+					FileHandler.writeFile(eventDeadlineTask, remainingTask);
 				}
-			}
-			eventDeadlineEndDateMap.get(task.getEndTime()).remove(task);
-			if (eventDeadlineEndDateMap.get(task.getEndTime()).size() == 0) {
-				eventDeadlineEndDateMap.remove(task.getEndTime());
-			}
-			eventDeadlinePriorityMap.get(task.getPriority()).remove(task);
-			if (eventDeadlinePriorityMap.get(task.getPriority()).size() == 0) {
-				eventDeadlinePriorityMap.remove(task.getPriority());
+				if(TaskieTask.isEvent(task)){
+					eventStartDateMap.get(task.getStartTime()).remove(task);
+					if (eventStartDateMap.get(task.getStartTime()).size() == 0) {
+						eventStartDateMap.remove(task.getStartTime());
+					}
+				}
+				eventDeadlineEndDateMap.get(task.getEndTime()).remove(task);
+				if (eventDeadlineEndDateMap.get(task.getEndTime()).size() == 0) {
+					eventDeadlineEndDateMap.remove(task.getEndTime());
+				}
+				eventDeadlinePriorityMap.get(task.getPriority()).remove(task);
+				if (eventDeadlinePriorityMap.get(task.getPriority()).size() == 0) {
+					eventDeadlinePriorityMap.remove(task.getPriority());
+				}
 			}
 			return eventDeadlineTaskList;
 		} else {
-			TaskieTask task = floatTaskList.get(index);
+			TaskieTask task = floatTaskList.remove(index);
 			floatPriorityMap.get(task.getPriority()).remove(task);
 			FileHandler.clearFile(floatTask);
 			for(TaskieTask remainingTask: floatTaskList){
@@ -227,6 +230,21 @@ public class TaskieStorage {
 			}
 			return floatTaskList;
 		}
+	}
+	//delete all,return value index 0--eventDeadlineTask, 1--floatTask
+	public static ArrayList<ArrayList<TaskieTask>> deleteAll(){
+		FileHandler.clearFile(eventDeadlineTask);
+		FileHandler.clearFile(floatTask);
+		eventDeadlineTaskList = new ArrayList<TaskieTask>();
+		floatTaskList =  new ArrayList<TaskieTask>();
+		eventStartDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
+		eventDeadlineEndDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
+		eventDeadlinePriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
+		floatPriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
+		ArrayList<ArrayList<TaskieTask>> returnList = new ArrayList<ArrayList<TaskieTask>>();
+		returnList.add(eventDeadlineTaskList);
+		returnList.add(floatTaskList);
+		return returnList;
 	}
 
 	// if you want to search all the tasks contains the key words, search twice
@@ -271,6 +289,23 @@ public class TaskieStorage {
 			return searchResult;
 		}
 	}
+	
+	public static ArrayList<IndexTaskPair> searchTask(Date start){
+		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
+		if(!eventStartDateMap.containsKey(start)){
+			return searchResult;
+		}
+		else{
+			ArrayList<TaskieTask> tasks = eventStartDateMap.get(start);
+			for(TaskieTask task: tasks){
+				IndexTaskPair pair = new IndexTaskPair(eventDeadlineTaskList.indexOf(task), task);
+				searchResult.add(pair);
+			}
+			return searchResult;
+		}
+	}
+	
+	
 
 	public static void markDown(int index, TaskieEnum.TaskType type) {
 		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
@@ -348,10 +383,10 @@ class FileHandler {
 
 	// Write content in to a file.
 	public static void writeFile(File file, TaskieTask task) {
-		String fileName = file.getName();
+		//String fileName = file.getName();
 		if (TaskieTask.isEvent(task) || TaskieTask.isDeadline(task)) {
 			try {
-				FileWriter writer = new FileWriter(fileName, true);
+				FileWriter writer = new FileWriter(file, true);
 				JSONWriter jWriter = new JSONWriter(writer);
 				jWriter.object();
 				jWriter.key("task");
@@ -388,7 +423,7 @@ class FileHandler {
 		}
 		else{
 			try {
-				FileWriter writer = new FileWriter(fileName, true);
+				FileWriter writer = new FileWriter(file, true);
 				JSONWriter jWriter = new JSONWriter(writer);
 				jWriter.object();
 				jWriter.key("task");
@@ -424,9 +459,9 @@ class FileHandler {
 	}
 	
 	public static void clearFile(File file){
-		String fileName = file.getName();
+		//String fileName = file.getName();
 		try {
-			FileWriter writer = new FileWriter(fileName);
+			FileWriter writer = new FileWriter(file);
 			writer.write("");
 			writer.close();
 		} catch (IOException e) {
