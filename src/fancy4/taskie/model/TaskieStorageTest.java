@@ -1,16 +1,38 @@
 package fancy4.taskie.model;
 
+import java.util.*;
+
 public class TaskieStorageTest {
 
 	public static void main(String[] args){
 		// TODO Auto-generated method stub
 		try {
-			TaskieStorage.load("/test");
+			TaskieStorage.load("test");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		TaskieTask float1 = new TaskieTask("finish tutorial");
+		TaskieTask float2 = new TaskieTask("go to dinner with misaki");
+		TaskieTask deadline1 = new TaskieTask("finish assignment", getDate(2015, 10, 6));
+		TaskieTask event1 = new TaskieTask("meeting", getDate(2015, 10, 5, 14, 0), getDate(2015, 10, 5, 15, 0));
+		TaskieStorage.addTask(float1);
+		TaskieStorage.addTask(float2);
+		TaskieStorage.addTask(deadline1);
+		TaskieStorage.addTask(event1);
 
+	}
+	public static Date getDate(int year, int month, int day){
+		Calendar cal = Calendar.getInstance();
+		cal.set(year, month-1, day);
+		Date date = cal.getTime();
+		return date;
+	}
+	public static Date getDate(int year, int month, int day, int hour, int min){
+		Calendar cal = Calendar.getInstance();
+		cal.set(year, month-1, day, hour, min);
+		Date date = cal.getTime();
+		return date;
 	}
 
 }
