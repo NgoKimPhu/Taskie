@@ -6,6 +6,7 @@ package fancy4.taskie.model;
  */
 import java.util.*;
 import java.io.*;
+import java.nio.file.Files;
 import java.util.regex.*;
 import java.text.*;
 
@@ -26,8 +27,13 @@ public class TaskieStorage {
 	private static TaskComparator tc = new TaskComparator();
 
 	public static void load(String pathName) throws Exception {
-		eventDeadlineTask = new File(pathName +"/eventDeadline.json");
-		floatTask = new File(pathName+"/floatTask.json");
+		File folder = new File(pathName);
+		if(!folder.exists()){
+			folder.mkdir();
+		}
+		eventDeadlineTask = new File(folder, "/eventDeadline.json");
+		floatTask = new File(folder,  "/floatTask.json");
+		System.out.println(folder.toPath());
 		eventStartDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
 		eventDeadlineEndDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
 		eventDeadlinePriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
@@ -71,10 +77,11 @@ public class TaskieStorage {
 			
 		}
 		else{
+			eventDeadlineTask.createNewFile();
 			eventDeadlineTaskList = new ArrayList<TaskieTask>();
 		}
 		if(floatTask.exists()){
-			floatTaskList = FileHandler.readFile(floatTask);
+			floatTaskList = FileHandler.readFloatFile(floatTask);
 			for(TaskieTask task: floatTaskList){
 				TaskieEnum.TaskPriority priority = task.getPriority();
 				if(!floatPriorityMap.containsKey(priority)){
@@ -84,6 +91,7 @@ public class TaskieStorage {
 			}
 		}
 		else{
+			floatTask.createNewFile();
 			floatTaskList = new ArrayList<TaskieTask>();
 		}
 	}
@@ -138,7 +146,7 @@ public class TaskieStorage {
 			FileHandler.clearFile(eventDeadlineTask);
 			for(TaskieTask t: eventDeadlineTaskList){
 				//System.out.println(t.getTitle());
-				FileHandler.writeFile(eventDeadlineTask, t, t.getType());
+				FileHandler.writeFile(eventDeadlineTask, t);
 			}
 			if(TaskieTask.isEvent(task)){
 				if (!eventStartDateMap.containsKey(task.getStartTime())) {
@@ -171,7 +179,7 @@ public class TaskieStorage {
 			return eventDeadlineTaskList;
 		} else {
 			floatTaskList.add(task);
-			FileHandler.writeFile(floatTask, task, task.getType());
+			FileHandler.writeFile(floatTask, task);
 
 			if (!floatPriorityMap.containsKey(task.getPriority())) {
 				ArrayList<TaskieTask> tasks = new ArrayList<TaskieTask>();
@@ -188,6 +196,10 @@ public class TaskieStorage {
 	public static ArrayList<TaskieTask> deleteTask(int index, TaskieEnum.TaskType type) {
 		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
 			TaskieTask task = eventDeadlineTaskList.remove(index);
+			FileHandler.clearFile(eventDeadlineTask);
+			for(TaskieTask remainingTask: eventDeadlineTaskList){
+				FileHandler.writeFile(eventDeadlineTask, remainingTask);
+			}
 			if(TaskieTask.isEvent(task)){
 				eventStartDateMap.get(task.getStartTime()).remove(task);
 				if (eventStartDateMap.get(task.getStartTime()).size() == 0) {
@@ -204,9 +216,12 @@ public class TaskieStorage {
 			}
 			return eventDeadlineTaskList;
 		} else {
-
 			TaskieTask task = floatTaskList.get(index);
 			floatPriorityMap.get(task.getPriority()).remove(task);
+			FileHandler.clearFile(floatTask);
+			for(TaskieTask remainingTask: floatTaskList){
+				FileHandler.writeFile(floatTask, remainingTask);
+			}
 			if (floatPriorityMap.get(task.getPriority()).size() == 0) {
 				floatPriorityMap.remove(task.getPriority());
 			}
@@ -275,11 +290,11 @@ class FileHandler {
 			"dd-MM-yyyy HH:mm");
 
 	public static ArrayList<TaskieTask> readFile(File file) throws Exception {
-		String fileName = file.getName();
+		//String fileName = file.getName();
 		String line = new String();
 		ArrayList<TaskieTask> fileContent = new ArrayList<TaskieTask>();
 		try {
-			BufferedReader in = new BufferedReader(new FileReader(fileName));
+			BufferedReader in = new BufferedReader(new FileReader(file));
 			line = in.readLine();
 			while (line != null) {
 				JSONObject taskLine= new JSONObject(line);
@@ -296,17 +311,20 @@ class FileHandler {
 				line = in.readLine();
 			}
 			in.close();
+			for(TaskieTask t: fileContent){
+				System.out.println(t.getTitle());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return fileContent;
 	}
 	public static ArrayList<TaskieTask> readFloatFile(File file) throws Exception {
-		String fileName = file.getName();
+		//String fileName = file.getName();
 		String line = new String();
 		ArrayList<TaskieTask> fileContent = new ArrayList<TaskieTask>();
 		try {
-			BufferedReader in = new BufferedReader(new FileReader(fileName));
+			BufferedReader in = new BufferedReader(new FileReader(file));
 			line = in.readLine();
 			while (line != null) {
 				JSONObject taskLine= new JSONObject(line);
@@ -329,9 +347,9 @@ class FileHandler {
 	}
 
 	// Write content in to a file.
-	public static void writeFile(File file, TaskieTask task, TaskieEnum.TaskType type) {
+	public static void writeFile(File file, TaskieTask task) {
 		String fileName = file.getName();
-		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
+		if (TaskieTask.isEvent(task) || TaskieTask.isDeadline(task)) {
 			try {
 				FileWriter writer = new FileWriter(fileName, true);
 				JSONWriter jWriter = new JSONWriter(writer);
@@ -345,7 +363,7 @@ class FileHandler {
 				jWriter.value(task.getType().ordinal());
 				
 				jWriter.key("start-time");
-				jWriter.value(type.equals(TaskieEnum.TaskType.DEADLINE)? "null": sdf.format(task.getStartTime()));
+				jWriter.value(TaskieTask.isDeadline(task)? "null": sdf.format(task.getStartTime()));
 				
 				jWriter.key("end-time");
 				jWriter.value(sdf.format(task.getEndTime()));
