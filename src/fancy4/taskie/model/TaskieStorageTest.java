@@ -1,7 +1,7 @@
 package fancy4.taskie.model;
 
 import java.util.*;
-
+import org.junit.*;
 public class TaskieStorageTest {
 
 	public static void main(String[] args){
@@ -20,6 +20,8 @@ public class TaskieStorageTest {
 		TaskieStorage.addTask(float2);
 		TaskieStorage.addTask(deadline1);
 		TaskieStorage.addTask(event1);
+		TaskieStorage.deleteTask(2, TaskieEnum.TaskType.FLOAT);
+		TaskieStorage.deleteTask(2, TaskieEnum.TaskType.EVENT);
 
 	}
 	public static Date getDate(int year, int month, int day){
