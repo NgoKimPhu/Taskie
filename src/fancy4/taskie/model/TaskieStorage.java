@@ -43,7 +43,7 @@ public class TaskieStorage {
 		floatPriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
 		commandStack = new Stack<HashMap<String, Object>>();
 		if(eventDeadlineTask.exists()){
-			eventDeadlineTaskList = FileHandler.readFile(eventDeadlineTask);
+			eventDeadlineTaskList = FileHandler.readEventDeadlineFile(eventDeadlineTask);
 			for(TaskieTask task: eventDeadlineTaskList){
 				// deal with event start time
 				if(TaskieTask.isEvent(task)){
@@ -562,7 +562,7 @@ public class TaskieStorage {
 		Collections.sort(eventDeadlineTaskList, tc);
 		return eventDeadlineTaskList;
 	}
-	public static ArrayList<TaskieTask> updateEventStart(int index, Date start, Date end){	
+	public static ArrayList<TaskieTask> updateEventStart(int index, Date start){	
 		TaskieTask task = eventDeadlineTaskList.get(index);
 		if(TaskieTask.isEvent(task)){
 			task.setStartTime(start);
@@ -578,17 +578,14 @@ public class TaskieStorage {
 			Collections.sort(eventDeadlineTaskList, tc);
 		}
 		return eventDeadlineTaskList;
-	}
-	
-	
+	}	
 }
 
 class FileHandler {
 	private static final SimpleDateFormat sdf = new SimpleDateFormat(
 			"dd-MM-yyyy HH:mm");
 
-	public static ArrayList<TaskieTask> readFile(File file) throws Exception {
-		//String fileName = file.getName();
+	public static ArrayList<TaskieTask> readEventDeadlineFile(File file) throws Exception {
 		String line = new String();
 		ArrayList<TaskieTask> fileContent = new ArrayList<TaskieTask>();
 		try {
@@ -618,7 +615,6 @@ class FileHandler {
 		return fileContent;
 	}
 	public static ArrayList<TaskieTask> readFloatFile(File file) throws Exception {
-		//String fileName = file.getName();
 		String line = new String();
 		ArrayList<TaskieTask> fileContent = new ArrayList<TaskieTask>();
 		try {
