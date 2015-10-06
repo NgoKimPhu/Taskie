@@ -20,9 +20,9 @@ public class TaskieAction {
 		this.index = index;
 	}
 	
-	public TaskieAction(TaskieEnum.Actions type, String keyword) {
+	public TaskieAction(TaskieEnum.Actions type, Object obj) {
 		this.type = type;
-		this.keyword = keyword;
+		this.keyword = obj;
 	}
 	
 	public TaskieEnum.Actions getType() {

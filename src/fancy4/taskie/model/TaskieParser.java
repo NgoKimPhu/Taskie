@@ -57,7 +57,11 @@ public final class TaskieParser {
 					
 				}
 				return new TaskieAction(actionType, new TaskieTask(commandData));
-				
+			case DELETE:
+				return new TaskieAction(actionType, new TaskieTask(commandData));
+			case SEARCH:
+				return new TaskieAction(actionType, commandData);
+			case UPDATE:
 			default:
 				return new TaskieAction(TaskieEnum.Actions.INVALID, (TaskieTask) null);
 		}
