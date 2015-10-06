@@ -8,12 +8,19 @@ package fancy4.taskie.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Stack;
 
 public class TaskieLogic {
 
 	private static ArrayList<TaskieTask> searchResult;
 	private static ArrayList<Integer> indexSave;
+	private static Stack<TaskieAction> undoStack;
+	private static Stack<TaskieAction> redoStack;
+	private static Stack<TaskieAction> commandSave;
 
+	/*****
+	 * Below are backbone functions.
+	 */
 	public static void initialise() {
 		try {
 			TaskieStorage.load("");
@@ -32,6 +39,7 @@ public class TaskieLogic {
 
 	private static String[][] takeAction(TaskieAction action) {
 		try {
+			commandSave.push(action);
 			switch (action.getType()) {
 			case ADD:
 				return add(action.getTask());
@@ -41,6 +49,10 @@ public class TaskieLogic {
 				return search(action);
 			case UPDATE:
 				return update(action.getIndex(), action.getTask());
+			case UNDO:
+				return undo();
+			case REDO:
+				return redo();
 			default:
 				return add(action.getTask());
 			}
@@ -49,6 +61,9 @@ public class TaskieLogic {
 		}
 	}
 	
+	/*****
+	 * Below are auxiliary methods.
+	 */
 	private static String[][] display(Collection<TaskieTask> taskList, String message) {
 		String[] feedback = new String[] {message};
 		String[] tasks = toStringArray(taskList);
@@ -83,6 +98,11 @@ public class TaskieLogic {
 		}
 	}
 
+	
+	/*****
+	 * Below are feature methods.
+	 * Including add, delete, search, update.
+	 */
 	private static String[][] add(TaskieTask task) {
 		Collection<TaskieTask> taskList = TaskieStorage.addTask(task);
 		String feedback = new String(task.getTitle() + " is added");
@@ -101,23 +121,23 @@ public class TaskieLogic {
 			throws UnrecognisedCommandException {
 		TaskieEnum.TaskType type = action.getTask().getType();
 		Object searchKey = action.getSearch();
-		Collection<IndexTaskPair> taskList;
+		Collection<IndexTaskPair> indexTaskList;
 		if (searchKey instanceof String) {
-			taskList = TaskieStorage.searchTask((ArrayList<String>) searchKey,
+			indexTaskList = TaskieStorage.searchTask((ArrayList<String>) searchKey,
 					type);
 		} else if (searchKey instanceof Date) {
-			taskList = TaskieStorage.searchTask((Date) searchKey, type);
+			indexTaskList = TaskieStorage.searchTask((Date) searchKey, type);
 		} else if (searchKey instanceof Integer) {
-			taskList = TaskieStorage.searchTask(
+			indexTaskList = TaskieStorage.searchTask(
 					(TaskieEnum.TaskPriority) searchKey, type);
 		} else if (searchKey instanceof Boolean) {
-			taskList = TaskieStorage.searchTask((Boolean) searchKey, type);
+			indexTaskList = TaskieStorage.searchTask((Boolean) searchKey, type);
 		} else {
 			throw new UnrecognisedCommandException("Unrecognised search key.");
 		}
 		searchResult.clear();
 		indexSave.clear();
-		for (IndexTaskPair pair : taskList) {
+		for (IndexTaskPair pair : indexTaskList) {
 			searchResult.add(pair.getTask());
 			indexSave.add(pair.getIndex());
 		}
@@ -160,17 +180,33 @@ public class TaskieLogic {
 		return display(taskList, feedback);
 	}
 	
-//	private static String[][] undo() {
-		
-//	}
+	/*****
+	 * Below are undo/redo methods.
+	 */
+	private static String[][] undo() {
+		if (undoStack.isEmpty()) {
+			String feedback = "No more action to undo.";
+			return display(new ArrayList<TaskieTask>(), feedback);
+		}
+		TaskieAction action = undoStack.pop();
+		redoStack.push(commandSave.pop());
+		return takeAction(action);
+	}
+	
+	private static String[][] redo() {
+		if (redoStack.isEmpty()) {
+			String feedback = "No more action to redo.";
+			return display(new ArrayList<TaskieTask>(), feedback);
+		}
+		TaskieAction action = redoStack.pop();
+		return takeAction(action);
+	}
 
 }
 
+
 class UnrecognisedCommandException extends Exception {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public UnrecognisedCommandException(String message) {
