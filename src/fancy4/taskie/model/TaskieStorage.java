@@ -121,16 +121,7 @@ public class TaskieStorage {
 			floatTaskList = new ArrayList<TaskieTask>();
 		}
 	}
-	private static Date createDateKey(Date date){
-		Calendar calendar = Calendar.getInstance();
-		Calendar calendarForKey = Calendar.getInstance();
-		calendar.setTime(date);
-		calendarForKey.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
-		calendarForKey.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
-		calendarForKey.set(Calendar.DATE, calendar.get(Calendar.DATE));
-		Date key = calendarForKey.getTime();
-		return key;
-	}
+	
 
 	// use to modify command stack after processing each command.
 	public static Stack<HashMap<String, Object>> getCommandStack() {
@@ -176,9 +167,9 @@ public class TaskieStorage {
 			}
 			//add event map
 			if(TaskieTask.isEvent(task)){
+				
 				if (!eventStartDateMap.containsKey(task.getStartTime())) {
 					ArrayList<TaskieTask> tasks = new ArrayList<TaskieTask>();
-
 					tasks.add(task);
 					eventStartDateMap.put(task.getStartTime(), tasks);
 				} else {
@@ -518,6 +509,10 @@ public class TaskieStorage {
 	public static ArrayList<ArrayList<TaskieTask>> updateFloatToDeadline(int index, Date end){
 		ArrayList<ArrayList<TaskieTask>> returnResult = new ArrayList<ArrayList<TaskieTask>>();
 		TaskieTask task = floatTaskList.remove(index);
+		floatPriorityMap.get(task.getPriority()).remove(task);
+		if(floatPriorityMap.get(task.getPriority()).size()==0){
+			floatPriorityMap.remove(task.getPriority());
+		}
 		task.setToDeadline(end);
 		eventDeadlineTaskList.add(task);
 		Collections.sort(eventDeadlineTaskList, tc);
@@ -528,8 +523,34 @@ public class TaskieStorage {
 	public static ArrayList<ArrayList<TaskieTask>> updateFloatToEvent(int index, Date start, Date end){
 		ArrayList<ArrayList<TaskieTask>> returnResult = new ArrayList<ArrayList<TaskieTask>>();
 		TaskieTask task = floatTaskList.remove(index);
+		// fix bug: update map
+		floatPriorityMap.get(task.getPriority()).remove(task);
+		if(floatPriorityMap.get(task.getPriority()).size()==0){
+			floatPriorityMap.remove(task.getPriority());
+		}
 		task.setToEvent(start, end);
+		// update event maps
 		eventDeadlineTaskList.add(task);
+		if(!eventStartDateMap.containsKey(task.getStartTime())){
+			eventStartDateMap.put(task.getStartTime(), new ArrayList<TaskieTask>());
+		}
+		eventStartDateMap.get(task.getStartTime()).add(task);
+		Date startKey = createDateKey(task.getStartTime());
+		if(!eventStartDateMap.containsKey(startKey)){
+			eventStartDateMap.put(startKey, new ArrayList<TaskieTask>());
+		}
+		eventStartDateMap.get(startKey).add(task);
+		
+		if(!eventEndDateMap.containsKey(task.getStartTime())){
+			eventEndDateMap.put(task.getStartTime(), new ArrayList<TaskieTask>());
+		}
+		eventEndDateMap.get(task.getStartTime()).add(task);
+		Date endKey = createDateKey(task.getStartTime());
+		if(!eventStartDateMap.containsKey(endKey)){
+			eventStartDateMap.put(endKey, new ArrayList<TaskieTask>());
+		}
+		eventStartDateMap.get(endKey).add(task);
+		
 		Collections.sort(eventDeadlineTaskList, tc);
 		returnResult.add(eventDeadlineTaskList);
 		returnResult.add(floatTaskList);
@@ -578,7 +599,18 @@ public class TaskieStorage {
 			Collections.sort(eventDeadlineTaskList, tc);
 		}
 		return eventDeadlineTaskList;
-	}	
+	}
+	
+	private static Date createDateKey(Date date){
+		Calendar calendar = Calendar.getInstance();
+		Calendar calendarForKey = Calendar.getInstance();
+		calendar.setTime(date);
+		calendarForKey.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
+		calendarForKey.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
+		calendarForKey.set(Calendar.DATE, calendar.get(Calendar.DATE));
+		Date key = calendarForKey.getTime();
+		return key;
+	}
 }
 
 class FileHandler {
