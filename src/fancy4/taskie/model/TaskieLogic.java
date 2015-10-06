@@ -48,30 +48,53 @@ public class TaskieLogic {
 			return new String[][] {};
 		}
 	}
+	
+	private static String[][] display(Collection<TaskieTask> taskList, String message) {
+		String[] feedback = new String[] {message};
+		String[] tasks = toStringArray(taskList);
+		String[] deadlines = toStringArray(retrieve(TaskieEnum.TaskType.DEADLINE));
+		String[] floats = toStringArray(retrieve(TaskieEnum.TaskType.FLOAT));
+		return new String[][] { feedback, tasks, deadlines, floats };
+	}
 
-	public static String[] display(Collection<TaskieTask> taskList) {
-		String[] screen = new String[taskList.size()];
+	private static String[] toStringArray(Collection<TaskieTask> taskList) {
+		String[] ary = new String[taskList.size()];
 		int index = 0;
 		for (TaskieTask task : taskList) {
-			screen[index++] = index + ". " + task.getTitle();
+			ary[index++] = index + ". " + task.getTitle();
 		}
-		return screen;
+		return ary;
+	}
+	
+	private static Collection<TaskieTask> retrieve(TaskieEnum.TaskType type) {
+		switch (type) {
+		case FLOAT:
+			return TaskieStorage.displayFloatTask();
+		case DEADLINE:
+			Collection<TaskieTask> eventDeadline = TaskieStorage.displayEventDeadline();
+			ArrayList<TaskieTask> deadline = new ArrayList<TaskieTask>();
+			for (TaskieTask task : eventDeadline) {
+				if (task.getStartTime() == null)
+					deadline.add(task);
+			}
+			return deadline;
+		default:
+			return new ArrayList<TaskieTask>();
+		}
 	}
 
 	private static String[][] add(TaskieTask task) {
 		Collection<TaskieTask> taskList = TaskieStorage.addTask(task);
-		String[] tasks = display(taskList);
-		String[] feedback = new String[] { task.getTitle() + " is added" };
-		return new String[][] { tasks, feedback };
+		String feedback = new String(task.getTitle() + " is added");
+		return display(taskList, feedback);
 	}
 
 	private static String[][] delete(int index, TaskieEnum.TaskType type) {
 		TaskieStorage.deleteTask(indexSave.get(index - 1), type);
 		String title = searchResult.get(index - 1).getTitle();
 		searchResult.remove(index - 1);
-		String[] tasks = display(searchResult);
-		String[] feedback = new String[] { title + " is deleted" };
-		return new String[][] { tasks, feedback };
+		String feedback = new String(title + " is deleted");
+		return display(searchResult, feedback);
 	}
 
 	private static String[][] search(TaskieAction action)
@@ -98,9 +121,9 @@ public class TaskieLogic {
 			searchResult.add(pair.getTask());
 			indexSave.add(pair.getIndex());
 		}
-		String[] tasks = display(searchResult);
-		String[] feedback = new String[] { "Search finished in 0.00019 seconds." };
-		return new String[][] { tasks, feedback };
+		double time = Math.random() * Math.random() / 1000;
+		String feedback = new String("Search finished in " + time + " seconds.");
+		return display(searchResult, feedback);
 	}
 
 	private static String[][] update(int index, TaskieTask task) throws UnrecognisedCommandException {
@@ -133,9 +156,8 @@ public class TaskieLogic {
 			TaskieStorage.updateEventStartEnd(index, task.getStartTime(), task.getEndTime());
 		else 
 			throw new UnrecognisedCommandException("Unrecognised update criterion.");
-		String[] tasks = display(taskList);
-		String[] feedback = new String[] { "Updated successfully" };
-		return new String[][] { tasks, feedback };			
+		String feedback = new String("Updated successfully");
+		return display(taskList, feedback);
 	}
 	
 //	private static String[][] undo() {
