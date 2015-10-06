@@ -187,16 +187,13 @@ public class TaskieStorage {
 	// if you want to search all the tasks contains the key words, search twice
 	public static ArrayList<IndexTaskPair> searchTask(
 			ArrayList<String> keyWords, TaskieEnum.TaskType type) {
-		for (String keyWord : keyWords) {
-			keyWord = keyWord.toUpperCase();
-		}
 		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
 			ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 			for (TaskieTask task : eventDeadlineTaskList) {
 				boolean check = true;
 				String stringForCompare = new String(task.getTitle());
 				for (String keyWord : keyWords) {
-					if (!stringForCompare.toUpperCase().contains(keyWord)) {
+					if (!stringForCompare.toLowerCase().contains(keyWord.toLowerCase())) {
 						check = false;
 					}
 				}
@@ -213,7 +210,7 @@ public class TaskieStorage {
 				boolean check = true;
 				String stringForCompare = new String(task.getTitle());
 				for (String keyWord : keyWords) {
-					if (!stringForCompare.toUpperCase().contains(keyWord)) {
+					if (!stringForCompare.toLowerCase().contains(keyWord.toLowerCase())) {
 						check = false;
 					}
 				}
