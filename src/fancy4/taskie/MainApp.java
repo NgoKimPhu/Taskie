@@ -16,18 +16,14 @@ public class MainApp extends Application {
 
     private Stage primaryStage;
     private BorderPane rootLayout;
-    public static ObservableList<String> taskData = FXCollections.observableArrayList();
+    public ObservableList<String> taskData = FXCollections.observableArrayList();
+    public ObservableList<String> dTaskData = FXCollections.observableArrayList();
+    public ObservableList<String> fTaskData = FXCollections.observableArrayList();
     
     public static String[] data = {};
     public MainApp() {
     	//data = TaskieLogic.execute("add order a pizza")[0];
-    	TaskieLogic.initialise();
-    	String command = "add dummy line for testing";
-    	String[][] screen = TaskieLogic.execute(command);
-    	data = screen[0];
-    	System.out.println(data.length);
-    	taskData.addAll(data);
-   
+    	//TaskieLogic.initialise();
     }
     
    /* public static void refresh(String cmd) {
@@ -39,6 +35,12 @@ public class MainApp extends Application {
     
     public ObservableList<String> getTaskData() {
     	return taskData;
+    }
+    public ObservableList<String> getDTaskData() {
+    	return dTaskData;
+    }
+    public ObservableList<String> getFTaskData() {
+    	return fTaskData;
     }
     
     @Override
