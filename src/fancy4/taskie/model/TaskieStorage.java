@@ -621,6 +621,18 @@ public class TaskieStorage {
 				eventPriorityMap.remove(priority);
 			}
 		}
+		else{
+			Date end = task.getEndTime();
+			TaskieEnum.TaskPriority priority = task.getPriority();
+			deadlineEndDateMap.get(end).remove(task);
+			if(isEmpty(deadlineEndDateMap.get(end))){
+				deadlineEndDateMap.remove(end);
+			}
+			deadlinePriorityMap.get(priority).remove(task);
+			if(isEmpty(deadlinePriorityMap.get(priority))){
+				deadlinePriorityMap.remove(priority);
+			}
+		}
 		task.setToFloat();
 		floatTaskList.add(task);
 		if(!floatPriorityMap.containsKey(task.getPriority())){
@@ -634,6 +646,7 @@ public class TaskieStorage {
 	}
 	public static ArrayList<TaskieTask> updateEventToDeadline(int index){
 		TaskieTask task = eventDeadlineTaskList.get(index);
+		
 		task.setToDeadline(task.getEndTime());
 		Collections.sort(eventDeadlineTaskList, tc);
 		return eventDeadlineTaskList;
@@ -681,6 +694,94 @@ public class TaskieStorage {
 	private static boolean isEmpty(ArrayList<TaskieTask> tasks){
 		return tasks.size() == 0;
 	}
+	private static void addToEventMap(TaskieTask task){
+		Date start = task.getStartTime();
+		Date end = task.getEndTime();
+		TaskieEnum.TaskPriority priority = task.getPriority();
+		if(!eventStartDateMap.containsKey(start)){
+			eventStartDateMap.put(start, new ArrayList<TaskieTask>());
+		}
+		eventStartDateMap.get(start).add(task);
+		Date startKey = createDateKey(start);
+		if(!eventStartDateMap.containsKey(startKey)){
+			eventStartDateMap.put(startKey, new ArrayList<TaskieTask>());
+		}
+		eventStartDateMap.get(startKey).add(task);
+		if(!eventEndDateMap.containsKey(end)){
+			eventEndDateMap.put(end, new ArrayList<TaskieTask>());
+		}
+		eventEndDateMap.get(end).add(task);
+		Date endKey = createDateKey(task.getStartTime());
+		if(!eventStartDateMap.containsKey(endKey)){
+			eventStartDateMap.put(endKey, new ArrayList<TaskieTask>());
+		}
+		eventStartDateMap.get(endKey).add(task);
+		if(!eventPriorityMap.containsKey(priority)){
+			eventPriorityMap.put(priority, new ArrayList<TaskieTask>());
+		}
+		eventPriorityMap.get(priority).add(task);
+	}
+	private static void addToDeadlineMap(TaskieTask task){
+		Date end = task.getEndTime();
+		Date endKey = createDateKey(end);
+		TaskieEnum.TaskPriority priority = task.getPriority();
+		if(!deadlineEndDateMap.containsKey(end)){
+			deadlineEndDateMap.put(end, new ArrayList<TaskieTask>());
+		}
+		deadlineEndDateMap.get(end).add(task);
+		if(!deadlineEndDateMap.containsKey(endKey)){
+			deadlineEndDateMap.put(endKey, new ArrayList<TaskieTask>());
+		}
+		deadlineEndDateMap.get(endKey).add(task);
+		if(!deadlinePriorityMap.containsKey(priority)){
+			deadlinePriorityMap.put(priority, new ArrayList<TaskieTask>());
+		}
+		deadlinePriorityMap.get(priority).add(task);
+	}
+	private static void addToFloatMap(TaskieTask task){
+		TaskieEnum.TaskPriority priority = task.getPriority();
+		if(!floatPriorityMap.containsKey(priority)){
+			floatPriorityMap.put(priority, new ArrayList<TaskieTask>());
+		}
+		floatPriorityMap.get(priority).add(task);
+	}
+	private static void removeFromEventMap(TaskieTask task){
+		Date start = task.getStartTime();
+		Date end = task.getEndTime();
+		TaskieEnum.TaskPriority priority = task.getPriority();
+		eventStartDateMap.get(start).remove(task);
+		if(isEmpty(eventStartDateMap.get(start))){
+			eventStartDateMap.remove(start);
+		}
+		eventEndDateMap.get(end).remove(task);
+		if(isEmpty(eventEndDateMap.get(end))){
+			eventEndDateMap.remove(end);
+		}
+		eventPriorityMap.get(priority).remove(task);
+		if(isEmpty(eventPriorityMap.get(priority))){
+			eventPriorityMap.remove(priority);
+		}
+	}
+	private static void removeFromDeadlineMap(TaskieTask task){
+		Date end = task.getEndTime();
+		TaskieEnum.TaskPriority priority = task.getPriority();
+		deadlineEndDateMap.get(end).remove(task);
+		if(isEmpty(deadlineEndDateMap.get(end))){
+			deadlineEndDateMap.remove(end);
+		}
+		deadlinePriorityMap.get(priority).remove(task);
+		if(isEmpty(deadlinePriorityMap.get(priority))){
+			deadlinePriorityMap.remove(priority);
+		}
+	}
+	private static void removeFromFloatMap(TaskieTask task){
+		TaskieEnum.TaskPriority priority = task.getPriority();
+		floatPriorityMap.get(priority).remove(task);
+		if(isEmpty(floatPriorityMap.get(priority))){
+			floatPriorityMap.remove(task.getPriority());
+		}
+	}
+	
 }
 
 class FileHandler {
