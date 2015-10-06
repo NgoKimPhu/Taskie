@@ -85,7 +85,7 @@ public class TaskieOverviewController {
 			dData = new String[]{"d1","d2","d3","d4","d5",};
 			fData = new String[]{"f1","f2","f3","f4","f5",};
 			String response = "response";*/
-			
+
 			mainData = fromLogic[1];
 			dData = fromLogic[2];
 			fData = fromLogic[3];
@@ -95,7 +95,7 @@ public class TaskieOverviewController {
 			updateDTable(dData);
 			updateFTable(fData);
 			
-			textOutputResponse += "input: " + input + "\n" + "response: " + response + "\n";
+			textOutputResponse += "> " + input + "\n" + response + "\n";
 			textOutput.setText(textOutputResponse);
 			
 			/*
@@ -105,7 +105,7 @@ public class TaskieOverviewController {
 			for (String s:mainData) {
 				System.out.print(s+" ");
 			}
-			System.out.println("\n + daedline display:");
+			System.out.println("\n + deadline display:");
 			for (String s:dData) {
 				System.out.print(s+" ");
 			}
