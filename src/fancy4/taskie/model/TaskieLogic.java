@@ -62,7 +62,8 @@ public class TaskieLogic {
 				return add(action.getTask());
 			}
 		} catch (UnrecognisedCommandException e) {
-			return new String[][] {};
+			System.err.println("Unrecognised Command");
+			return new String[][] {{"Fatal error"}, {""}, {""}, {""}};
 		}
 	}
 	
@@ -134,7 +135,9 @@ public class TaskieLogic {
 		Object searchKey = action.getSearch();
 		Collection<IndexTaskPair> indexTaskList;
 		if (searchKey instanceof String) {
-			indexTaskList = TaskieStorage.searchTask((ArrayList<String>) searchKey, type);
+			ArrayList<String> searchList = new ArrayList<String>();
+			searchList.add((String) searchKey);
+			indexTaskList = TaskieStorage.searchTask(searchList, type);
 		} else if (searchKey instanceof Date) {
 			indexTaskList = TaskieStorage.searchTask((Date) searchKey, type);
 		} else if (searchKey instanceof Integer) {
