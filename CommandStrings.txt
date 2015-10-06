@@ -1,0 +1,10 @@
+add
+delete del
+delall deleteall clear
+undo
+redo
+clear clr
+search find view
+sort
+update
+invalid
