@@ -25,7 +25,6 @@ public class TaskieTask {
 		this.type = TaskieEnum.TaskType.FLOAT;
 		this.title = title;
 		this.description = new String();
-		// start from the moment it is created
 		this.startTime = null;
 		this.endTime = null;
 		// the new task's priority is the lowest
@@ -34,10 +33,8 @@ public class TaskieTask {
 	}
 	// create float task with specific priority.
 	public TaskieTask(String title, TaskieEnum.TaskPriority priority){
-		//this.count+=1;
 		this.type = TaskieEnum.TaskType.FLOAT;
 		this.title = title;
-		//this.id = this.count;
 		this.description = new String();
 		this.startTime = null;
 		this.endTime = null;
@@ -53,7 +50,6 @@ public class TaskieTask {
 		else{
 			this.type = TaskieEnum.TaskType.FLOAT;
 			this.title = title;
-			//this.id = this.count;
 			this.description = description;
 			this.startTime = null;
 			this.endTime = null;
@@ -63,34 +59,28 @@ public class TaskieTask {
 	}
 	// create deadline task.
 	public TaskieTask(String title, Date endTime){
-		//this.count+=1;
 		this.type = TaskieEnum.TaskType.DEADLINE;
 		this.title = title;
-		//this.id = this.count;
 		this.description = new String();
-		this.startTime = new Date();
+		this.startTime = null;
 		this.endTime = endTime;
 		this.priority = TaskieEnum.TaskPriority.VERY_LOW;
 		this.status = false;
 	}
 	// create deadline task with specific priority.
 	public TaskieTask(String title, Date endTime, TaskieEnum.TaskPriority priority){
-		//this.count+=1;
 		this.type = TaskieEnum.TaskType.DEADLINE;
 		this.title = title;
-		//this.id = this.count;
 		this.description = new String();
-		this.startTime = new Date();
+		this.startTime = null;
 		this.endTime = endTime;
 		this.priority = priority;
 		this.status = false;
 	}
 	// create event.
 	public TaskieTask(String title, Date startTime, Date endTime){
-		//this.count+=1;
 		this.type = TaskieEnum.TaskType.EVENT;
 		this.title = title;
-		//this.id = this.count;
 		this.description = new String();
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -99,17 +89,30 @@ public class TaskieTask {
 	}
 	// create event with specific priority.
 	public TaskieTask(String title, Date startTime, Date endTime, TaskieEnum.TaskPriority priority){
-		//this.count+=1;
 		this.type = TaskieEnum.TaskType.EVENT;
 		this.title = title;
-		//this.id = this.count;
 		this.description = new String();
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.priority = priority;
 		this.status = false;
 	}
-	// load deadline task or event
+	// load deadline task
+	public TaskieTask(String title, TaskieEnum.TaskType type, Date endTime, TaskieEnum.TaskPriority priority, boolean status, String description) throws Exception{
+		if(type.equals(TaskieEnum.TaskType.FLOAT)){
+			throw new Exception("Task type not match.");
+		}
+		else{
+			this.type = type;
+			this.title = title;
+			this.description = description;
+			this.startTime = null;
+			this.endTime = endTime;
+			this.priority = priority;
+			this.status = status;
+		}
+	}
+	//load event
 	public TaskieTask(String title, TaskieEnum.TaskType type, Date startTime, Date endTime, TaskieEnum.TaskPriority priority, boolean status, String description) throws Exception{
 		if(type.equals(TaskieEnum.TaskType.FLOAT)){
 			throw new Exception("Task type not match.");
@@ -117,7 +120,6 @@ public class TaskieTask {
 		else{
 			this.type = type;
 			this.title = title;
-			//this.id = this.count;
 			this.description = description;
 			this.startTime = startTime;
 			this.endTime = endTime;
@@ -177,11 +179,6 @@ public class TaskieTask {
 	public String getTitle(){
 		return this.title;
 	}
-	/*
-	public long getId(){
-		return this.id;
-	}
-	*/
 	public String getDescription(){
 		return this.description;
 	}
@@ -197,35 +194,49 @@ public class TaskieTask {
 	public TaskieEnum.TaskPriority getPriority(){
 		return this.priority;
 	}
+	public static boolean isEvent(TaskieTask task){
+		return task.getType().equals(TaskieEnum.TaskType.EVENT);
+	}
+	public static boolean isDeadline(TaskieTask task){
+		return task.getType().equals(TaskieEnum.TaskType.DEADLINE);
+	}
+	public static boolean isFloat(TaskieTask task){
+		return task.getType().equals(TaskieEnum.TaskType.FLOAT);
+	}
+	public static boolean isDone(TaskieTask task){
+		return task.getStatus()==true;
+	}
 }
 
+// This comparator will only be used when we sorting event and float tasks
 class TaskComparator implements Comparator<TaskieTask> {
 	public int compare(TaskieTask task1, TaskieTask task2){
-		if(task1.getType().equals(TaskieEnum.TaskType.FLOAT)){
-			if(!task2.getType().equals(TaskieEnum.TaskType.FLOAT)){
-				return 1;
+		if(TaskieTask.isEvent(task1) && TaskieTask.isEvent(task2)){
+			if(!task1.getStatus() && task2.getStatus()){
+				return -1;
 			}
+			else if(task1.getStatus() && !task2.getStatus()){
+				return 1;
+			} 
 			else{
-				if(task1.getPriority().compareTo(task2.getPriority())==0){
-					if(task1.getStartTime().before(task2.getStartTime())){
-						return -1;
-					}
-					else if(task1.getStartTime().after(task2.getStartTime())){
-						return 1;
-					}
-					else{
-						return task1.getTitle().compareTo(task2.getTitle());
-					}
+				if(task1.getStartTime().before(task2.getStartTime())){
+					return -1;
+				}
+				else if(task1.getStartTime().after(task2.getStartTime())){
+					return 1;
 				}
 				else{
-					return task1.getPriority().compareTo(task2.getPriority());
+					return task1.getTitle().compareTo(task2.getTitle());
 				}
 			}
 		}
-		else{
-			if(task2.getType().equals(TaskieEnum.TaskType.FLOAT)){
+		else if(TaskieTask.isDeadline(task1) && TaskieTask.isDeadline(task2)){
+			if(!task1.getStatus() && task2.getStatus()){
 				return -1;
 			}
+			else if(task1.getStatus() && !task2.getStatus()){
+				return 1;
+			} 
 			else{
 				if(task1.getEndTime().before(task2.getEndTime())){
 					return -1;
@@ -234,21 +245,58 @@ class TaskComparator implements Comparator<TaskieTask> {
 					return 1;
 				}
 				else{
-					if(task1.getPriority().compareTo(task2.getPriority())==0){
-						if(task1.getStartTime().before(task2.getStartTime())){
-							return -1;
-						}
-						else if(task1.getStartTime().after(task2.getStartTime())){
-							return 1;
-						}
-						else{
-							return task1.getTitle().compareTo(task2.getTitle());
-						}
-					}
-					else{
-						return task1.getPriority().compareTo(task2.getPriority());
-					}
+					return task1.getTitle().compareTo(task2.getTitle());
 				}
+			}
+		}
+		else if(TaskieTask.isEvent(task1) && TaskieTask.isDeadline(task2)){
+			if(!task1.getStatus() && task2.getStatus()){
+				return -1;
+			}
+			else if(task1.getStatus() && !task2.getStatus()){
+				return 1;
+			} 
+			else{
+				if(task1.getStartTime().before(task2.getEndTime())){
+					return -1;
+				}
+				else if(task1.getStartTime().after(task2.getEndTime())){
+					return 1;
+				}
+				else{
+					return task1.getTitle().compareTo(task2.getTitle());
+				}
+			}
+		}
+		else if(TaskieTask.isDeadline(task1) && TaskieTask.isFloat(task2)){
+			if(!task1.getStatus() && task2.getStatus()){
+				return -1;
+			}
+			else if(task1.getStatus() && !task2.getStatus()){
+				return 1;
+			} 
+			else{
+				if(task1.getEndTime().before(task2.getStartTime())){
+					return -1;
+				}
+				else if(task1.getEndTime().after(task2.getStartTime())){
+					return 1;
+				}
+				else{
+					return task1.getTitle().compareTo(task2.getTitle());
+				}
+			}
+		}
+		// float
+		else{
+			if(!task1.getStatus() && task2.getStatus()){
+				return -1;
+			}
+			else if(task1.getStatus() && !task2.getStatus()){
+				return 1;
+			} 
+			else{
+				return task1.getTitle().compareTo(task2.getTitle());
 			}
 		}
 	}
