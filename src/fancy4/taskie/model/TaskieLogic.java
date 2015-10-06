@@ -104,7 +104,7 @@ public class TaskieLogic {
 	}
 
 	private static String[][] update(int index, TaskieTask task) throws UnrecognisedCommandException {
-		Collection<TaskieTask> taskList;
+		Collection<TaskieTask> taskList = new ArrayList<TaskieTask>();
 		if (task.getTitle() != null)
 			TaskieStorage.updateTaskTitle(index, task.getType(), task.getTitle());
 		else if (task.getType() == TaskieEnum.TaskType.FLOAT &&
@@ -138,9 +138,9 @@ public class TaskieLogic {
 		return new String[][] { tasks, feedback };			
 	}
 	
-	private static String[][] undo() {
+//	private static String[][] undo() {
 		
-	}
+//	}
 
 }
 
