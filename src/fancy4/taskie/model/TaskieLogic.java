@@ -36,10 +36,7 @@ public class TaskieLogic {
 			case DELETE:
 				return delete(action.getIndex(), action.getTask().getType());
 			case SEARCH:
-				Object searchKey = action.getSearch(); 
-				if (searchKey instanceof String)
-					return search((ArrayList<String>)action.getSearch(), action.getTask().getType());
-				//return search(action);
+				return search(action);
 			case UPDATE:
 				//return update();
 			default:
