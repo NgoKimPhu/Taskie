@@ -134,10 +134,12 @@ public class TaskieTask {
 		this.priority = priority;
 	}
 	public void setToFloat(){
+		this.startTime = null;
 		this.endTime = null;
 		this.type = TaskieEnum.TaskType.FLOAT;
 	}
 	public void setToDeadline(Date endTime){
+		this.startTime = null;
 		this.endTime = endTime;
 		this.type = TaskieEnum.TaskType.DEADLINE;
 	}
