@@ -28,13 +28,16 @@ public class TaskieStorage {
 	private static TaskComparator tc = new TaskComparator();
 
 	public static void load(String pathName) throws Exception {
+		if(pathName.trim().length()==0){
+			pathName = "newfolder";
+		}
 		File folder = new File(pathName);
 		if(!folder.exists()){
 			folder.mkdir();
 		}
 		eventDeadlineTask = new File(folder, "/eventDeadline.json");
 		floatTask = new File(folder,  "/floatTask.json");
-		System.out.println(folder.toPath());
+		//System.out.println(folder.toPath());
 		eventStartDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
 		eventEndDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
 		deadlineEndDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
@@ -603,7 +606,7 @@ public class TaskieStorage {
 		TaskieEnum.TaskPriority priority = task.getPriority();
 		floatPriorityMap.get(priority).remove(task);
 		if(isEmpty(floatPriorityMap.get(priority))){
-			floatPriorityMap.remove(task.getPriority());
+			floatPriorityMap.remove(priority);
 		}
 	}
 	
@@ -634,9 +637,6 @@ class FileHandler {
 				line = in.readLine();
 			}
 			in.close();
-			for(TaskieTask t: fileContent){
-				System.out.println(t.getTitle());
-			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
