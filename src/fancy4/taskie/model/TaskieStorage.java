@@ -482,6 +482,26 @@ public class TaskieStorage {
 	public static ArrayList<TaskieTask> updateTaskPriority(int index, TaskieEnum.TaskType type, TaskieEnum.TaskPriority priority){
 		if(type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)){
 			TaskieTask task = eventDeadlineTaskList.get(index);
+			if(TaskieTask.isEvent(task)){
+				eventPriorityMap.get(task.getPriority()).remove(task);
+				if(eventPriorityMap.get(task.getPriority()).size()==0){
+					eventPriorityMap.remove(task.getPriority());
+				}
+				if(!eventPriorityMap.containsKey(priority)){
+					eventPriorityMap.put(priority, new ArrayList<TaskieTask>());
+				}
+				eventPriorityMap.get(priority).add(task);
+			}
+			else{
+				deadlinePriorityMap.get(task.getPriority()).remove(task);
+				if(deadlinePriorityMap.get(task.getPriority()).size()==0){
+					deadlinePriorityMap.remove(task.getPriority());
+				}
+				if(!deadlinePriorityMap.containsKey(priority)){
+					deadlinePriorityMap.put(priority, new ArrayList<TaskieTask>());
+				}
+				deadlinePriorityMap.get(priority).add(task);
+			}
 			task.setPriority(priority);
 			Collections.sort(eventDeadlineTaskList, tc);
 			return eventDeadlineTaskList;
