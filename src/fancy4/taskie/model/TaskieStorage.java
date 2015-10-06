@@ -515,6 +515,19 @@ public class TaskieStorage {
 		}
 		task.setToDeadline(end);
 		eventDeadlineTaskList.add(task);
+		if(!deadlineEndDateMap.containsKey(task.getEndTime())){
+			deadlineEndDateMap.put(task.getEndTime(), new ArrayList<TaskieTask>());
+		}
+		deadlineEndDateMap.get(task.getEndTime()).add(task);
+		Date endKey = createDateKey(task.getEndTime());
+		if(!deadlineEndDateMap.containsKey(endKey)){
+			deadlineEndDateMap.put(endKey, new ArrayList<TaskieTask>());
+		}
+		deadlineEndDateMap.get(endKey).add(task);
+		if(!deadlinePriorityMap.containsKey(task.getPriority())){
+			deadlinePriorityMap.put(task.getPriority(), new ArrayList<TaskieTask>());
+		}
+		deadlinePriorityMap.get(task.getPriority()).add(task);
 		Collections.sort(eventDeadlineTaskList, tc);
 		returnResult.add(eventDeadlineTaskList);
 		returnResult.add(floatTaskList);
@@ -550,6 +563,10 @@ public class TaskieStorage {
 			eventStartDateMap.put(endKey, new ArrayList<TaskieTask>());
 		}
 		eventStartDateMap.get(endKey).add(task);
+		if(!eventPriorityMap.containsKey(task.getPriority())){
+			eventPriorityMap.put(task.getPriority(), new ArrayList<TaskieTask>());
+		}
+		eventPriorityMap.get(task.getPriority()).add(task);
 		
 		Collections.sort(eventDeadlineTaskList, tc);
 		returnResult.add(eventDeadlineTaskList);
