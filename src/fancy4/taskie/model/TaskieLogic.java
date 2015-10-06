@@ -48,6 +48,8 @@ public class TaskieLogic {
 				return add(action.getTask());
 			case DELETE:
 				return delete(action.getIndex(), action.getTask().getType());
+			case DELETEALL:
+				//return deleteAll
 			case SEARCH:
 				return search(action);
 			case UPDATE:
@@ -113,8 +115,14 @@ public class TaskieLogic {
 	}
 
 	private static String[][] delete(int index, TaskieEnum.TaskType type) {
-		TaskieStorage.deleteTask(indexSave.get(index - 1), type);
+		TaskieTask deleted = TaskieStorage.deleteTask(indexSave.get(index - 1), type);
 		String title = searchResult.get(index - 1).getTitle();
+		assert title.equals(deleted.getTitle());
+		
+		//Construct undo values
+		TaskieAction action = new TaskieAction(TaskieEnum.Actions.ADD, deleted);
+		undoStack.push(action);
+		
 		searchResult.remove(index - 1);
 		String feedback = new String(title + " is deleted");
 		return display(searchResult, feedback);
@@ -126,8 +134,7 @@ public class TaskieLogic {
 		Object searchKey = action.getSearch();
 		Collection<IndexTaskPair> indexTaskList;
 		if (searchKey instanceof String) {
-			indexTaskList = TaskieStorage.searchTask((ArrayList<String>) searchKey,
-					type);
+			indexTaskList = TaskieStorage.searchTask((ArrayList<String>) searchKey, type);
 		} else if (searchKey instanceof Date) {
 			indexTaskList = TaskieStorage.searchTask((Date) searchKey, type);
 		} else if (searchKey instanceof Integer) {
