@@ -20,8 +20,8 @@ public class TaskieAction {
 		this.index = index;
 	}
 	
-	public TaskieAction(TaskieEnum.Actions type, Object obj) {
-		this.type = type;
+	public TaskieAction(TaskieEnum.Actions type, TaskieTask task, Object obj) {
+		this(type, task);
 		this.keyword = obj;
 	}
 	
