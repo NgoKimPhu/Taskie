@@ -40,7 +40,7 @@ public class TaskieLogic {
 			case SEARCH:
 				return search(action);
 			case UPDATE:
-				return update();
+				return update(action.getIndex(), action.getTask());
 			default:
 				return add(action.getTask());
 			}
@@ -103,8 +103,39 @@ public class TaskieLogic {
 		return new String[][] { tasks, feedback };
 	}
 
-	private static String[][] update() {
-
+	private static String[][] update(int index, TaskieTask task) throws UnrecognisedCommandException {
+		Collection<TaskieTask> taskList;
+		if (task.getTitle() != null)
+			TaskieStorage.updateTaskTitle(index, task.getType(), task.getTitle());
+		else if (task.getType() == TaskieEnum.TaskType.FLOAT &&
+				 task.getStartTime() == null && task.getEndTime() != null)
+			TaskieStorage.updateFloatToDeadline(index, task.getEndTime());
+		else if (task.getType() == TaskieEnum.TaskType.FLOAT &&
+				task.getStartTime() != null && task.getEndTime() != null)
+			TaskieStorage.updateFloatToEvent(index, task.getStartTime(), task.getEndTime());
+		else if ((task.getType() == TaskieEnum.TaskType.EVENT ||
+				 task.getType() == TaskieEnum.TaskType.EVENT) && 
+				 task.getStartTime() == null && task.getEndTime() == null)
+			TaskieStorage.updateEventDeadlineToFloat(index);
+		else if (task.getType() == TaskieEnum.TaskType.EVENT &&
+				 task.getStartTime() == null && task.getEndTime() == null)
+			TaskieStorage.updateEventToDeadline(index);
+		else if (task.getType() == TaskieEnum.TaskType.DEADLINE &&
+				 task.getStartTime() != null)
+			TaskieStorage.updateDeadlineToEvent(index, task.getStartTime());
+		else if (task.getEndTime() != null)
+			TaskieStorage.updateEventDeadlineEnd(index, task.getEndTime());
+		else if (task.getType() == TaskieEnum.TaskType.EVENT &&
+				 task.getStartTime() != null && task.getEndTime() == null)
+			TaskieStorage.updateEventStart(index, task.getStartTime());
+		else if (task.getType() == TaskieEnum.TaskType.EVENT &&
+				 task.getStartTime() != null && task.getEndTime() != null)
+			TaskieStorage.updateEventStartEnd(index, task.getStartTime(), task.getEndTime());
+		else 
+			throw new UnrecognisedCommandException("Unrecognised update criterion.");
+		String[] tasks = display(taskList);
+		String[] feedback = new String[] { "Updated successfully" };
+		return new String[][] { tasks, feedback };			
 	}
 	
 	private static String[][] undo() {
