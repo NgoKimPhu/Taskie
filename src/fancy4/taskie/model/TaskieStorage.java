@@ -136,7 +136,7 @@ public class TaskieStorage {
 		}
 	}
 
-	public static ArrayList<TaskieTask> deleteTask(int index, TaskieEnum.TaskType type) {
+	public static TaskieTask deleteTask(int index, TaskieEnum.TaskType type) {
 		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
 			TaskieTask task = eventDeadlineTaskList.get(index);
 			if(task.getType().equals(type)){
@@ -152,10 +152,9 @@ public class TaskieStorage {
 				// delete from deadline maps
 				else{
 					removeFromDeadlineMap(task);
-				}
-				
+				}		
 			}
-			return eventDeadlineTaskList;
+			return task;
 		} else {
 			TaskieTask task = floatTaskList.remove(index);
 			floatPriorityMap.get(task.getPriority()).remove(task);
@@ -164,7 +163,7 @@ public class TaskieStorage {
 				FileHandler.writeFile(floatTask, remainingTask);
 			}
 			removeFromFloatMap(task);
-			return floatTaskList;
+			return task;
 		}
 	}
 	//delete all,return value index 0--eventDeadlineTask, 1--floatTask
