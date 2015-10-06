@@ -29,7 +29,7 @@ public class TaskieStorage {
 
 	public static void load(String pathName) throws Exception {
 		if(pathName.trim().length()==0){
-			pathName = "newfolder";
+			pathName = "TaskieData";
 		}
 		File folder = new File(pathName);
 		if(!folder.exists()){
