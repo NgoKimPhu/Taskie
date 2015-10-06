@@ -17,7 +17,9 @@ public class TaskieParserTest {
 
 	@Test
 	public void test() {
-		TaskieAction action = TaskieParser.parse("add test");
+		TaskieAction action = TaskieParser.parse("add test monday");
+		System.err.println(action.getTask().getTitle());
+		action = TaskieParser.parse("add test from today till mon");
 		System.err.println(action.getTask().getTitle());
 	}
 
