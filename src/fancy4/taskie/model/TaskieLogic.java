@@ -39,7 +39,7 @@ public class TaskieLogic {
 				Object searchKey = action.getSearch(); 
 				if (searchKey instanceof String)
 					return search((ArrayList<String>)action.getSearch(), action.getTask().getType());
-				//else if 
+				//return search(action);
 			case UPDATE:
 				//return update();
 			default:
@@ -79,8 +79,21 @@ public class TaskieLogic {
 	 * @return
 	 */
 	
-	private static String[][] search(ArrayList<String> keyword, TaskieEnum.TaskType type) {
-		Collection<IndexTaskPair> taskList = TaskieStorage.searchTask(keyword, type);
+	private static String[][] search(TaskieAction action) {
+		TaskieEnum.TaskType type = action.getTask().getType();
+		Object searchKey = action.getSearch();
+		Collection<IndexTaskPair> taskList;
+		if (searchKey instanceof String) {
+			taskList = TaskieStorage.searchTask((ArrayList<String>)searchKey, type);
+		} else if (searchKey instanceof Date) {
+			taskList = TaskieStorage.searchTask((Date)searchKey, type);
+		} else if (searchKey instanceof Integer) {
+			taskList = TaskieStorage.searchTask((Integer)searchKey, type);
+		} else if (searchKey instanceof Boolean) {
+			taskList = TaskieStorage.searchTask((Boolean)searchKey, type);
+		} else {
+			throw new UnrecognisedCommandException("Unrecognised search key.");
+		}
 		searchResult.clear();
 		indexSave.clear();
 		for (IndexTaskPair pair : taskList) {
@@ -91,19 +104,18 @@ public class TaskieLogic {
 		String[] feedback = new String[] {"Search finished in 0.00019 seconds."};
 		return new String[][] {tasks, feedback};
 	}
-/*
-	private static String[][] search(Date date, TaskieEnum.TaskType type) {
-		Collection<IndexTaskPair> taskList = TaskieStorage.searchTask(date, type);
+	
+}
+
+class UnrecognisedCommandException extends Exception {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public UnrecognisedCommandException(String message) {
+		super(message);
 	}
-	
-	private static String[][] search(int priority, TaskieEnum.TaskType type) {
-		Collection<IndexTaskPair> taskList = TaskieStorage.searchTask(priority, type);
-	}
-	
-	private static String[][] search(boolean isDone, TaskieEnum.TaskType type) {
-		Collection<IndexTaskPair> taskList = TaskieStorage.searchTask(isDone, type);
-	}
-*/
-	
-	
+
 }
