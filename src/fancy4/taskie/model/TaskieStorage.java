@@ -462,17 +462,125 @@ public class TaskieStorage {
 	} 
 	
 
-	public static void markDown(int index, TaskieEnum.TaskType type) {
+	public static ArrayList<TaskieTask> markDown(int index, TaskieEnum.TaskType type) {
 		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
 			eventDeadlineTaskList.get(index).setStatus(true);
+			Collections.sort(eventDeadlineTaskList, tc);
+			return eventDeadlineTaskList;
 		} else {
 			floatTaskList.get(index).setStatus(true);
+			Collections.sort(floatTaskList, tc);
+			return floatTaskList;
 		}
 	}
 
-	public void update() {
-
+	public static ArrayList<TaskieTask> updateTaskTitle(int index, TaskieEnum.TaskType type, String title){
+		if(type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)){
+			TaskieTask task = eventDeadlineTaskList.get(index);
+			task.setTitle(title);
+			Collections.sort(eventDeadlineTaskList, tc);
+			return eventDeadlineTaskList;
+		}
+		else{
+			TaskieTask task = floatTaskList.get(index);
+			task.setTitle(title);
+			Collections.sort(floatTaskList, tc);
+			return floatTaskList;
+		}
 	}
+	public static ArrayList<TaskieTask> updateTaskPriority(int index, TaskieEnum.TaskType type, TaskieEnum.TaskPriority priority){
+		if(type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)){
+			TaskieTask task = eventDeadlineTaskList.get(index);
+			task.setPriority(priority);
+			Collections.sort(eventDeadlineTaskList, tc);
+			return eventDeadlineTaskList;
+		}
+		else{
+			TaskieTask task = floatTaskList.get(index);
+			task.setPriority(priority);
+			Collections.sort(floatTaskList, tc);
+			return floatTaskList;
+		}
+	}
+	public static ArrayList<TaskieTask> updateTaskDescription(int index, TaskieEnum.TaskType type, String description){
+		if(type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)){
+			TaskieTask task = eventDeadlineTaskList.get(index);
+			task.setDescription(description);
+			return eventDeadlineTaskList;
+		}
+		else{
+			TaskieTask task = floatTaskList.get(index);
+			task.setDescription(description);
+			return floatTaskList;
+		}
+	}
+	//index 0-eventdeadline 1-float
+	public static ArrayList<ArrayList<TaskieTask>> updateFloatToDeadline(int index, Date end){
+		ArrayList<ArrayList<TaskieTask>> returnResult = new ArrayList<ArrayList<TaskieTask>>();
+		TaskieTask task = floatTaskList.remove(index);
+		task.setToDeadline(end);
+		eventDeadlineTaskList.add(task);
+		Collections.sort(eventDeadlineTaskList, tc);
+		returnResult.add(eventDeadlineTaskList);
+		returnResult.add(floatTaskList);
+		return returnResult;
+	}
+	public static ArrayList<ArrayList<TaskieTask>> updateFloatToEvent(int index, Date start, Date end){
+		ArrayList<ArrayList<TaskieTask>> returnResult = new ArrayList<ArrayList<TaskieTask>>();
+		TaskieTask task = floatTaskList.remove(index);
+		task.setToEvent(start, end);
+		eventDeadlineTaskList.add(task);
+		Collections.sort(eventDeadlineTaskList, tc);
+		returnResult.add(eventDeadlineTaskList);
+		returnResult.add(floatTaskList);
+		return returnResult;
+	}
+	public static ArrayList<ArrayList<TaskieTask>> updateEventDeadlineToFloat(int index){
+		ArrayList<ArrayList<TaskieTask>> returnResult = new ArrayList<ArrayList<TaskieTask>>();
+		TaskieTask task = eventDeadlineTaskList.remove(index);
+		task.setToFloat();
+		Collections.sort(floatTaskList, tc);
+		returnResult.add(eventDeadlineTaskList);
+		returnResult.add(floatTaskList);
+		return returnResult;
+	}
+	public static ArrayList<TaskieTask> updateEventToDeadline(int index){
+		TaskieTask task = eventDeadlineTaskList.get(index);
+		task.setToDeadline(task.getEndTime());
+		Collections.sort(eventDeadlineTaskList, tc);
+		return eventDeadlineTaskList;
+	}
+	public static ArrayList<TaskieTask> updateDeadlineToEvent(int index, Date start){
+		TaskieTask task = eventDeadlineTaskList.get(index);
+		task.setToEvent(start, task.getEndTime());
+		Collections.sort(eventDeadlineTaskList, tc);
+		return eventDeadlineTaskList;
+	}
+	public static ArrayList<TaskieTask> updateEventDeadlineEnd(int index, Date end){
+		TaskieTask task = eventDeadlineTaskList.get(index);
+		task.setEndTime(end);
+		Collections.sort(eventDeadlineTaskList, tc);
+		return eventDeadlineTaskList;
+	}
+	public static ArrayList<TaskieTask> updateEventStart(int index, Date start, Date end){	
+		TaskieTask task = eventDeadlineTaskList.get(index);
+		if(TaskieTask.isEvent(task)){
+			task.setStartTime(start);
+			Collections.sort(eventDeadlineTaskList, tc);
+		}
+		return eventDeadlineTaskList;
+	}
+	public static ArrayList<TaskieTask> updateEventStartEnd(int index, Date start, Date end){
+		TaskieTask task = floatTaskList.remove(index);
+		if(TaskieTask.isEvent(task)){
+			task.setStartTime(start);
+			task.setEndTime(end);
+			Collections.sort(eventDeadlineTaskList, tc);
+		}
+		return eventDeadlineTaskList;
+	}
+	
+	
 }
 
 class FileHandler {
