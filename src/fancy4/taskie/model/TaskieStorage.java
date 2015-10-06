@@ -508,6 +508,14 @@ public class TaskieStorage {
 		}
 		else{
 			TaskieTask task = floatTaskList.get(index);
+			floatPriorityMap.get(task.getPriority()).remove(task);
+			if(floatPriorityMap.get(task.getPriority()).size()==0){
+				floatPriorityMap.remove(task.getPriority());
+			}
+			if(!floatPriorityMap.containsKey(priority)){
+				floatPriorityMap.put(priority, new ArrayList<TaskieTask>());
+			}
+			floatPriorityMap.get(priority).add(task);
 			task.setPriority(priority);
 			Collections.sort(floatTaskList, tc);
 			return floatTaskList;
@@ -558,12 +566,12 @@ public class TaskieStorage {
 		TaskieTask task = floatTaskList.remove(index);
 		// fix bug: update map
 		floatPriorityMap.get(task.getPriority()).remove(task);
-		if(floatPriorityMap.get(task.getPriority()).size()==0){
+		if(isEmpty(floatPriorityMap.get(task.getPriority()))){
 			floatPriorityMap.remove(task.getPriority());
 		}
 		task.setToEvent(start, end);
-		// update event maps
 		eventDeadlineTaskList.add(task);
+		// update event maps
 		if(!eventStartDateMap.containsKey(task.getStartTime())){
 			eventStartDateMap.put(task.getStartTime(), new ArrayList<TaskieTask>());
 		}
@@ -596,7 +604,29 @@ public class TaskieStorage {
 	public static ArrayList<ArrayList<TaskieTask>> updateEventDeadlineToFloat(int index){
 		ArrayList<ArrayList<TaskieTask>> returnResult = new ArrayList<ArrayList<TaskieTask>>();
 		TaskieTask task = eventDeadlineTaskList.remove(index);
+		if(TaskieTask.isEvent(task)){
+			Date start = task.getStartTime();
+			Date end = task.getEndTime();
+			TaskieEnum.TaskPriority priority = task.getPriority();
+			eventStartDateMap.get(start).remove(task);
+			if(isEmpty(eventStartDateMap.get(start))){
+				eventStartDateMap.remove(start);
+			}
+			eventEndDateMap.get(end).remove(task);
+			if(isEmpty(eventEndDateMap.get(end))){
+				eventEndDateMap.remove(end);
+			}
+			eventPriorityMap.get(priority).remove(task);
+			if(isEmpty(eventPriorityMap.get(priority))){
+				eventPriorityMap.remove(priority);
+			}
+		}
 		task.setToFloat();
+		floatTaskList.add(task);
+		if(!floatPriorityMap.containsKey(task.getPriority())){
+			floatPriorityMap.put(task.getPriority(), new ArrayList<TaskieTask>());
+		}
+		floatPriorityMap.get(task.getPriority()).add(task);
 		Collections.sort(floatTaskList, tc);
 		returnResult.add(eventDeadlineTaskList);
 		returnResult.add(floatTaskList);
@@ -647,6 +677,9 @@ public class TaskieStorage {
 		calendarForKey.set(Calendar.DATE, calendar.get(Calendar.DATE));
 		Date key = calendarForKey.getTime();
 		return key;
+	}
+	private static boolean isEmpty(ArrayList<TaskieTask> tasks){
+		return tasks.size() == 0;
 	}
 }
 
