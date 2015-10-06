@@ -562,7 +562,7 @@ public class TaskieStorage {
 		Collections.sort(eventDeadlineTaskList, tc);
 		return eventDeadlineTaskList;
 	}
-	public static ArrayList<TaskieTask> updateEventStart(int index, Date start, Date end){	
+	public static ArrayList<TaskieTask> updateEventStart(int index, Date start){	
 		TaskieTask task = eventDeadlineTaskList.get(index);
 		if(TaskieTask.isEvent(task)){
 			task.setStartTime(start);
