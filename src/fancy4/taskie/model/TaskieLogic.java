@@ -24,6 +24,9 @@ public class TaskieLogic {
 	public static void initialise() {
 		try {
 			TaskieStorage.load("");
+			undoStack = new Stack<TaskieAction>();
+			redoStack = new Stack<TaskieAction>();
+			commandSave = new Stack<TaskieAction>();
 			searchResult = new ArrayList<TaskieTask>();
 			indexSave = new ArrayList<Integer>();
 		} catch (Exception e) {
