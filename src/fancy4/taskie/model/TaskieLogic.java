@@ -1,4 +1,5 @@
 package fancy4.taskie.model;
+
 /**
  * @author Qin_ShiHuang 
  *
@@ -9,10 +10,10 @@ import java.util.Collection;
 import java.util.Date;
 
 public class TaskieLogic {
-	
+
 	private static ArrayList<TaskieTask> searchResult;
 	private static ArrayList<Integer> indexSave;
-	
+
 	public static void initialise() {
 		try {
 			TaskieStorage.load("");
@@ -22,15 +23,16 @@ public class TaskieLogic {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static String[][] execute(String str) {
 		TaskieAction action = TaskieParser.parse(str);
 		String[][] screen = takeAction(action);
 		return screen;
 	}
-	
+
 	private static String[][] takeAction(TaskieAction action) {
-		switch (action.getType()) {
+		try {
+			switch (action.getType()) {
 			case ADD:
 				return add(action.getTask());
 			case DELETE:
@@ -38,12 +40,15 @@ public class TaskieLogic {
 			case SEARCH:
 				return search(action);
 			case UPDATE:
-				//return update();
+				return update();
 			default:
 				return add(action.getTask());
+			}
+		} catch (UnrecognisedCommandException e) {
+			return new String[][] {};
 		}
 	}
-	
+
 	public static String[] display(Collection<TaskieTask> taskList) {
 		String[] screen = new String[taskList.size()];
 		int index = 0;
@@ -52,42 +57,38 @@ public class TaskieLogic {
 		}
 		return screen;
 	}
-	
+
 	private static String[][] add(TaskieTask task) {
 		Collection<TaskieTask> taskList = TaskieStorage.addTask(task);
 		String[] tasks = display(taskList);
-		String[] feedback = new String[] {task.getTitle() + " is added"};
-		return new String[][] {tasks, feedback};
+		String[] feedback = new String[] { task.getTitle() + " is added" };
+		return new String[][] { tasks, feedback };
 	}
-	
+
 	private static String[][] delete(int index, TaskieEnum.TaskType type) {
 		TaskieStorage.deleteTask(indexSave.get(index - 1), type);
 		String title = searchResult.get(index - 1).getTitle();
 		searchResult.remove(index - 1);
 		String[] tasks = display(searchResult);
-		String[] feedback = new String[] {title + " is deleted"};
-		return new String[][] {tasks, feedback};
+		String[] feedback = new String[] { title + " is deleted" };
+		return new String[][] { tasks, feedback };
 	}
-	/*******
-	 * Important remark:
-	 * returned
-	 * @param keyword
-	 * @param type
-	 * @return
-	 */
-	
-	private static String[][] search(TaskieAction action) {
+
+	private static String[][] search(TaskieAction action)
+			throws UnrecognisedCommandException {
 		TaskieEnum.TaskType type = action.getTask().getType();
 		Object searchKey = action.getSearch();
 		Collection<IndexTaskPair> taskList;
 		if (searchKey instanceof String) {
-			taskList = TaskieStorage.searchTask((ArrayList<String>)searchKey, type);
+			taskList = TaskieStorage.searchTask((ArrayList<String>) searchKey,
+					type);
 		} else if (searchKey instanceof Date) {
-			taskList = TaskieStorage.searchTask((Date)searchKey, type);
+			taskList = TaskieStorage.searchTask((Date) searchKey, type);
 		} else if (searchKey instanceof Integer) {
-			taskList = TaskieStorage.searchTask((Integer)searchKey, type);
+			taskList = TaskieStorage.searchTask(
+					(TaskieEnum.TaskPriority) searchKey, type);
 		} else if (searchKey instanceof Boolean) {
-			taskList = TaskieStorage.searchTask((Boolean)searchKey, type);
+			taskList = TaskieStorage.searchTask((Boolean) searchKey, type);
 		} else {
 			throw new UnrecognisedCommandException("Unrecognised search key.");
 		}
@@ -98,14 +99,22 @@ public class TaskieLogic {
 			indexSave.add(pair.getIndex());
 		}
 		String[] tasks = display(searchResult);
-		String[] feedback = new String[] {"Search finished in 0.00019 seconds."};
-		return new String[][] {tasks, feedback};
+		String[] feedback = new String[] { "Search finished in 0.00019 seconds." };
+		return new String[][] { tasks, feedback };
+	}
+
+	private static String[][] update() {
+
 	}
 	
+	private static String[][] undo() {
+		
+	}
+
 }
 
 class UnrecognisedCommandException extends Exception {
-	
+
 	/**
 	 * 
 	 */
