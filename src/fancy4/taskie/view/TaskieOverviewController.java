@@ -114,10 +114,11 @@ public class TaskieOverviewController {
 				System.out.print(s+" ");
 			}
 			
-			textInput.selectPositionCaret(textInput.getLength());
-			textInput.deselect();
+			
 
 			textInput.clear();
+			textOutput.selectPositionCaret(textOutput.getLength());
+			textOutput.deselect();
 		}
 
 	}
