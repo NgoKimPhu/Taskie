@@ -166,8 +166,6 @@ public final class TaskieParser {
 					return new TaskieAction(TaskieEnum.Actions.INVALID, new TaskieTask(commandData));
 				}
 				return new TaskieAction(actionType, new TaskieTask(removeFirstWord(commandData)), index);
-			case UNDO:
-				return new TaskieAction(actionType, new TaskieTask(commandData));
 			default:
 				return new TaskieAction(TaskieEnum.Actions.INVALID, (TaskieTask) null);
 		}

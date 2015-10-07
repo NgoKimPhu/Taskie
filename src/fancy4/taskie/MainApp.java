@@ -20,18 +20,10 @@ public class MainApp extends Application {
     public ObservableList<String> dTaskData = FXCollections.observableArrayList();
     public ObservableList<String> fTaskData = FXCollections.observableArrayList();
     
-    public static String[] mdata = {};
-    public static String[] ddata = {};
-    public static String[] fdata = {};
+    public static String[] data = {};
     public MainApp() {
-    	TaskieLogic.initialise();
-    	mdata = TaskieLogic.execute("search")[1];
-    	taskData.addAll(mdata);
-    	ddata = TaskieLogic.execute("search")[2];
-    	dTaskData.addAll(ddata);
-    	fdata = TaskieLogic.execute("search")[3];
-    	fTaskData.addAll(fdata);
-    	
+    	//data = TaskieLogic.execute("add order a pizza")[0];
+    	//TaskieLogic.initialise();
     }
     
    /* public static void refresh(String cmd) {
