@@ -143,7 +143,7 @@ public class TaskieLogic {
 			return display(searchResult, feedback);
 		} catch (IndexOutOfBoundsException e) {
 			String feedback = "Could not find index " + index;
-			return display(retrieve(type), feedback);
+			return display(searchResult, feedback);
 		}
 	}
 
