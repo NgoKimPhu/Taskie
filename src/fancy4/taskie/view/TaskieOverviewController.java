@@ -1,8 +1,8 @@
 package fancy4.taskie.view;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+//import javafx.collections.FXCollections;
+//import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 //import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -114,8 +114,8 @@ public class TaskieOverviewController {
 				System.out.print(s+" ");
 			}
 			
-			textInput.selectPositionCaret(textInput.getLength());
-			textInput.deselect();
+			textOutput.selectPositionCaret(textOutput.getLength());
+			textOutput.deselect();
 
 			textInput.clear();
 		}
