@@ -116,17 +116,22 @@ public class TaskieLogic {
 	}
 
 	private static String[][] delete(int index, TaskieEnum.TaskType type) {
-		TaskieTask deleted = TaskieStorage.deleteTask(indexSave.get(index - 1), type);
-		String title = searchResult.get(index - 1).getTitle();
-		assert title.equals(deleted.getTitle());
-		
-		//Construct undo values
-		TaskieAction action = new TaskieAction(TaskieEnum.Actions.ADD, deleted);
-		undoStack.push(action);
-		
-		searchResult.remove(index - 1);
-		String feedback = new String(title + " is deleted");
-		return display(searchResult, feedback);
+		try {
+			TaskieTask deleted = TaskieStorage.deleteTask(indexSave.get(index - 1), type);
+			String title = searchResult.get(index - 1).getTitle();
+			assert title.equals(deleted.getTitle());
+			
+			//Construct undo values
+			TaskieAction action = new TaskieAction(TaskieEnum.Actions.ADD, deleted);
+			undoStack.push(action);
+			
+			searchResult.remove(index - 1);
+			String feedback = new String(title + " is deleted");
+			return display(searchResult, feedback);
+		} catch (IndexOutOfBoundsException e) {
+			String feedback = "Could not find index " + index;
+			return display(searchResult, feedback);
+		}
 	}
 
 	private static String[][] search(TaskieAction action)
@@ -155,7 +160,7 @@ public class TaskieLogic {
 			indexSave.add(pair.getIndex());
 		}
 		double time = Math.random() * Math.random() / 1000;
-		String feedback = new String("Search finished in " + time + " seconds.");
+		String feedback = new String("Search finished in " + String.format("%.5f", time) + " seconds.");
 		return display(searchResult, feedback);
 	}
 
