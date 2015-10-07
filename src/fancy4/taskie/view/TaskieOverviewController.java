@@ -105,11 +105,11 @@ public class TaskieOverviewController {
 			for (String s:mainData) {
 				System.out.print(s+" ");
 			}
-			System.out.println("\n + deadline display:");
+			System.out.println("\n  deadline display:");
 			for (String s:dData) {
 				System.out.print(s+" ");
 			}
-			System.out.println("\n + float display:");
+			System.out.println("\n  float display:");
 			for (String s:fData) {
 				System.out.print(s+" ");
 			}
