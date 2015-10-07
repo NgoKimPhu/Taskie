@@ -12,7 +12,7 @@ import java.util.Stack;
 
 public class TaskieLogic {
 
-	private static ArrayList<TaskieTask> searchResult;
+	private static Collection<TaskieTask> searchResult;
 	private static ArrayList<Integer> indexSave;
 	private static Stack<TaskieAction> undoStack;
 	private static Stack<TaskieAction> redoStack;
@@ -29,7 +29,6 @@ public class TaskieLogic {
 			commandSave = new Stack<TaskieAction>();
 			searchResult = new ArrayList<TaskieTask>();
 			indexSave = new ArrayList<Integer>();
-			execute("search");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -115,6 +114,7 @@ public class TaskieLogic {
 		IndexTaskPair added = TaskieStorage.addTask(task);
 		TaskieEnum.TaskType type = added.getTask().getType();
 		Collection<TaskieTask> taskList = retrieve(type);
+		searchResult = retrieve(TaskieEnum.TaskType.FLOAT);
 		
 		//Undo
 		int index = added.getIndex();
@@ -129,7 +129,7 @@ public class TaskieLogic {
 	private static String[][] delete(int index, TaskieEnum.TaskType type) {
 		try {
 			TaskieTask deleted = TaskieStorage.deleteTask(indexSave.get(index - 1), type);
-			String title = searchResult.get(index - 1).getTitle();
+			String title = ((ArrayList<TaskieTask>)searchResult).get(index - 1).getTitle();
 			assert title.equals(deleted.getTitle());
 			
 			// Construct undo values
