@@ -115,9 +115,11 @@ public class TaskieLogic {
 		TaskieEnum.TaskType type = added.getTask().getType();
 		Collection<TaskieTask> taskList = retrieve(type);
 		searchResult = retrieve(TaskieEnum.TaskType.FLOAT);
+		for (int i = 0; i < searchResult.size(); i++)
+			indexSave.add(i);
 		
 		//Undo
-		int index = added.getIndex();
+		int index = added.getIndex() + 1;
 		TaskieTask undo = new TaskieTask("");
 		TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, undo, index);;
 		undoStack.push(undoAction);
@@ -141,7 +143,7 @@ public class TaskieLogic {
 			return display(searchResult, feedback);
 		} catch (IndexOutOfBoundsException e) {
 			String feedback = "Could not find index " + index;
-			return display(searchResult, feedback);
+			return display(retrieve(type), feedback);
 		}
 	}
 
