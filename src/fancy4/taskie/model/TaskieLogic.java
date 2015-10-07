@@ -89,18 +89,18 @@ public class TaskieLogic {
 	
 	private static Collection<TaskieTask> retrieve(TaskieEnum.TaskType type) {
 		switch (type) {
-		case FLOAT:
-			return TaskieStorage.displayFloatTask();
-		case DEADLINE:
-			Collection<TaskieTask> eventDeadline = TaskieStorage.displayEventDeadline();
-			ArrayList<TaskieTask> deadline = new ArrayList<TaskieTask>();
-			for (TaskieTask task : eventDeadline) {
-				if (task.getStartTime() == null)
-					deadline.add(task);
-			}
-			return deadline;
-		default:
-			return new ArrayList<TaskieTask>();
+			case FLOAT:
+				return TaskieStorage.displayFloatTask();
+			case DEADLINE:
+				Collection<TaskieTask> eventDeadline = TaskieStorage.displayEventDeadline();
+				ArrayList<TaskieTask> deadline = new ArrayList<TaskieTask>();
+				for (TaskieTask task : eventDeadline) {
+					if (task.getStartTime() == null)
+						deadline.add(task);
+				}
+				return deadline;
+			default:
+				return new ArrayList<TaskieTask>();
 		}
 	}
 
@@ -121,7 +121,7 @@ public class TaskieLogic {
 			String title = searchResult.get(index - 1).getTitle();
 			assert title.equals(deleted.getTitle());
 			
-			//Construct undo values
+			// Construct undo values
 			TaskieAction action = new TaskieAction(TaskieEnum.Actions.ADD, deleted);
 			undoStack.push(action);
 			
