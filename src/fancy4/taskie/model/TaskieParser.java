@@ -19,8 +19,9 @@ public final class TaskieParser {
 			+ "(?:(\\d{1,2}\\s?)?(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|"
 			+ "Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|(?:Nov|Dec)(?:ember)?)"
 			+ "\\s?(\\d{1,2})?)";
+	private static final String PATTERN_TIME = "\\b(?:at|by)\\s?(\\d{1,2})\\s?"
+			+ "(?:[.:h ]\\s?(\\d{1,2})\\s?m?)?(am|pm|)?";
 	private static final String PATTERN_TIMERANGE_FORMAT = "(?:%1$s)\\s?(?:-|~|to|till|until)\\s?(?:%1$s)";
-	private static final String PATTERN_TIME = "\\b\\d{1,2}\\s?(am|pm|([.:h ]\\s?\\d{1,2}\\s?m?)?)";
 	
 	private static final HashMap<String, Integer> weekDays = new HashMap<String, Integer>();
 	private static final HashMap<String, Integer> months = new HashMap<String, Integer>();
@@ -93,42 +94,19 @@ public final class TaskieParser {
 		
 		switch (actionType) {
 			case ADD:
-				Pattern timeRangePattern = Pattern.compile(getTimeRangePattern(PATTERN_DAY), 
-						Pattern.CASE_INSENSITIVE);
-				System.out.println(getTimeRangePattern(PATTERN_DAY));
-				Matcher matcher = timeRangePattern.matcher(commandData);
-				if (matcher.find()) {
-					Calendar startTime = Calendar.getInstance();
-					Calendar endTime = Calendar.getInstance();
-					System.out.println(matcher.group(0));
-					if (matcher.group(1) != null) { // (today|tomorrow|tmr)
-						if (!matcher.group(1).equals("today")) {
-							startTime.add(Calendar.DATE, 1);
-						}
-					} else if (matcher.group(2) != null) { // weekday
-						startTime.set(Calendar.DAY_OF_WEEK, 
-								weekDays.get(matcher.group(1).substring(0, 3).toLowerCase()));
-					} else if (matcher.group(3) != null) { // ((\d{1,2})\s?[\\/.-]?(\d{1,2}))
-						int dateInt1 = Integer.parseInt(matcher.group(4));
-						int dateInt2 = Integer.parseInt(matcher.group(5));
-						if (dateInt2 > 12) {
-							startTime.set(Calendar.DATE, dateInt2);
-							startTime.set(Calendar.MONTH, dateInt1);
-						} else {
-							startTime.set(Calendar.DATE, dateInt1);
-							startTime.set(Calendar.MONTH, dateInt2);
-						}
-					} else { // (\d{1,2}) (month) (\d{1,2})
-						startTime.set(Calendar.MONTH, 
-								months.get(matcher.group(7).substring(0, 3).toLowerCase()));
-						int date;
-						if (matcher.group(6) != null) {
-							date = Integer.parseInt(matcher.group(6));
-						} else {
-							date = Integer.parseInt(matcher.group(8));
-						}
-						startTime.set(Calendar.DATE, date);
-					}
+				Calendar startTime = Calendar.getInstance();
+				Calendar endTime = Calendar.getInstance();
+				Matcher matcher = Pattern.compile("").matcher("");
+				if (matchFound(matcher, getTimeRangePattern(PATTERN_DAY), commandData)) {
+					System.out.println("Date range detected: "+matcher.group(0));
+					setTime(matcher, startTime, 1);
+					setTime(matcher, endTime, 9);
+					System.out.println(printTime(startTime)+" till "+printTime(endTime));
+				} else if (matchFound(matcher, PATTERN_DAY, commandData)) {
+					System.out.println("Date detected: "+matcher.group(0));
+					setTime(matcher, startTime, 1);
+					setTime(matcher, endTime, 1);
+					System.out.println(printTime(startTime));
 				} else {
 					System.out.println("No match found!\n");
 				}
@@ -153,6 +131,58 @@ public final class TaskieParser {
 				return new TaskieAction(TaskieEnum.Actions.INVALID, (TaskieTask) null);
 		}
 		
+	}
+
+	private static String printTime(Calendar time) {
+		int year = time.get(Calendar.YEAR);
+		int month = time.get(Calendar.MONTH);      // 0 to 11
+		int day = time.get(Calendar.DAY_OF_MONTH);
+		int hour = time.get(Calendar.HOUR_OF_DAY);
+		int minute = time.get(Calendar.MINUTE);
+		int second = time.get(Calendar.SECOND);
+		
+		return String.format("%4d/%02d/%02d %02d:%02d:%02d",
+				year, month+1, day, hour, minute, second);
+	}
+	
+	private static boolean matchFound(Matcher m, String patternString, String string) {
+		m.usePattern(Pattern.compile(patternString, Pattern.CASE_INSENSITIVE));
+		m.reset(string);
+		return m.find();
+	}
+
+	private static void setTime(Matcher matcher, Calendar time, int groupOffset) {
+		if (matcher.group(groupOffset) != null) { // (today|tomorrow|tmr)
+			if (!matcher.group(groupOffset).equals("today")) {
+				time.add(Calendar.DATE, 1);
+			}
+		} else if (matcher.group(groupOffset + 1) != null) { // weekday
+			time.set(Calendar.DAY_OF_WEEK, 
+					weekDays.get(matcher.group(groupOffset + 1).substring(0, 3).toLowerCase()));
+			if (time.before(Calendar.getInstance())) {
+				time.add(Calendar.DATE, 7);
+			}
+		} else if (matcher.group(groupOffset + 2) != null) { // ((\d{1,2})\s?[\\/.-]?(\d{1,2}))
+			int dateInt1 = Integer.parseInt(matcher.group(groupOffset + 3));
+			int dateInt2 = Integer.parseInt(matcher.group(groupOffset + 4));
+			if (dateInt2 > 12) {
+				time.set(Calendar.DATE, dateInt2);
+				time.set(Calendar.MONTH, dateInt1);
+			} else {
+				time.set(Calendar.DATE, dateInt1);
+				time.set(Calendar.MONTH, dateInt2);
+			}
+		} else { // (\d{1,2}) (month) (\d{1,2})
+			time.set(Calendar.MONTH, 
+					months.get(matcher.group(groupOffset + 6).substring(0, 3).toLowerCase()));
+			int date;
+			if (matcher.group(groupOffset + 5) != null) {
+				date = Integer.parseInt(matcher.group(groupOffset + 5));
+			} else {
+				date = Integer.parseInt(matcher.group(groupOffset + 7));
+			}
+			time.set(Calendar.DATE, date);
+		}
 	}
 	
 	private static TaskieEnum.Actions determineTaskieAction(String actionTypeString) {
