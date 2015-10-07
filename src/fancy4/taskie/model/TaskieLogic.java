@@ -29,6 +29,7 @@ public class TaskieLogic {
 			commandSave = new Stack<TaskieAction>();
 			searchResult = new ArrayList<TaskieTask>();
 			indexSave = new ArrayList<Integer>();
+			execute("search");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
