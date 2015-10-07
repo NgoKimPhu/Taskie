@@ -89,6 +89,7 @@ public class TaskieLogic {
 	
 	private static Collection<TaskieTask> retrieve(TaskieEnum.TaskType type) {
 		switch (type) {
+		case EVENT:
 			case FLOAT:
 				return TaskieStorage.displayFloatTask();
 			case DEADLINE:
@@ -110,7 +111,16 @@ public class TaskieLogic {
 	 * Including add, delete, search, update.
 	 */
 	private static String[][] add(TaskieTask task) {
-		Collection<TaskieTask> taskList = TaskieStorage.addTask(task);
+		IndexTaskPair added = TaskieStorage.addTask(task);
+		TaskieEnum.TaskType type = added.getTask().getType();
+		Collection<TaskieTask> taskList = retrieve(type);
+		
+		//Undo
+		int index = added.getIndex();
+		TaskieTask undo = new TaskieTask("");
+		TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, undo, index);;
+		undoStack.push(undoAction);
+		
 		String feedback = new String(task.getTitle() + " is added");
 		return display(taskList, feedback);
 	}
