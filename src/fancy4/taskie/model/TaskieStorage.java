@@ -355,12 +355,22 @@ public class TaskieStorage {
 			TaskieTask task = eventDeadlineTaskList.get(index);
 			task.setTitle(title);
 			Collections.sort(eventDeadlineTaskList, tc);
+			FileHandler.clearFile(eventDeadlineTask);
+			for(TaskieTask t: eventDeadlineTaskList){
+				//System.out.println(t.getTitle());
+				FileHandler.writeFile(eventDeadlineTask, t);
+			}
 			return eventDeadlineTaskList;
 		}
 		else{
 			TaskieTask task = floatTaskList.get(index);
 			task.setTitle(title);
 			Collections.sort(floatTaskList, tc);
+			FileHandler.clearFile(floatTask);
+			for(TaskieTask t: floatTaskList){
+				//System.out.println(t.getTitle());
+				FileHandler.writeFile(floatTask, t);
+			}
 			return floatTaskList;
 		}
 	}
@@ -379,6 +389,11 @@ public class TaskieStorage {
 			}
 			
 			Collections.sort(eventDeadlineTaskList, tc);
+			FileHandler.clearFile(eventDeadlineTask);
+			for(TaskieTask t: eventDeadlineTaskList){
+				//System.out.println(t.getTitle());
+				FileHandler.writeFile(eventDeadlineTask, t);
+			}
 			return eventDeadlineTaskList;
 		}
 		else{
@@ -387,6 +402,11 @@ public class TaskieStorage {
 			task.setPriority(priority);
 			addToPriorityMap(floatPriorityMap, task);
 			Collections.sort(floatTaskList, tc);
+			FileHandler.clearFile(floatTask);
+			for(TaskieTask t: floatTaskList){
+				//System.out.println(t.getTitle());
+				FileHandler.writeFile(floatTask, t);
+			}
 			return floatTaskList;
 		}
 	}
@@ -394,11 +414,21 @@ public class TaskieStorage {
 		if(type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)){
 			TaskieTask task = eventDeadlineTaskList.get(index);
 			task.setDescription(description);
+			FileHandler.clearFile(eventDeadlineTask);
+			for(TaskieTask t: eventDeadlineTaskList){
+				//System.out.println(t.getTitle());
+				FileHandler.writeFile(eventDeadlineTask, t);
+			}
 			return eventDeadlineTaskList;
 		}
 		else{
 			TaskieTask task = floatTaskList.get(index);
 			task.setDescription(description);
+			FileHandler.clearFile(floatTask);
+			for(TaskieTask t: floatTaskList){
+				//System.out.println(t.getTitle());
+				FileHandler.writeFile(floatTask, t);
+			}
 			return floatTaskList;
 		}
 	}
@@ -411,6 +441,16 @@ public class TaskieStorage {
 		eventDeadlineTaskList.add(task);
 		addToDeadlineMap(task);
 		Collections.sort(eventDeadlineTaskList, tc);
+		FileHandler.clearFile(eventDeadlineTask);
+		for(TaskieTask t: eventDeadlineTaskList){
+			//System.out.println(t.getTitle());
+			FileHandler.writeFile(eventDeadlineTask, t);
+		}
+		FileHandler.clearFile(floatTask);
+		for(TaskieTask t: floatTaskList){
+			//System.out.println(t.getTitle());
+			FileHandler.writeFile(floatTask, t);
+		}
 		returnResult.add(eventDeadlineTaskList);
 		returnResult.add(floatTaskList);
 		return returnResult;
@@ -425,6 +465,16 @@ public class TaskieStorage {
 		// update event maps
 		addToEventMap(task);		
 		Collections.sort(eventDeadlineTaskList, tc);
+		FileHandler.clearFile(eventDeadlineTask);
+		for(TaskieTask t: eventDeadlineTaskList){
+			//System.out.println(t.getTitle());
+			FileHandler.writeFile(eventDeadlineTask, t);
+		}
+		FileHandler.clearFile(floatTask);
+		for(TaskieTask t: floatTaskList){
+			//System.out.println(t.getTitle());
+			FileHandler.writeFile(floatTask, t);
+		}
 		returnResult.add(eventDeadlineTaskList);
 		returnResult.add(floatTaskList);
 		return returnResult;
@@ -442,6 +492,16 @@ public class TaskieStorage {
 		floatTaskList.add(task);
 		addToFloatMap(task);
 		Collections.sort(floatTaskList, tc);
+		FileHandler.clearFile(eventDeadlineTask);
+		for(TaskieTask t: eventDeadlineTaskList){
+			//System.out.println(t.getTitle());
+			FileHandler.writeFile(eventDeadlineTask, t);
+		}
+		FileHandler.clearFile(floatTask);
+		for(TaskieTask t: floatTaskList){
+			//System.out.println(t.getTitle());
+			FileHandler.writeFile(floatTask, t);
+		}
 		returnResult.add(eventDeadlineTaskList);
 		returnResult.add(floatTaskList);
 		return returnResult;
@@ -452,6 +512,12 @@ public class TaskieStorage {
 		task.setToDeadline(task.getEndTime());
 		addToDeadlineMap(task);
 		Collections.sort(eventDeadlineTaskList, tc);
+		Collections.sort(floatTaskList, tc);
+		FileHandler.clearFile(eventDeadlineTask);
+		for(TaskieTask t: eventDeadlineTaskList){
+			//System.out.println(t.getTitle());
+			FileHandler.writeFile(eventDeadlineTask, t);
+		}
 		return eventDeadlineTaskList;
 	}
 	public static ArrayList<TaskieTask> updateDeadlineToEvent(int index, Date start){
@@ -460,6 +526,11 @@ public class TaskieStorage {
 		task.setToEvent(start, task.getEndTime());
 		addToEventMap(task);
 		Collections.sort(eventDeadlineTaskList, tc);
+		FileHandler.clearFile(eventDeadlineTask);
+		for(TaskieTask t: eventDeadlineTaskList){
+			//System.out.println(t.getTitle());
+			FileHandler.writeFile(eventDeadlineTask, t);
+		}
 		return eventDeadlineTaskList;
 	}
 	public static ArrayList<TaskieTask> updateEventDeadlineEnd(int index, Date end){
@@ -487,6 +558,11 @@ public class TaskieStorage {
 			task.setStartTime(start);
 			addToStartDateMap(eventStartDateMap, task);
 			Collections.sort(eventDeadlineTaskList, tc);
+			FileHandler.clearFile(eventDeadlineTask);
+			for(TaskieTask t: eventDeadlineTaskList){
+				//System.out.println(t.getTitle());
+				FileHandler.writeFile(eventDeadlineTask, t);
+			}
 		}
 		return eventDeadlineTaskList;
 	}
@@ -500,6 +576,11 @@ public class TaskieStorage {
 			addToStartDateMap(eventStartDateMap, task);
 			addToEndDateMap(eventEndDateMap, task);
 			Collections.sort(eventDeadlineTaskList, tc);
+			FileHandler.clearFile(eventDeadlineTask);
+			for(TaskieTask t: eventDeadlineTaskList){
+				//System.out.println(t.getTitle());
+				FileHandler.writeFile(eventDeadlineTask, t);
+			}
 		}
 		return eventDeadlineTaskList;
 	}
