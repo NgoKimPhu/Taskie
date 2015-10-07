@@ -27,6 +27,12 @@ public class TaskieParserTest {
 		System.err.println("^ " + action.getTask().getTitle());
 		action = TaskieParser.parse("conference 7 today till 9pm tmr");
 		System.err.println("^ " + action.getTask().getTitle());
+		action = TaskieParser.parse("conference tmr from 5 to 6 pm"); //TODO
+		System.err.println("^ " + action.getTask().getTitle());
+		action = TaskieParser.parse("conference 7.15pm till 9.30 tmr night at th");
+		System.err.println("^ " + action.getTask().getTitle());
+		action = TaskieParser.parse("conference today 7.15pm till 9.30 tmr night at th");
+		System.err.println("^ " + action.getTask().getTitle());
 		
 	}
 
