@@ -18,9 +18,16 @@ public class TaskieParserTest {
 	@Test
 	public void test() {
 		TaskieAction action = TaskieParser.parse("add test monday");
-		System.err.println(action.getTask().getTitle());
+		System.err.println("^ " + action.getTask().getTitle());
 		action = TaskieParser.parse("add test from today till mon");
-		System.err.println(action.getTask().getTitle());
+		System.err.println("^ " + action.getTask().getTitle());
+		action = TaskieParser.parse("buy pizza 7pm today");
+		System.err.println("^ " + action.getTask().getTitle());
+		action = TaskieParser.parse("class from 2 to 3");
+		System.err.println("^ " + action.getTask().getTitle());
+		action = TaskieParser.parse("conference 7 today till 9pm tmr");
+		System.err.println("^ " + action.getTask().getTitle());
+		
 	}
 
 }
