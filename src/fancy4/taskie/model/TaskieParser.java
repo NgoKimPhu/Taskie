@@ -19,9 +19,10 @@ public final class TaskieParser {
 			+ "(?:(\\d{1,2}\\s?)?(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|"
 			+ "Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|(?:Nov|Dec)(?:ember)?)"
 			+ "\\s?(\\d{1,2})?)";
-	private static final String PATTERN_TIME = "\\b(?:at|by)\\s?(\\d{1,2})\\s?"
-			+ "(?:[.:h ]\\s?(\\d{1,2})\\s?m?)?(am|pm|)?";
-	private static final String PATTERN_TIMERANGE_FORMAT = "(?:%1$s)\\s?(?:-|~|to|till|until)\\s?(?:%1$s)";
+	private static final String PATTERN_TIME = "\\b(?:at|by)?\\s?(\\d{1,2})\\s?"
+			+ "(?:[.:h ]\\s?(\\d{1,2})\\s?m?)?\\s?(am|pm)?";
+	private static final String PATTERN_TIMERANGE_FORMAT = "(?:fr(?:om)\\s)?(?:%1$s)\\s?(?:%2$s)?\\s?"
+			+ "(?:-|~|to|till|until)\\s?(?:%2$s)?\\s?(?:%1$s)";
 	
 	private static final HashMap<String, Integer> weekDays = new HashMap<String, Integer>();
 	private static final HashMap<String, Integer> months = new HashMap<String, Integer>();
@@ -95,22 +96,60 @@ public final class TaskieParser {
 		switch (actionType) {
 			case ADD:
 				Calendar startTime = Calendar.getInstance();
+				startTime.set(Calendar.HOUR_OF_DAY, 12);
+				startTime.set(Calendar.MINUTE, 0);
+				startTime.set(Calendar.SECOND, 0);
 				Calendar endTime = Calendar.getInstance();
+				endTime.set(Calendar.HOUR_OF_DAY, 12);
+				endTime.set(Calendar.MINUTE, 0);
+				endTime.set(Calendar.SECOND, 0);
 				Matcher matcher = Pattern.compile("").matcher("");
-				if (matchFound(matcher, getTimeRangePattern(PATTERN_DAY), commandData)) {
+				boolean isRange = true;
+				boolean isFloat = true;
+				
+				if (matchFound(matcher, getTimeRangePattern(PATTERN_DAY, PATTERN_TIME), commandData)) {
 					System.out.println("Date range detected: "+matcher.group(0));
-					setTime(matcher, startTime, 1);
-					setTime(matcher, endTime, 9);
+					isFloat = false;
+					setDate(matcher, startTime, 1);
+					setDate(matcher, endTime, 15);
 					System.out.println(printTime(startTime)+" till "+printTime(endTime));
 				} else if (matchFound(matcher, PATTERN_DAY, commandData)) {
 					System.out.println("Date detected: "+matcher.group(0));
-					setTime(matcher, startTime, 1);
-					setTime(matcher, endTime, 1);
+					isFloat = false;
+					setDate(matcher, startTime, 1);
+					setDate(matcher, endTime, 1);
 					System.out.println(printTime(startTime));
 				} else {
-					System.out.println("No match found!\n");
+					System.out.println("No match found for date!\n");
 				}
-				return new TaskieAction(actionType, new TaskieTask(commandData));
+				
+				if (matchFound(matcher, getTimeRangePattern(PATTERN_TIME, PATTERN_DAY), commandData)) {
+					System.out.println("Time range detected: "+matcher.group(0));
+					isFloat = false;
+					setTime(matcher, startTime, 1);
+					setTime(matcher, endTime, 20);
+					System.out.println(printTime(startTime)+" till "+printTime(endTime));
+				} else if (matchFound(matcher, PATTERN_TIME, commandData)) {
+					System.out.println("Time detected: "+matcher.group(0));
+					isFloat = false;
+					isRange = false;
+					setTime(matcher, endTime, 1);
+					System.out.println(printTime(endTime));
+				} else {
+					System.out.println("No match found for time!\n");
+				}
+				
+				if (isFloat) {
+					return new TaskieAction(actionType, new TaskieTask(commandData));
+				} else {
+					if (isRange) {
+						return new TaskieAction(actionType, 
+								new TaskieTask(commandData, startTime.getTime(), endTime.getTime()));
+					} else {
+						return new TaskieAction(actionType, 
+								new TaskieTask(commandData, endTime.getTime()));
+					}
+				}
 			case DELETE:
 				try {
 					index = Integer.parseInt(commandData);
@@ -151,7 +190,7 @@ public final class TaskieParser {
 		return m.find();
 	}
 
-	private static void setTime(Matcher matcher, Calendar time, int groupOffset) {
+	private static void setDate(Matcher matcher, Calendar time, int groupOffset) {
 		if (matcher.group(groupOffset) != null) { // (today|tomorrow|tmr)
 			if (!matcher.group(groupOffset).equals("today")) {
 				time.add(Calendar.DATE, 1);
@@ -167,10 +206,10 @@ public final class TaskieParser {
 			int dateInt2 = Integer.parseInt(matcher.group(groupOffset + 4));
 			if (dateInt2 > 12) {
 				time.set(Calendar.DATE, dateInt2);
-				time.set(Calendar.MONTH, dateInt1);
+				time.set(Calendar.MONTH, dateInt1 - 1);
 			} else {
 				time.set(Calendar.DATE, dateInt1);
-				time.set(Calendar.MONTH, dateInt2);
+				time.set(Calendar.MONTH, dateInt2 - 1);
 			}
 		} else { // (\d{1,2}) (month) (\d{1,2})
 			time.set(Calendar.MONTH, 
@@ -182,6 +221,23 @@ public final class TaskieParser {
 				date = Integer.parseInt(matcher.group(groupOffset + 7));
 			}
 			time.set(Calendar.DATE, date);
+		}
+	}
+	
+	private static void setTime(Matcher matcher, Calendar time, int groupOffset) {
+		if (matcher.group(groupOffset) != null) { // (\d{1,2})
+			int hour = Integer.parseInt(matcher.group(groupOffset));
+			if (matcher.group(groupOffset + 2) != null) { // (am|pm)
+				time.set(Calendar.HOUR, hour);
+				time.set(Calendar.AM_PM, (matcher.group(groupOffset + 2).toLowerCase().equals("am"))
+										? Calendar.AM : Calendar.PM);
+			} else {
+				time.set(Calendar.HOUR_OF_DAY, hour);
+			}
+		}
+		if (matcher.group(groupOffset + 1) != null) { // (?:[.:h ]\s?(\d{1,2})\s?m?)
+			int minute = Integer.parseInt(matcher.group(groupOffset + 1));
+			time.set(Calendar.MINUTE, minute);
 		}
 	}
 	
@@ -200,7 +256,11 @@ public final class TaskieParser {
 	}
 	
 	private static String getTimeRangePattern (String patternString) {
-		return String.format(PATTERN_TIMERANGE_FORMAT, patternString);
+		return String.format(PATTERN_TIMERANGE_FORMAT, patternString, "");
+	}
+	
+	private static String getTimeRangePattern (String patternString, String skippedString) {
+		return String.format(PATTERN_TIMERANGE_FORMAT, patternString, skippedString);
 	}
 	
 	private static String getFirstWord (String inputString) {
