@@ -28,12 +28,22 @@ public class TaskieStorage {
 	private static TaskComparator tc = new TaskComparator();
 
 	public static void load(String pathName) throws Exception {
+		File folder;
 		if(pathName.trim().length()==0){
 			pathName = "TaskieData";
+			folder = new File(pathName);
 		}
-		File folder = new File(pathName);
-		if(!folder.exists()){
-			folder.mkdir();
+		else{
+			File userPath = new File(pathName);
+			if(!userPath.exists()){
+				throw new Exception("Ooops! Invalid user path.");
+			}
+			else{
+				folder = new File(pathName+"/TaskieData");
+				if(!folder.exists()){
+					folder.mkdir();
+				}
+			}
 		}
 		eventDeadlineTask = new File(folder, "/eventDeadline.json");
 		floatTask = new File(folder,  "/floatTask.json");
