@@ -12,16 +12,20 @@ import java.util.regex.Pattern;
 public final class TaskieParser {
 	private static final String MESSAGE_INVALID_COMMAND_FORMAT = "invalid command format : %1$s";
 	// TODO make a class
-	private static final String PATTERN_DAY = "\\b(today|tomorrow|tmr)|"
+	private static final String PATTERN_DAY = "\\b(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)|"
 			+ "(?:(?:next\\s)?((?:Mon|Fri|Sun)(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|"
 			+ "Thu(?:rsday)?|Sat(?:urday)?))|"
-			+ "((\\d{1,2})\\s?[\\\\/.-]\\s?(\\d{1,2}))|"
+			+ "(?:(\\d{1,2})\\s?[\\\\\\/-]\\s?(\\d{1,2}))|"
 			+ "(?:(\\d{1,2}\\s?)?(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|"
 			+ "Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|(?:Nov|Dec)(?:ember)?)"
 			+ "\\s?(\\d{1,2})?)";
-	private static final String PATTERN_TIME = "\\b(?:at|by)?\\s?(\\d{1,2})\\s?"
-			+ "(?:[.:h ]\\s?(\\d{1,2})\\s?m?)?\\s?(am|pm)?";
-	private static final String PATTERN_TIMERANGE_FORMAT = "(?:fr(?:om)\\s)?(?:%1$s)\\s?(?:%2$s)?\\s?"
+	private static final String PATTERN_TIME = "(?:\\b(?:(?=fr(?:om)|-|~|to|till|until)|at|by))?\\s?"
+			+ "(\\d{1,2})\\s?"
+			+ "(?=[.:h ]\\s?\\d{1,2}\\s?m?|am|pm|tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)"
+			+ "(?:[.:h ]\\s?(\\d{1,2})\\s?m?)?\\s?(am|pm)?\\s?"
+			+ "(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)?\\b|"
+			+ "(?:\\b(?:(?=fr(?:om)|-|~|to|till|until)|at|by))\\s?(\\d{1,2})\\b";
+	private static final String PATTERN_TIMERANGE_FORMAT = "(?:fr(?:om)?\\s)?(?:%1$s)\\s?(?:%2$s)?\\s?"
 			+ "(?:-|~|to|till|until)\\s?(?:%2$s)?\\s?(?:%1$s)";
 	
 	private static final HashMap<String, Integer> weekDays = new HashMap<String, Integer>();
@@ -111,7 +115,7 @@ public final class TaskieParser {
 					System.out.println("Date range detected: "+matcher.group(0));
 					isFloat = false;
 					setDate(matcher, startTime, 1);
-					setDate(matcher, endTime, 15);
+					setDate(matcher, endTime, 18);
 					System.out.println(printTime(startTime)+" till "+printTime(endTime));
 				} else if (matchFound(matcher, PATTERN_DAY, commandData)) {
 					System.out.println("Date detected: "+matcher.group(0));
@@ -192,7 +196,7 @@ public final class TaskieParser {
 
 	private static void setDate(Matcher matcher, Calendar time, int groupOffset) {
 		if (matcher.group(groupOffset) != null) { // (today|tomorrow|tmr)
-			if (!matcher.group(groupOffset).equals("today")) {
+			if (!matcher.group(groupOffset).contains("today")) {
 				time.add(Calendar.DATE, 1);
 			}
 		} else if (matcher.group(groupOffset + 1) != null) { // weekday
@@ -202,8 +206,8 @@ public final class TaskieParser {
 				time.add(Calendar.DATE, 7);
 			}
 		} else if (matcher.group(groupOffset + 2) != null) { // ((\d{1,2})\s?[\\/.-]?(\d{1,2}))
-			int dateInt1 = Integer.parseInt(matcher.group(groupOffset + 3));
-			int dateInt2 = Integer.parseInt(matcher.group(groupOffset + 4));
+			int dateInt1 = Integer.parseInt(matcher.group(groupOffset + 2));
+			int dateInt2 = Integer.parseInt(matcher.group(groupOffset + 3));
 			if (dateInt2 > 12) {
 				time.set(Calendar.DATE, dateInt2);
 				time.set(Calendar.MONTH, dateInt1 - 1);
@@ -213,12 +217,12 @@ public final class TaskieParser {
 			}
 		} else { // (\d{1,2}) (month) (\d{1,2})
 			time.set(Calendar.MONTH, 
-					months.get(matcher.group(groupOffset + 6).substring(0, 3).toLowerCase()));
+					months.get(matcher.group(groupOffset + 5).substring(0, 3).toLowerCase()));
 			int date;
-			if (matcher.group(groupOffset + 5) != null) {
-				date = Integer.parseInt(matcher.group(groupOffset + 5));
+			if (matcher.group(groupOffset + 4) != null) {
+				date = Integer.parseInt(matcher.group(groupOffset + 4));
 			} else {
-				date = Integer.parseInt(matcher.group(groupOffset + 7));
+				date = Integer.parseInt(matcher.group(groupOffset + 6));
 			}
 			time.set(Calendar.DATE, date);
 		}
@@ -231,13 +235,22 @@ public final class TaskieParser {
 				time.set(Calendar.HOUR, hour);
 				time.set(Calendar.AM_PM, (matcher.group(groupOffset + 2).toLowerCase().equals("am"))
 										? Calendar.AM : Calendar.PM);
+			} else if (matcher.group(groupOffset + 3) != null &&
+					matcher.group(groupOffset + 3).contains("night")) {
+				// tonight|(?:today|tomorrow|tmr)\\s?(?:night)?
+				time.set(Calendar.HOUR, hour);
+				time.set(Calendar.AM_PM, Calendar.PM);
 			} else {
 				time.set(Calendar.HOUR_OF_DAY, hour);
 			}
-		}
-		if (matcher.group(groupOffset + 1) != null) { // (?:[.:h ]\s?(\d{1,2})\s?m?)
-			int minute = Integer.parseInt(matcher.group(groupOffset + 1));
-			time.set(Calendar.MINUTE, minute);
+			
+			if (matcher.group(groupOffset + 1) != null) { // (?:[.:h ]\s?(\d{1,2})\s?m?)
+				int minute = Integer.parseInt(matcher.group(groupOffset + 1));
+				time.set(Calendar.MINUTE, minute);
+			}
+		} else {
+			int hour = Integer.parseInt(matcher.group(groupOffset + 4));
+			time.set(Calendar.HOUR_OF_DAY, hour);
 		}
 	}
 	
