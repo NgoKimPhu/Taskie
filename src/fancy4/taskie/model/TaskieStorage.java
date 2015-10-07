@@ -109,7 +109,7 @@ public class TaskieStorage {
 	}
 	
 	// add task
-	public static ArrayList<TaskieTask> addTask(TaskieTask task) {
+	public static IndexTaskPair addTask(TaskieTask task) {
 		if (TaskieTask.isEvent(task)
 				|| TaskieTask.isDeadline(task)) {
 			eventDeadlineTaskList.add(task);
@@ -127,12 +127,12 @@ public class TaskieStorage {
 			else{
 				addToDeadlineMap(task);
 			}	
-			return eventDeadlineTaskList;
+			return new IndexTaskPair(eventDeadlineTaskList.indexOf(task), task);
 		} else {
 			floatTaskList.add(task);
 			FileHandler.writeFile(floatTask, task);
 			addToFloatMap(task);
-			return floatTaskList;
+			return new IndexTaskPair(floatTaskList.indexOf(task), task);
 		}
 	}
 
