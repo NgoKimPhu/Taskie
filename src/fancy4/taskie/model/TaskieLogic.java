@@ -89,22 +89,43 @@ public class TaskieLogic {
 		return ary;
 	}
 	
-	private static ArrayList<TaskieTask> retrieve(TaskieEnum.TaskType type) {
+	private static ArrayList<IndexTaskPair> powerRetrieve(TaskieEnum.TaskType type) {
 		switch (type) {
-		case EVENT:
+			case EVENT:
+				ArrayList<TaskieTask> eventRaw = TaskieStorage.displayEventDeadline();
+				ArrayList<IndexTaskPair> event = new ArrayList<IndexTaskPair>();
+				for (int i = 0; i < eventRaw.size(); i++) {
+					TaskieTask task = eventRaw.get(i);
+					if (task.getType().equals(TaskieEnum.TaskType.EVENT))
+						event.add(new IndexTaskPair(i, task));
+				}
+				return event;
 			case FLOAT:
-				return TaskieStorage.displayFloatTask();
+				ArrayList<TaskieTask> floatRaw = TaskieStorage.displayFloatTask();
+				ArrayList<IndexTaskPair> floatTasks = new ArrayList<IndexTaskPair>();
+				for (int i = 0; i < floatRaw.size(); i++)
+					floatTasks.add(new IndexTaskPair(i, floatRaw.get(i)));
+				return floatTasks;	
 			case DEADLINE:
-				Collection<TaskieTask> eventDeadline = TaskieStorage.displayEventDeadline();
-				ArrayList<TaskieTask> deadline = new ArrayList<TaskieTask>();
-				for (TaskieTask task : eventDeadline) {
-					if (task.getStartTime() == null)
-						deadline.add(task);
+				ArrayList<TaskieTask> deadlineRaw = TaskieStorage.displayEventDeadline();
+				ArrayList<IndexTaskPair> deadline = new ArrayList<IndexTaskPair>();
+				for (int i = 0; i < deadlineRaw.size(); i++) {
+					TaskieTask task = deadlineRaw.get(i);
+					if (task.getType().equals(TaskieEnum.TaskType.EVENT))
+						deadline.add(new IndexTaskPair(i, task));
 				}
 				return deadline;
 			default:
-				return new ArrayList<TaskieTask>();
+				return new ArrayList<IndexTaskPair>();
 		}
+	}
+	
+	private static ArrayList<TaskieTask> retrieve(TaskieEnum.TaskType type) {
+		ArrayList<IndexTaskPair> raw = powerRetrieve(type);
+		ArrayList<TaskieTask> result = new ArrayList<TaskieTask>();
+		for (IndexTaskPair pair : raw)
+			result.add(pair.getTask());
+		return result;
 	}
 
 	
@@ -115,10 +136,7 @@ public class TaskieLogic {
 	private static String[][] add(TaskieTask task) {
 		IndexTaskPair added = TaskieStorage.addTask(task);
 		TaskieEnum.TaskType type = added.getTask().getType();
-		//Collection<TaskieTask> taskList = retrieve(type);
 		searchResult = retrieve(type);
-		for (int i = 0; i < searchResult.size(); i++)
-			indexSave.add(i);
 		
 		//Undo
 		int index = added.getIndex();
