@@ -75,8 +75,8 @@ public class TaskieLogic {
 	private static String[][] display(Collection<TaskieTask> taskList, String message) {
 		String[] feedback = new String[] {message};
 		String[] tasks = toStringArray(taskList);
-		String[] deadlines = toStringArray(retrieve(TaskieEnum.TaskType.DEADLINE));
-		String[] floats = toStringArray(retrieve(TaskieEnum.TaskType.FLOAT));
+		String[] deadlines = toStringArray(retrieveTaskList(TaskieEnum.TaskType.DEADLINE));
+		String[] floats = toStringArray(retrieveTaskList(TaskieEnum.TaskType.FLOAT));
 		return new String[][] { feedback, tasks, deadlines, floats };
 	}
 
@@ -120,11 +120,19 @@ public class TaskieLogic {
 		}
 	}
 	
-	private static ArrayList<TaskieTask> retrieve(TaskieEnum.TaskType type) {
+	private static ArrayList<TaskieTask> retrieveTaskList(TaskieEnum.TaskType type) {
 		ArrayList<IndexTaskPair> raw = powerRetrieve(type);
 		ArrayList<TaskieTask> result = new ArrayList<TaskieTask>();
 		for (IndexTaskPair pair : raw)
 			result.add(pair.getTask());
+		return result;
+	}
+	
+	private static ArrayList<Integer> retrieveIndexList(TaskieEnum.TaskType type) {
+		ArrayList<IndexTaskPair> raw = powerRetrieve(type);
+		ArrayList<Integer> result = new ArrayList<Integer>();
+		for (IndexTaskPair pair : raw)
+			result.add(pair.getIndex());
 		return result;
 	}
 
@@ -136,7 +144,8 @@ public class TaskieLogic {
 	private static String[][] add(TaskieTask task) {
 		IndexTaskPair added = TaskieStorage.addTask(task);
 		TaskieEnum.TaskType type = added.getTask().getType();
-		searchResult = retrieve(type);
+		searchResult = retrieveTaskList(type);
+		indexSave = retrieveIndexList(type);
 		
 		//Undo
 		int index = added.getIndex();
@@ -235,9 +244,10 @@ public class TaskieLogic {
 			TaskieStorage.updateEventStartEnd(index, task.getStartTime(), task.getEndTime());
 		else 
 			throw new UnrecognisedCommandException("Unrecognised update criterion.");
-		Collection<TaskieTask> taskList = retrieve(task.getType());
+		searchResult = retrieveTaskList(task.getType());
+		indexSave = retrieveIndexList(task.getType());
 		String feedback = new String("Updated successfully");
-		return display(taskList, feedback);
+		return display(searchResult, feedback);
 	}
 	
 	private static String[][] deleteAll() {
