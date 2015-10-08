@@ -12,7 +12,7 @@ import java.util.Stack;
 
 public class TaskieLogic {
 
-	private static Collection<TaskieTask> searchResult;
+	private static ArrayList<TaskieTask> searchResult;
 	private static ArrayList<Integer> indexSave;
 	private static Stack<TaskieAction> undoStack;
 	private static Stack<TaskieAction> redoStack;
@@ -58,6 +58,8 @@ public class TaskieLogic {
 				return undo();
 			case REDO:
 				return redo();
+			case RESET:
+				return reset();
 			default:
 				return add(action.getTask());
 			}
@@ -87,7 +89,7 @@ public class TaskieLogic {
 		return ary;
 	}
 	
-	private static Collection<TaskieTask> retrieve(TaskieEnum.TaskType type) {
+	private static ArrayList<TaskieTask> retrieve(TaskieEnum.TaskType type) {
 		switch (type) {
 		case EVENT:
 			case FLOAT:
@@ -113,32 +115,40 @@ public class TaskieLogic {
 	private static String[][] add(TaskieTask task) {
 		IndexTaskPair added = TaskieStorage.addTask(task);
 		TaskieEnum.TaskType type = added.getTask().getType();
-		Collection<TaskieTask> taskList = retrieve(type);
-		searchResult = retrieve(TaskieEnum.TaskType.FLOAT);
+		//Collection<TaskieTask> taskList = retrieve(type);
+		searchResult = retrieve(type);
 		for (int i = 0; i < searchResult.size(); i++)
 			indexSave.add(i);
 		
 		//Undo
-		int index = added.getIndex() + 1;
+		int index = added.getIndex();
 		TaskieTask undo = new TaskieTask("");
-		TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, undo, index);;
+		TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, undo, index + 1);;
 		undoStack.push(undoAction);
 		
 		String feedback = new String(task.getTitle() + " is added");
-		return display(taskList, feedback);
+		return display(searchResult, feedback);
 	}
 
 	private static String[][] delete(int index, TaskieEnum.TaskType type) {
 		try {
-			TaskieTask deleted = TaskieStorage.deleteTask(indexSave.get(index - 1), type);
-			String title = ((ArrayList<TaskieTask>)searchResult).get(index - 1).getTitle();
-			assert title.equals(deleted.getTitle());
+			int id = indexSave.get(index - 1);
+			TaskieTask deleted = TaskieStorage.deleteTask(id, type);
+			searchResult.remove(index - 1);
+			indexSave.remove(index - 1);
+			String title = deleted.getTitle();
+			
+			// updating the real id
+			for (int i = index - 1; i < searchResult.size(); i++) {
+				if (searchResult.get(i).getType().equals(type)) {
+					indexSave.set(i, indexSave.get(i) - 1);
+				}
+			}
 			
 			// Construct undo values
 			TaskieAction action = new TaskieAction(TaskieEnum.Actions.ADD, deleted);
 			undoStack.push(action);
 			
-			searchResult.remove(index - 1);
 			String feedback = new String(title + " is deleted");
 			return display(searchResult, feedback);
 		} catch (IndexOutOfBoundsException e) {
@@ -178,7 +188,6 @@ public class TaskieLogic {
 	}
 
 	private static String[][] update(int index, TaskieTask task) throws UnrecognisedCommandException {
-		Collection<TaskieTask> taskList = new ArrayList<TaskieTask>();
 		if (task.getTitle() != null)
 			TaskieStorage.updateTaskTitle(index, task.getType(), task.getTitle());
 		else if (task.getType() == TaskieEnum.TaskType.FLOAT &&
@@ -207,8 +216,15 @@ public class TaskieLogic {
 			TaskieStorage.updateEventStartEnd(index, task.getStartTime(), task.getEndTime());
 		else 
 			throw new UnrecognisedCommandException("Unrecognised update criterion.");
+		Collection<TaskieTask> taskList = retrieve(task.getType());
 		String feedback = new String("Updated successfully");
 		return display(taskList, feedback);
+	}
+	
+	private static String[][] reset() {
+		TaskieStorage.deleteAll();
+		String feedback = new String("Restored to factory settings.");
+		return display(new ArrayList<TaskieTask>(), feedback);
 	}
 	
 	/*****
