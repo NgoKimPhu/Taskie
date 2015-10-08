@@ -47,9 +47,9 @@ public class TaskieLogic {
 			case ADD:
 				return add(action.getTask());
 			case DELETE:
-				return delete(action.getIndex(), action.getTask().getType());
+				return delete(action.getIndex());
 			case DELETEALL:
-				//return deleteAll
+				return deleteAll();
 			case SEARCH:
 				return search(action);
 			case UPDATE:
@@ -130,9 +130,10 @@ public class TaskieLogic {
 		return display(searchResult, feedback);
 	}
 
-	private static String[][] delete(int index, TaskieEnum.TaskType type) {
+	private static String[][] delete(int index) {
 		try {
 			int id = indexSave.get(index - 1);
+			TaskieEnum.TaskType type = searchResult.get(index - 1).getType();
 			TaskieTask deleted = TaskieStorage.deleteTask(id, type);
 			searchResult.remove(index - 1);
 			indexSave.remove(index - 1);
@@ -219,6 +220,13 @@ public class TaskieLogic {
 		Collection<TaskieTask> taskList = retrieve(task.getType());
 		String feedback = new String("Updated successfully");
 		return display(taskList, feedback);
+	}
+	
+	private static String[][] deleteAll() {
+		for (int i = searchResult.size(); i > 0; i--)
+			delete(i);
+		String feedback = new String("All deleted.");
+		return display(new ArrayList<TaskieTask>(), feedback);
 	}
 	
 	private static String[][] reset() {
