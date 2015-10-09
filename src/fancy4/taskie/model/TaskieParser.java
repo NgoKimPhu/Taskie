@@ -278,8 +278,8 @@ public final class TaskieParser {
 		}
 		System.err.println("\""+commandData+"\"");
 		
-		int index;
 		TimeDetector timeDetector = new TimeDetector();
+		Scanner sc;
 		
 		switch (actionType) {
 			case ADD:
@@ -306,9 +306,32 @@ public final class TaskieParser {
 				}
 			
 			case DELETE:
-				Scanner sc = new Scanner(commandData);
+				sc = new Scanner(commandData);
 				sc.useDelimiter("\\s+|(?<=\\D)(?=\\d)");
 				String firstToken = sc.next();
+				int index = -1;
+				if (sc.hasNext()) {
+					index = sc.nextInt();
+				}
+				sc.close();
+				
+				if (firstToken.equals("d")) {
+					return new TaskieAction(actionType, TaskieEnum.TaskType.DEADLINE, index, null);
+				} else if (firstToken.equals("f")) {
+					return new TaskieAction(actionType, TaskieEnum.TaskType.FLOAT, index, null);
+				} else if (firstToken.matches("\\d+")) {
+					return new TaskieAction(actionType, Integer.parseInt(firstToken), null);
+				} else {
+					return new TaskieAction(actionType, null);
+				}
+			
+			case SEARCH:
+				return new TaskieAction(actionType, new TaskieTask(commandData), commandData);
+			
+			case UPDATE:
+				sc = new Scanner(commandData);
+				sc.useDelimiter("\\s+|(?<=\\D)(?=\\d)");
+				firstToken = sc.next();
 				if (firstToken.equals("d")) {
 					return new TaskieAction(actionType, TaskieEnum.TaskType.DEADLINE, sc.nextInt(), null);
 				} else if (firstToken.equals("f")) {
@@ -318,17 +341,6 @@ public final class TaskieParser {
 				} else {
 					return new TaskieAction(actionType, null);
 				}
-			
-			case SEARCH:
-				return new TaskieAction(actionType, new TaskieTask(commandData), commandData);
-			
-			case UPDATE:
-				try {
-					index = Integer.parseInt(getFirstWord(commandData));
-				} catch (NumberFormatException e) {
-					return new TaskieAction(TaskieEnum.Actions.INVALID, new TaskieTask(commandData));
-				}
-				return new TaskieAction(actionType, new TaskieTask(removeFirstWord(commandData)), index);
 			
 			default:
 				return new TaskieAction(actionType, null);
