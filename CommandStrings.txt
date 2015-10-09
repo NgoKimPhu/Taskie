@@ -7,4 +7,5 @@ clear clr
 search find view
 sort
 update
-invalid
+displayall viewall
+reset
