@@ -18,8 +18,11 @@ public class TaskieLogic {
 	private static Stack<TaskieAction> redoStack;
 	private static Stack<TaskieAction> commandSave;
 
+	
 	/*****
 	 * Below are backbone functions.
+	 * 
+	 * 
 	 */
 	public static void initialise() {
 		try {
@@ -36,13 +39,17 @@ public class TaskieLogic {
 
 	public static String[][] execute(String str) {
 		TaskieAction action = TaskieParser.parse(str);
+		// command stack
+		if (action.getType().equals(TaskieEnum.Actions.ADD) ||
+			action.getType().equals(TaskieEnum.Actions.DELETE)) {
+			commandSave.push(action);
+		}
 		String[][] screen = takeAction(action);
 		return screen;
 	}
-
+	
 	private static String[][] takeAction(TaskieAction action) {
 		try {
-			commandSave.push(action);
 			switch (action.getType()) {
 			case ADD:
 				return add(action.getTask());
@@ -69,8 +76,12 @@ public class TaskieLogic {
 		}
 	}
 	
+	
+	
 	/*****
 	 * Below are auxiliary methods.
+	 * 
+	 * 
 	 */
 	private static String[][] display(Collection<TaskieTask> taskList, String message) {
 		String[] feedback = new String[] {message};
@@ -137,9 +148,11 @@ public class TaskieLogic {
 	}
 
 	
+	
 	/*****
 	 * Below are feature methods.
 	 * Including add, delete, search, update.
+	 * 
 	 */
 	private static String[][] add(TaskieTask task) {
 		IndexTaskPair added = TaskieStorage.addTask(task);
