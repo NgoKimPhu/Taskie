@@ -285,18 +285,19 @@ public final class TaskieParser {
 			case ADD:
 				timeDetector.detectTime(commandData);
 				String title = timeDetector.removeTime();
-				System.err.println("Title: " + title);
+				System.err.println("Title: \"" + title + "\"");
 				
 				switch (timeDetector.getTaskType()) {
 					case FLOAT:
+						System.out.println("Float task\n");
 						return new TaskieAction(actionType, new TaskieTask(title));
 					case DEADLINE:
-						System.out.println(printTime(timeDetector.endTime));
+						System.out.println(printTime(timeDetector.endTime) + "\n");
 						return new TaskieAction(actionType, 
 								new TaskieTask(title, timeDetector.getEndTime()));
 					case EVENT:
 						System.out.println(printTime(timeDetector.startTime)
-								+ " till " + printTime(timeDetector.endTime));
+								+ " till " + printTime(timeDetector.endTime) + "\n");
 						return new TaskieAction(actionType, 
 								new TaskieTask(title, 
 										timeDetector.getStartTime(), timeDetector.getEndTime()));
