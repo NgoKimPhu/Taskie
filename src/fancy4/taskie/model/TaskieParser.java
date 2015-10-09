@@ -306,12 +306,18 @@ public final class TaskieParser {
 				}
 			
 			case DELETE:
-				try {
-					index = Integer.parseInt(commandData);
-				} catch (NumberFormatException e) {
-					return new TaskieAction(TaskieEnum.Actions.INVALID, new TaskieTask(commandData));
+				Scanner sc = new Scanner(commandData);
+				sc.useDelimiter("\\s+|(?<=\\D)(?=\\d)");
+				String firstToken = sc.next();
+				if (firstToken.equals("d")) {
+					return new TaskieAction(actionType, TaskieEnum.TaskType.DEADLINE, sc.nextInt(), null);
+				} else if (firstToken.equals("f")) {
+					return new TaskieAction(actionType, TaskieEnum.TaskType.FLOAT, sc.nextInt(), null);
+				} else if (firstToken.matches("\\d+")) {
+					return new TaskieAction(actionType, sc.nextInt(), null);
+				} else {
+					return new TaskieAction(actionType, null);
 				}
-				return new TaskieAction(actionType, new TaskieTask(commandData), index);
 			
 			case SEARCH:
 				return new TaskieAction(actionType, new TaskieTask(commandData), commandData);
