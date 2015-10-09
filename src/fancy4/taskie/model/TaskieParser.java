@@ -1,4 +1,5 @@
 package fancy4.taskie.model;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.*;
@@ -9,11 +10,9 @@ import fancy4.taskie.model.TaskieEnum.TaskType;
 
 /**
  * @author Ngo Kim Phu
- *
  */
 public final class TaskieParser {
 	private static final String MESSAGE_INVALID_COMMAND_FORMAT = "invalid command format : %1$s";
-	// TODO make a class
 	private static final String PATTERN_TYPE = "\\b(?:(?:-)?float|event|deadline)\\s?";
 	private static final String PATTERN_DAY = "\\b(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)|"
 			+ "(?:(?:next\\s)?((?:Mon|Fri|Sun)(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|"
