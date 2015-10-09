@@ -594,6 +594,42 @@ public class TaskieStorage {
 		}
 		return eventDeadlineTaskList;
 	}
+	public static String viewTaskDescription(int index, TaskieEnum.TaskType type){
+		String description;
+		if(type.equals(TaskieEnum.TaskType.EVENT)||type.equals(TaskieEnum.TaskType.DEADLINE)){
+			description = eventDeadlineTaskList.get(index).getDescription();
+		}
+		else{
+			description = floatTaskList.get(index).getDescription();
+		}
+		return description;
+	}
+	
+	public static void addTaskDescription(int index, TaskieEnum.TaskType type, String description){
+		if(type.equals(TaskieEnum.TaskType.EVENT)||type.equals(TaskieEnum.TaskType.DEADLINE)){
+			eventDeadlineTaskList.get(index).setDescription(description);
+			rewriteEventDeadlineFile();
+		}
+		else{
+			floatTaskList.get(index).setDescription(description);
+			rewriteFloatFile();
+		}
+	}
+	
+	public static void editTaskDescription(int index, TaskieEnum.TaskType type, String description){
+		if(type.equals(TaskieEnum.TaskType.EVENT)||type.equals(TaskieEnum.TaskType.DEADLINE)){
+			String oldDescription = eventDeadlineTaskList.get(index).getDescription();
+			String newDescription = oldDescription + " "+ description;
+			eventDeadlineTaskList.get(index).setDescription(newDescription);
+			rewriteEventDeadlineFile();
+		}
+		else{
+			String oldDescription = floatTaskList.get(index).getDescription();
+			String newDescription = oldDescription + " "+ description;
+			floatTaskList.get(index).setDescription(description);
+			rewriteFloatFile();
+		}
+	}
 	
 	private static Date createDateKey(Date date){
 		Calendar calendar = Calendar.getInstance();
@@ -739,6 +775,18 @@ public class TaskieStorage {
 		map.get(priority).remove(task);
 		if(isEmpty(map.get(priority))){
 			map.remove(priority);
+		}
+	}
+	private static void rewriteEventDeadlineFile(){
+		FileHandler.clearFile(eventDeadlineTask);
+		for(TaskieTask t: eventDeadlineTaskList){
+			FileHandler.writeFile(eventDeadlineTask, t);
+		}
+	}
+	private static void rewriteFloatFile(){
+		FileHandler.clearFile(floatTask);
+		for(TaskieTask t: floatTaskList){
+			FileHandler.writeFile(floatTask, t);
 		}
 	}
 	
