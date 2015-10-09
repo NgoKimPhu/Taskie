@@ -13,7 +13,7 @@ import fancy4.taskie.model.TaskieEnum.TaskType;
  */
 public final class TaskieParser {
 	private static final String MESSAGE_INVALID_COMMAND_FORMAT = "invalid command format : %1$s";
-	private static final String PATTERN_TYPE = "\\b(?:(?:-)?float|event|deadline)?\\s?";
+	private static final String PATTERN_TYPE = "(?:(?:-)?\\b(?:float|event|deadline))?\\s?";
 	private static final String PATTERN_DAY = "\\b(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)|"
 			+ "(?:(?:next\\s)?((?:Mon|Fri|Sun)(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|"
 			+ "Thu(?:rsday)?|Sat(?:urday)?))|"
@@ -72,7 +72,6 @@ public final class TaskieParser {
 		}
 		
 		public void detectTime() {
-			System.err.println("\""+dataString+"\"");
 			matchStartPos = dataString.length()-1;
 			matchEndPos = 0;
 			if (isMatchFound(getTimeRangePattern(PATTERN_DAY, PATTERN_TIME), dataString)) {
@@ -277,14 +276,15 @@ public final class TaskieParser {
 		} else {
 			commandData = removeFirstWord(command);
 		}
-
+		System.err.println("\""+commandData+"\"");
+		
 		int index;
 		TimeDetector timeDetector = new TimeDetector();
 		
 		switch (actionType) {
 			case ADD:
 				timeDetector.detectTime(commandData);
-				String title = timeDetector.removeTime();
+				String title = timeDetector.removeTime().replaceAll("\\s?-(\\w+)", "");
 				System.err.println("Title: \"" + title + "\"");
 				
 				switch (timeDetector.getTaskType()) {
