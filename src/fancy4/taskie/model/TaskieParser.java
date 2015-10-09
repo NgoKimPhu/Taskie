@@ -19,13 +19,13 @@ public final class TaskieParser {
 			+ "(?:(\\d{1,2}\\s?)?(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|"
 			+ "Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|(?:Nov|Dec)(?:ember)?)"
 			+ "\\s?(\\d{1,2})?)";
-	private static final String PATTERN_TIME = "(?:\\b(?:(?=fr(?:om)|-|~|to|till|until)|at|by))?\\s?"
+	private static final String PATTERN_TIME = "(?:\\b(?:(?<=fr(?:om)?|-|~|to|till|until)|at|by))?\\s?"
 			+ "(\\d{1,2})\\s?"
 			+ "(?=[.:h ]\\s?\\d{1,2}\\s?m?|am|pm|tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)"
 			+ "(?:[.:h ]\\s?(\\d{1,2})\\s?m?)?\\s?(am|pm)?\\s?"
 			+ "(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)?\\b|"
-			+ "(?:\\b(?:(?=fr(?:om)|-|~|to|till|until)|at|by))\\s?(\\d{1,2})\\b";
-	private static final String PATTERN_TIMERANGE_FORMAT = "(?:fr(?:om)?\\s)?(?:%1$s)\\s?(?:%2$s)?\\s?"
+			+ "(?:\\b(?:(?<=fr(?:om)?|-|~|to|till|until)|at|by))\\s?(\\d{1,2})\\b";
+	private static final String PATTERN_TIMERANGE_FORMAT = "(?:fr(?:om)?\\s?)?(?:%1$s)\\s?(?:%2$s)?\\s?"
 			+ "(?:-|~|to|till|until)\\s?(?:%2$s)?\\s?(?:%1$s)";
 	
 	private static final HashMap<String, Integer> weekDays = new HashMap<String, Integer>();
@@ -33,6 +33,7 @@ public final class TaskieParser {
 	
 	private static ArrayList<String>[] commandStrings;
 	
+	// TODO consider public TaskieParser getInstance() return/create the sole instance
 	private TaskieParser() {
 	}
 	
@@ -111,20 +112,19 @@ public final class TaskieParser {
 				boolean isRange = true;
 				boolean isFloat = true;
 				
+				System.err.println("v " + commandData);
 				if (matchFound(matcher, getTimeRangePattern(PATTERN_DAY, PATTERN_TIME), commandData)) {
 					System.out.println("Date range detected: "+matcher.group(0));
 					isFloat = false;
 					setDate(matcher, startTime, 1);
 					setDate(matcher, endTime, 18);
-					System.out.println(printTime(startTime)+" till "+printTime(endTime));
 				} else if (matchFound(matcher, PATTERN_DAY, commandData)) {
 					System.out.println("Date detected: "+matcher.group(0));
 					isFloat = false;
 					setDate(matcher, startTime, 1);
 					setDate(matcher, endTime, 1);
-					System.out.println(printTime(startTime));
 				} else {
-					System.out.println("No match found for date!\n");
+					System.out.println("No match found for date!");
 				}
 				
 				if (matchFound(matcher, getTimeRangePattern(PATTERN_TIME, PATTERN_DAY), commandData)) {
@@ -132,24 +132,24 @@ public final class TaskieParser {
 					isFloat = false;
 					setTime(matcher, startTime, 1);
 					setTime(matcher, endTime, 20);
-					System.out.println(printTime(startTime)+" till "+printTime(endTime));
 				} else if (matchFound(matcher, PATTERN_TIME, commandData)) {
 					System.out.println("Time detected: "+matcher.group(0));
 					isFloat = false;
 					isRange = false;
 					setTime(matcher, endTime, 1);
-					System.out.println(printTime(endTime));
 				} else {
-					System.out.println("No match found for time!\n");
+					System.out.println("No match found for time!");
 				}
 				
 				if (isFloat) {
 					return new TaskieAction(actionType, new TaskieTask(commandData));
 				} else {
 					if (isRange) {
+						System.out.println(printTime(startTime)+" till "+printTime(endTime));
 						return new TaskieAction(actionType, 
 								new TaskieTask(commandData, startTime.getTime(), endTime.getTime()));
 					} else {
+						System.out.println(printTime(endTime));
 						return new TaskieAction(actionType, 
 								new TaskieTask(commandData, endTime.getTime()));
 					}
