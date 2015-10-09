@@ -27,11 +27,12 @@ public class MainApp extends Application {
     	//data = TaskieLogic.execute("add order a pizza")[0];
     	//TaskieLogic.initialise();
     	TaskieLogic.initialise();
-    	mdata = TaskieLogic.execute("search")[1];
+    	String[][] iniDisplay = TaskieLogic.execute("search");
+    	mdata = iniDisplay[1];
     	taskData.addAll(mdata);
-    	ddata = TaskieLogic.execute("search")[2];
+    	ddata = iniDisplay[2];
     	dTaskData.addAll(ddata);
-    	fdata = TaskieLogic.execute("search")[3];
+    	fdata = iniDisplay[3];
     	fTaskData.addAll(fdata);
 
     }

@@ -46,7 +46,7 @@ public class TaskieOverviewController {
 
 	@FXML
 	private void initialize() {
-		TaskieLogic.initialise();
+		//TaskieLogic.initialise();
 		iniColumn(taskColumn);
 		iniColumn(dTaskColumn);
 		iniColumn(fTaskColumn);
@@ -54,7 +54,7 @@ public class TaskieOverviewController {
 	}
 	
 	private void iniColumn(TableColumn<String, String> column) {
-		TaskieLogic.initialise();
+		//TaskieLogic.initialise();
 		column.setCellValueFactory(new Callback<CellDataFeatures<String, String>, ObservableValue<String>>() {
 			public ObservableValue<String> call(CellDataFeatures<String, String> p) {
 				return new SimpleStringProperty(p.getValue());
