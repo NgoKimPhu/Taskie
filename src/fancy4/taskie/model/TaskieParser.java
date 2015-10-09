@@ -39,6 +39,7 @@ public final class TaskieParser {
 		private TaskieEnum.TaskType taskType;
 		private Calendar startTime, endTime;
 		private Matcher matcher;
+		private int matchStartPos, matchEndPos;
 		
 		public TimeDetector() {
 			taskType = TaskType.FLOAT;
@@ -57,6 +58,8 @@ public final class TaskieParser {
 		
 		public void detectTime (String dataString) {
 			System.err.println("v " + dataString);
+			matchStartPos = dataString.length()-1;
+			matchEndPos = 0;
 			if (matchFound(getTimeRangePattern(PATTERN_DAY, PATTERN_TIME), dataString)) {
 				System.out.println("Date range detected: "+matcher.group(0));
 				taskType = TaskType.EVENT;
@@ -90,7 +93,16 @@ public final class TaskieParser {
 		private boolean matchFound(String patternString, String dataString) {
 			matcher.usePattern(Pattern.compile(patternString, Pattern.CASE_INSENSITIVE));
 			matcher.reset(dataString);
-			return matcher.find();
+			boolean matchFound = matcher.find();
+			if (matchFound) {
+				if (matcher.start() < matchStartPos) {
+					matchStartPos = matcher.start();
+				}
+				if (matcher.end() > matchEndPos) {
+					matchEndPos = matcher.end();
+				}
+			}
+			return matchFound;
 		}
 
 		private void setDate(Calendar time, int groupOffset) {
@@ -179,6 +191,14 @@ public final class TaskieParser {
 			return endTime.getTime();
 		}
 		
+		public int getMatchStartPos() {
+			return matchStartPos;
+		}
+
+		public int getMatchEndPos() {
+			return matchEndPos;
+		}
+
 	}
 	
 	// TODO consider public TaskieParser getInstance() return/create the sole instance
@@ -286,11 +306,8 @@ public final class TaskieParser {
 				}
 				return new TaskieAction(actionType, new TaskieTask(removeFirstWord(commandData)), index);
 			
-			case UNDO:
-				return new TaskieAction(actionType, new TaskieTask(commandData));
-			
 			default:
-				return new TaskieAction(TaskieEnum.Actions.INVALID, (TaskieTask) null);
+				return new TaskieAction(actionType, null);
 		}
 		
 	}
