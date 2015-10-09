@@ -24,7 +24,7 @@ public class TaskieParserTest {
 		TaskieParser.parse("tmr 2 to 3"); // should I recognize this as time?
 		TaskieParser.parse("class from 2 to 3");
 		TaskieParser.parse("conference 7 today till 9pm tmr");
-		TaskieParser.parse("conference tmr from 5 to 6 pm"); //TODO
+		TaskieParser.parse("conference tmr from 5 to 6 pm");
 		TaskieParser.parse("conference 7.15pm till 9.30 tmr night at th");
 		TaskieParser.parse("conference today 7.15pm till 9.30 tmr night at th");
 		
