@@ -626,7 +626,7 @@ public class TaskieStorage {
 		else{
 			String oldDescription = floatTaskList.get(index).getDescription();
 			String newDescription = oldDescription + " "+ description;
-			floatTaskList.get(index).setDescription(description);
+			floatTaskList.get(index).setDescription(newDescription);
 			rewriteFloatFile();
 		}
 	}
