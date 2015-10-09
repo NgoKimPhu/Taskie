@@ -1,5 +1,5 @@
-add
-delete del
+add +
+delete del -
 delall deleteall clear
 undo
 redo
