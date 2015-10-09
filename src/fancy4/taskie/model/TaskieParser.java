@@ -13,7 +13,7 @@ import fancy4.taskie.model.TaskieEnum.TaskType;
  */
 public final class TaskieParser {
 	private static final String MESSAGE_INVALID_COMMAND_FORMAT = "invalid command format : %1$s";
-	private static final String PATTERN_TYPE = "\\b(?:(?:-)?float|event|deadline)\\s?";
+	private static final String PATTERN_TYPE = "\\b(?:(?:-)?float|event|deadline)?\\s?";
 	private static final String PATTERN_DAY = "\\b(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)|"
 			+ "(?:(?:next\\s)?((?:Mon|Fri|Sun)(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|"
 			+ "Thu(?:rsday)?|Sat(?:urday)?))|"
@@ -36,12 +36,18 @@ public final class TaskieParser {
 	private static ArrayList<String>[] commandStrings;
 	
 	static private class TimeDetector {
+		private String dataString;
 		private TaskieEnum.TaskType taskType;
 		private Calendar startTime, endTime;
 		private Matcher matcher;
 		private int matchStartPos, matchEndPos;
 		
 		public TimeDetector() {
+			this("");
+		}
+		
+		public TimeDetector(String dataString) {
+			this.dataString = dataString;
 			taskType = TaskType.FLOAT;
 			
 			startTime = Calendar.getInstance();
@@ -56,17 +62,26 @@ public final class TaskieParser {
 			matcher = Pattern.compile("").matcher("");
 		}
 		
-		public void detectTime (String dataString) {
-			System.err.println("v " + dataString);
+		public void setDataString(String dataString) {
+			this.dataString = dataString;
+		}
+		
+		public void detectTime(String dataString) {
+			setDataString(dataString);
+			detectTime();
+		}
+		
+		public void detectTime() {
+			System.err.println("\""+dataString+"\"");
 			matchStartPos = dataString.length()-1;
 			matchEndPos = 0;
-			if (matchFound(getTimeRangePattern(PATTERN_DAY, PATTERN_TIME), dataString)) {
-				System.out.println("Date range detected: "+matcher.group(0));
+			if (isMatchFound(getTimeRangePattern(PATTERN_DAY, PATTERN_TIME), dataString)) {
+				System.out.println("Date range detected: "+matcher.group());
 				taskType = TaskType.EVENT;
 				setDate(startTime, 1);
 				setDate(endTime, 18);
-			} else if (matchFound(PATTERN_DAY, dataString)) {
-				System.out.println("Date detected: "+matcher.group(0));
+			} else if (isMatchFound(PATTERN_DAY, dataString)) {
+				System.out.println("Date detected: "+matcher.group());
 				taskType = TaskType.DEADLINE;
 				setDate(startTime, 1);
 				setDate(endTime, 1);
@@ -74,13 +89,13 @@ public final class TaskieParser {
 				System.out.println("No match found for date!");
 			}
 			
-			if (matchFound(getTimeRangePattern(PATTERN_TIME, PATTERN_DAY), dataString)) {
-				System.out.println("Time range detected: "+matcher.group(0));
+			if (isMatchFound(getTimeRangePattern(PATTERN_TIME, PATTERN_DAY), dataString)) {
+				System.out.println("Time range detected: "+matcher.group());
 				taskType = TaskType.EVENT;
 				setTime(startTime, 1);
 				setTime(endTime, 20);
-			} else if (matchFound(PATTERN_TIME, dataString)) {
-				System.out.println("Time detected: "+matcher.group(0));
+			} else if (isMatchFound(PATTERN_TIME, dataString)) {
+				System.out.println("Time detected: "+matcher.group());
 				if (taskType != TaskType.EVENT) {
 					taskType = TaskType.DEADLINE;
 				}
@@ -90,7 +105,15 @@ public final class TaskieParser {
 			}
 		}
 		
-		private boolean matchFound(String patternString, String dataString) {
+		public String removeTime() {
+			String dataWithoutTime = dataString;
+			if (matchStartPos < matchEndPos) {
+				dataWithoutTime = dataWithoutTime.replaceAll(PATTERN_TYPE + timeMatchSubstr(), "");
+			}
+			return dataWithoutTime.trim().replaceAll("\\s{2,}", "\\s");
+		}
+		
+		private boolean isMatchFound(String patternString, String dataString) {
 			matcher.usePattern(Pattern.compile(patternString, Pattern.CASE_INSENSITIVE));
 			matcher.reset(dataString);
 			boolean matchFound = matcher.find();
@@ -171,8 +194,8 @@ public final class TaskieParser {
 			}
 		}
 		
-		private String getTimeRangePattern (String patternString) {
-			return String.format(PATTERN_TIMERANGE_FORMAT, patternString, "");
+		private String timeMatchSubstr() {
+			return dataString.substring(matchStartPos, matchEndPos);
 		}
 		
 		private String getTimeRangePattern (String patternString, String skippedString) {
@@ -189,14 +212,6 @@ public final class TaskieParser {
 
 		public Date getEndTime() {
 			return endTime.getTime();
-		}
-		
-		public int getMatchStartPos() {
-			return matchStartPos;
-		}
-
-		public int getMatchEndPos() {
-			return matchEndPos;
 		}
 
 	}
@@ -269,19 +284,21 @@ public final class TaskieParser {
 		switch (actionType) {
 			case ADD:
 				timeDetector.detectTime(commandData);
+				String title = timeDetector.removeTime();
+				System.err.println("Title: " + title);
 				
 				switch (timeDetector.getTaskType()) {
 					case FLOAT:
-						return new TaskieAction(actionType, new TaskieTask(commandData));
+						return new TaskieAction(actionType, new TaskieTask(title));
 					case DEADLINE:
 						System.out.println(printTime(timeDetector.endTime));
 						return new TaskieAction(actionType, 
-								new TaskieTask(commandData, timeDetector.getEndTime()));
+								new TaskieTask(title, timeDetector.getEndTime()));
 					case EVENT:
 						System.out.println(printTime(timeDetector.startTime)
 								+ " till " + printTime(timeDetector.endTime));
 						return new TaskieAction(actionType, 
-								new TaskieTask(commandData, 
+								new TaskieTask(title, 
 										timeDetector.getStartTime(), timeDetector.getEndTime()));
 					default:
 						throw new Error();
