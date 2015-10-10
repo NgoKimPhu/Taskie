@@ -315,9 +315,9 @@ public final class TaskieParser {
 				}
 				sc.close();
 				
-				if (firstToken.equals("d")) {
+				if (firstToken.matches("[-/]?d")) {
 					return new TaskieAction(actionType, TaskieEnum.TaskType.DEADLINE, index, null);
-				} else if (firstToken.equals("f")) {
+				} else if (firstToken.matches("[-/]?f")) {
 					return new TaskieAction(actionType, TaskieEnum.TaskType.FLOAT, index, null);
 				} else if (firstToken.matches("\\d+")) {
 					return new TaskieAction(actionType, Integer.parseInt(firstToken), null);
