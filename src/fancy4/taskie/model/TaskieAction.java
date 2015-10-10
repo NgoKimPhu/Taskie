@@ -17,9 +17,17 @@ public class TaskieAction {
 		this.task = task;
 	}
 	
+	public TaskieAction(TaskieEnum.Actions type, int index) {
+		this(type, index, null);
+	}
+	
 	public TaskieAction(TaskieEnum.Actions type, int index, TaskieTask task) {
 		this(type, task);
 		this.index = index;
+	}
+	
+	public TaskieAction(TaskieEnum.Actions type, TaskieEnum.TaskType taskType, int index) {
+		this(type, taskType, index, null);
 	}
 	
 	public TaskieAction(TaskieEnum.Actions type, TaskieEnum.TaskType taskType, int index, TaskieTask task) {
