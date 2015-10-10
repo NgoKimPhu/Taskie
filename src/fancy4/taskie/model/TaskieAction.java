@@ -40,6 +40,10 @@ public class TaskieAction {
 		return taskType;
 	}
 	
+	public void setTaskType(TaskieEnum.TaskType type) {
+		this.taskType = type;
+	}
+	
 	public int getIndex() {
 		return index;
 	}

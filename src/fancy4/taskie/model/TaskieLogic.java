@@ -7,6 +7,8 @@ package fancy4.taskie.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Stack;
 
@@ -17,6 +19,8 @@ public class TaskieLogic {
 	private static Stack<TaskieAction> undoStack;
 	private static Stack<TaskieAction> redoStack;
 	private static Stack<TaskieAction> commandSave;
+	private static boolean isUndoAction; 
+	private static Comparator<IndexTaskPair> comparator;
 
 	
 	/*****
@@ -27,17 +31,25 @@ public class TaskieLogic {
 	public static void initialise() {
 		try {
 			TaskieStorage.load("");
+			isUndoAction = false;
 			undoStack = new Stack<TaskieAction>();
 			redoStack = new Stack<TaskieAction>();
 			commandSave = new Stack<TaskieAction>();
 			searchResult = new ArrayList<TaskieTask>();
 			indexSave = new ArrayList<Integer>();
+			comparator = new Comparator<IndexTaskPair>() {
+				@Override
+		        public int compare(IndexTaskPair first, IndexTaskPair second) {
+					return first.getTask().getTitle().compareTo(second.getTask().getTitle());
+		        }
+			};
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	public static String[][] execute(String str) {
+		isUndoAction = false;
 		TaskieAction action = TaskieParser.parse(str);
 		// command stack
 		redoStack.clear();
@@ -114,12 +126,14 @@ public class TaskieLogic {
 					if (task.getType().equals(TaskieEnum.TaskType.EVENT))
 						event.add(new IndexTaskPair(i, task));
 				}
+				Collections.sort(event, comparator);
 				return event;
 			case FLOAT:
 				ArrayList<TaskieTask> floatRaw = TaskieStorage.displayFloatTask();
 				ArrayList<IndexTaskPair> floatTasks = new ArrayList<IndexTaskPair>();
 				for (int i = 0; i < floatRaw.size(); i++)
 					floatTasks.add(new IndexTaskPair(i, floatRaw.get(i)));
+				Collections.sort(floatTasks, comparator);
 				return floatTasks;	
 			case DEADLINE:
 				ArrayList<TaskieTask> deadlineRaw = TaskieStorage.displayEventDeadline();
@@ -129,6 +143,7 @@ public class TaskieLogic {
 					if (task.getType().equals(TaskieEnum.TaskType.EVENT))
 						deadline.add(new IndexTaskPair(i, task));
 				}
+				Collections.sort(deadline, comparator);
 				return deadline;
 			default:
 				return new ArrayList<IndexTaskPair>();
@@ -167,12 +182,13 @@ public class TaskieLogic {
 		IndexTaskPair added = TaskieStorage.addTask(task);
 		retrieve(task.getType());
 		
-		//Undo
-		int index = added.getIndex();
-		TaskieTask undo = new TaskieTask("");
-		TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, undo, index + 1);;
-		undoStack.push(undoAction);
-		
+		if (!isUndoAction) {
+			int index = added.getIndex();
+			TaskieTask undo = new TaskieTask("");
+			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, task.getType(), searchResult.indexOf(task) + 1, undo);
+			undoAction.setTaskType(task.getType());
+			undoStack.push(undoAction);
+		}
 		String feedback = new String(task.getTitle() + " is added");
 		return display(searchResult, feedback);
 	}
@@ -182,20 +198,21 @@ public class TaskieLogic {
 			int id = indexSave.get(index - 1);
 			TaskieEnum.TaskType type = searchResult.get(index - 1).getType();
 			TaskieTask deleted = TaskieStorage.deleteTask(id, type);
-			searchResult.remove(index - 1);
-			indexSave.remove(index - 1);
 			String title = deleted.getTitle();
 			
 			// updating the real id
-			for (int i = index - 1; i < searchResult.size(); i++) {
+			retrieve(type);
+			/*for (int i = index - 1; i < searchResult.size(); i++) {
 				if (searchResult.get(i).getType().equals(type)) {
 					indexSave.set(i, indexSave.get(i) - 1);
 				}
-			}
+			}*/
 			
 			// Construct undo values
-			TaskieAction action = new TaskieAction(TaskieEnum.Actions.ADD, deleted);
-			undoStack.push(action);
+			if (!isUndoAction) {
+				TaskieAction action = new TaskieAction(TaskieEnum.Actions.ADD, deleted);
+				undoStack.push(action);
+			}
 			
 			String feedback = new String(title + " is deleted");
 			return display(searchResult, feedback);
@@ -274,6 +291,8 @@ public class TaskieLogic {
 		for (int i = searchResult.size(); i > 0; i--)
 			delete(i);
 		String feedback = new String("All deleted.");
+		undoStack.clear();
+		redoStack.clear();
 		return display(new ArrayList<TaskieTask>(), feedback);
 	}
 	
@@ -287,9 +306,10 @@ public class TaskieLogic {
 	 * Below are undo/redo methods.
 	 */
 	private static String[][] undo() {
+		isUndoAction = true;
 		if (undoStack.isEmpty()) {
 			String feedback = "No more action to undo.";
-			return display(new ArrayList<TaskieTask>(), feedback);
+			return display(searchResult, feedback);
 		}
 		TaskieAction action = undoStack.pop();
 		redoStack.push(commandSave.pop());
