@@ -215,6 +215,48 @@ public final class TaskieParser {
 
 	}
 	
+	static private class TaskSelectorDetector {
+		private final String PATTERN_DELIMITER = "\\s+|(?<=\\D)(?=\\d)";
+		private String taskDataString;
+		private TaskieEnum.TaskType taskType = TaskieEnum.TaskType.UNKNOWN;
+		private int index = -1;
+		
+		public TaskSelectorDetector(String dataString) {
+			Scanner sc = new Scanner(dataString);
+			//sc.useDelimiter(PATTERN_DELIMITER);
+			//String firstToken = sc.next();
+				
+			if (sc.hasNextInt()) {
+				taskType = null;
+				index = sc.nextInt();
+			} else if (sc.hasNext("[-/]?d")) {
+				sc.next();
+				taskType = TaskieEnum.TaskType.DEADLINE;
+				index = sc.nextInt();
+			} else if (sc.hasNext("[-/]?f")) {
+				sc.next();
+				taskType = TaskieEnum.TaskType.FLOAT;
+				index = sc.nextInt();
+			}
+
+			this.taskDataString = sc.nextLine().trim();
+			sc.close();
+		}
+
+		public TaskieEnum.TaskType getTaskType() {
+			return taskType;
+		}
+
+		public int getIndex() {
+			return index;
+		}
+
+		public String getTaskDataString() {
+			return taskDataString;
+		}
+		
+	}
+	
 	// TODO consider public TaskieParser getInstance() return/create the sole instance
 	private TaskieParser() {
 	}
@@ -302,50 +344,41 @@ public final class TaskieParser {
 								new TaskieTask(title, 
 										timeDetector.getStartTime(), timeDetector.getEndTime()));
 					default:
-						throw new Error();
+						throw new Error("Fatal error in TaskieParser#timeDetector");
 				}
 			
 			case DELETE:
-				sc = new Scanner(commandData);
-				sc.useDelimiter("\\s+|(?<=\\D)(?=\\d)");
-				String firstToken = sc.next();
-				int index = -1;
-				if (sc.hasNext()) {
-					index = sc.nextInt();
-				}
-				sc.close();
-				
-				if (firstToken.matches("[-/]?d")) {
-					return new TaskieAction(actionType, TaskieEnum.TaskType.DEADLINE, index, null);
-				} else if (firstToken.matches("[-/]?f")) {
-					return new TaskieAction(actionType, TaskieEnum.TaskType.FLOAT, index, null);
-				} else if (firstToken.matches("\\d+")) {
-					return new TaskieAction(actionType, Integer.parseInt(firstToken), null);
-				} else {
-					return new TaskieAction(actionType, null);
-				}
+				return parseDelete(actionType, commandData);
 			
 			case SEARCH:
 				return new TaskieAction(actionType, new TaskieTask(commandData), commandData);
 			
 			case UPDATE:
-				sc = new Scanner(commandData);
-				sc.useDelimiter("\\s+|(?<=\\D)(?=\\d)");
-				firstToken = sc.next();
-				if (firstToken.equals("d")) {
-					return new TaskieAction(actionType, TaskieEnum.TaskType.DEADLINE, sc.nextInt(), null);
-				} else if (firstToken.equals("f")) {
-					return new TaskieAction(actionType, TaskieEnum.TaskType.FLOAT, sc.nextInt(), null);
-				} else if (firstToken.matches("\\d+")) {
-					return new TaskieAction(actionType, sc.nextInt(), null);
-				} else {
-					return new TaskieAction(actionType, null);
-				}
+				return parseUpdate(actionType, commandData);
 			
 			default:
 				return new TaskieAction(actionType, null);
 		}
 		
+	}
+
+	private static TaskieAction parseDelete(TaskieEnum.Actions actionType, String commandData) {
+		TaskSelectorDetector tSD = new TaskSelectorDetector(commandData);
+		if (tSD.getTaskType() == TaskieEnum.TaskType.UNKNOWN) {
+			return new TaskieAction(actionType, null);
+		} else {
+			return new TaskieAction(actionType, tSD.getTaskType(), tSD.getIndex());
+		}
+	}
+
+	private static TaskieAction parseUpdate(TaskieEnum.Actions actionType, String commandData) {
+		TaskSelectorDetector tSD = new TaskSelectorDetector(commandData);
+		if (tSD.getTaskType() == TaskieEnum.TaskType.UNKNOWN) {
+			return new TaskieAction(actionType, null);
+		} else {
+			return new TaskieAction(actionType, tSD.getTaskType(), tSD.getIndex(), 
+					new TaskieTask(tSD.getTaskDataString()));
+		}
 	}
 
 	private static String printTime(Calendar time) {
