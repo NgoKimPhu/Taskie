@@ -40,8 +40,9 @@ public class TaskieLogic {
 	public static String[][] execute(String str) {
 		TaskieAction action = TaskieParser.parse(str);
 		// command stack
-		if (action.getType().equals(TaskieEnum.Actions.ADD) ||
-			action.getType().equals(TaskieEnum.Actions.DELETE)) {
+		redoStack.clear();
+		if (!action.getType().equals(TaskieEnum.Actions.UNDO) ||
+			!action.getType().equals(TaskieEnum.Actions.REDO)) {
 			commandSave.push(action);
 		}
 		String[][] screen = takeAction(action);
@@ -54,6 +55,9 @@ public class TaskieLogic {
 			case ADD:
 				return add(action.getTask());
 			case DELETE:
+				if (action.getTask() != null) {
+					retrieve(action.getTaskType());
+				}
 				return delete(action.getIndex());
 			case DELETEALL:
 				return deleteAll();
@@ -146,6 +150,11 @@ public class TaskieLogic {
 			result.add(pair.getIndex());
 		return result;
 	}
+	
+	private static void retrieve(TaskieEnum.TaskType type) {
+		searchResult = retrieveTaskList(type);
+		indexSave = retrieveIndexList(type);
+	}
 
 	
 	
@@ -156,9 +165,7 @@ public class TaskieLogic {
 	 */
 	private static String[][] add(TaskieTask task) {
 		IndexTaskPair added = TaskieStorage.addTask(task);
-		TaskieEnum.TaskType type = added.getTask().getType();
-		searchResult = retrieveTaskList(type);
-		indexSave = retrieveIndexList(type);
+		retrieve(task.getType());
 		
 		//Undo
 		int index = added.getIndex();
