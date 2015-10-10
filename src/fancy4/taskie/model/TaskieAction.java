@@ -36,6 +36,10 @@ public class TaskieAction {
 		return type;
 	}
 	
+	public TaskieEnum.TaskType getTaskType() {
+		return taskType;
+	}
+	
 	public int getIndex() {
 		return index;
 	}
