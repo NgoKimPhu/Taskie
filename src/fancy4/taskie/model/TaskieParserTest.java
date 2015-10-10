@@ -16,7 +16,7 @@ public class TaskieParserTest {
 	}
 
 	@Test
-	public void test() {
+	public void testAdd() {
 		TaskieParser.parse("add test monday");
 		TaskieParser.parse("buy 5 apples");
 		TaskieParser.parse("i want to float");
@@ -33,7 +33,16 @@ public class TaskieParserTest {
 		TaskieParser.parse("+ dinner with myself tmr from 5 to 6 pm");
 		TaskieParser.parse("dance 7.15pm till 9.30 tmr night at th");
 		TaskieParser.parse("party today 7.15pm till 9.30 tmr night at th");
-		
+	}
+	
+	@Test
+	public void testDelete() {
+		TaskieParser.parse("- 1");
+		TaskieParser.parse("- d1");
+		TaskieParser.parse("- d 1");
+		TaskieParser.parse("- f1");
+		TaskieParser.parse("- -f1");
+		TaskieParser.parse("- /f 1");
 	}
 
 }
