@@ -247,8 +247,7 @@ public final class TaskieParser {
 		
 		public TaskSelectorDetector(String dataString) {
 			Scanner sc = new Scanner(dataString);
-			//sc.useDelimiter(PATTERN_DELIMITER);
-			//String firstToken = sc.next();
+			sc.useDelimiter(PATTERN_DELIMITER);
 				
 			if (sc.hasNextInt()) {
 				taskType = null;
@@ -263,7 +262,7 @@ public final class TaskieParser {
 				index = sc.nextInt();
 			}
 
-			this.taskDataString = sc.nextLine().trim();
+			this.taskDataString = sc.hasNext() ? sc.nextLine().trim() : "";
 			sc.close();
 		}
 
@@ -326,6 +325,7 @@ public final class TaskieParser {
 	}
 	
 	protected static TaskieAction parse (String inputString) {
+		System.err.println("\"" + inputString + "\"");
 		String command = inputString.trim();
 		
 		if (command.isEmpty()) {
@@ -342,7 +342,6 @@ public final class TaskieParser {
 		} else {
 			commandData = removeFirstWord(command);
 		}
-		System.err.println("\""+commandData+"\"");
 		
 		switch (actionType) {
 			case ADD:
