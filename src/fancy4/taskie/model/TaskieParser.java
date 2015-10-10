@@ -215,6 +215,30 @@ public final class TaskieParser {
 
 	}
 	
+	static private class TaskCompiler {
+		public static TaskieTask compileTask(String commandData) {
+			TimeDetector timeDetector = new TimeDetector();
+			timeDetector.detectTime(commandData);
+			String title = timeDetector.removeTime().replaceAll("\\s?-(\\w+)", "");
+			System.err.println("Title: \"" + title + "\"");
+			
+			switch (timeDetector.getTaskType()) {
+				case FLOAT:
+					System.out.println("Float task\n");
+					return new TaskieTask(title);
+				case DEADLINE:
+					System.out.println(printTime(timeDetector.endTime) + "\n");
+					return new TaskieTask(title, timeDetector.getEndTime());
+				case EVENT:
+					System.out.println(printTime(timeDetector.startTime)
+							+ " till " + printTime(timeDetector.endTime) + "\n");
+					return new TaskieTask(title, timeDetector.getStartTime(), timeDetector.getEndTime());
+				default:
+					throw new Error("Fatal error in TaskieParser#timeDetector");
+			}
+		}
+	}
+	
 	static private class TaskSelectorDetector {
 		private final String PATTERN_DELIMITER = "\\s+|(?<=\\D)(?=\\d)";
 		private String taskDataString;
@@ -320,41 +344,18 @@ public final class TaskieParser {
 		}
 		System.err.println("\""+commandData+"\"");
 		
-		TimeDetector timeDetector = new TimeDetector();
-		Scanner sc;
-		
 		switch (actionType) {
 			case ADD:
-				timeDetector.detectTime(commandData);
-				String title = timeDetector.removeTime().replaceAll("\\s?-(\\w+)", "");
-				System.err.println("Title: \"" + title + "\"");
-				
-				switch (timeDetector.getTaskType()) {
-					case FLOAT:
-						System.out.println("Float task\n");
-						return new TaskieAction(actionType, new TaskieTask(title));
-					case DEADLINE:
-						System.out.println(printTime(timeDetector.endTime) + "\n");
-						return new TaskieAction(actionType, 
-								new TaskieTask(title, timeDetector.getEndTime()));
-					case EVENT:
-						System.out.println(printTime(timeDetector.startTime)
-								+ " till " + printTime(timeDetector.endTime) + "\n");
-						return new TaskieAction(actionType, 
-								new TaskieTask(title, 
-										timeDetector.getStartTime(), timeDetector.getEndTime()));
-					default:
-						throw new Error("Fatal error in TaskieParser#timeDetector");
-				}
+				return parseAdd(commandData);
 			
 			case DELETE:
-				return parseDelete(actionType, commandData);
+				return parseDelete(commandData);
 			
 			case SEARCH:
-				return new TaskieAction(actionType, new TaskieTask(commandData), commandData);
+				return new TaskieAction(actionType, TaskCompiler.compileTask(commandData), commandData);
 			
 			case UPDATE:
-				return parseUpdate(actionType, commandData);
+				return parseUpdate(commandData);
 			
 			default:
 				return new TaskieAction(actionType, null);
@@ -362,22 +363,30 @@ public final class TaskieParser {
 		
 	}
 
-	private static TaskieAction parseDelete(TaskieEnum.Actions actionType, String commandData) {
+	private static TaskieAction parseAdd(String commandData) throws Error {
+		TaskieTask task = TaskCompiler.compileTask(commandData);
+
+		return new TaskieAction(TaskieEnum.Actions.ADD, task);
+	}
+
+	private static TaskieAction parseDelete(String commandData) {
 		TaskSelectorDetector tSD = new TaskSelectorDetector(commandData);
+		
 		if (tSD.getTaskType() == TaskieEnum.TaskType.UNKNOWN) {
-			return new TaskieAction(actionType, null);
+			return new TaskieAction(TaskieEnum.Actions.DELETE, null);
 		} else {
-			return new TaskieAction(actionType, tSD.getTaskType(), tSD.getIndex());
+			return new TaskieAction(TaskieEnum.Actions.DELETE, tSD.getTaskType(), tSD.getIndex());
 		}
 	}
 
-	private static TaskieAction parseUpdate(TaskieEnum.Actions actionType, String commandData) {
+	private static TaskieAction parseUpdate(String commandData) {
 		TaskSelectorDetector tSD = new TaskSelectorDetector(commandData);
+		TaskieTask task = TaskCompiler.compileTask(tSD.getTaskDataString());
+		
 		if (tSD.getTaskType() == TaskieEnum.TaskType.UNKNOWN) {
-			return new TaskieAction(actionType, null);
+			return new TaskieAction(TaskieEnum.Actions.UPDATE, null);
 		} else {
-			return new TaskieAction(actionType, tSD.getTaskType(), tSD.getIndex(), 
-					new TaskieTask(tSD.getTaskDataString()));
+			return new TaskieAction(TaskieEnum.Actions.UPDATE, tSD.getTaskType(), tSD.getIndex(), task);
 		}
 	}
 
