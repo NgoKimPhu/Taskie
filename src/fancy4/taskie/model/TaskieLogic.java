@@ -118,12 +118,13 @@ public class TaskieLogic {
 	
 	private static ArrayList<IndexTaskPair> powerRetrieve(TaskieEnum.TaskType type) {
 		switch (type) {
+			case DEADLINE:
 			case EVENT:
 				ArrayList<TaskieTask> eventRaw = TaskieStorage.displayEventDeadline();
 				ArrayList<IndexTaskPair> event = new ArrayList<IndexTaskPair>();
 				for (int i = 0; i < eventRaw.size(); i++) {
 					TaskieTask task = eventRaw.get(i);
-					if (task.getType().equals(TaskieEnum.TaskType.EVENT))
+					//if (task.getType().equals(TaskieEnum.TaskType.EVENT))
 						event.add(new IndexTaskPair(i, task));
 				}
 				Collections.sort(event, comparator);
@@ -135,6 +136,7 @@ public class TaskieLogic {
 					floatTasks.add(new IndexTaskPair(i, floatRaw.get(i)));
 				Collections.sort(floatTasks, comparator);
 				return floatTasks;	
+				/*
 			case DEADLINE:
 				ArrayList<TaskieTask> deadlineRaw = TaskieStorage.displayEventDeadline();
 				ArrayList<IndexTaskPair> deadline = new ArrayList<IndexTaskPair>();
@@ -145,6 +147,7 @@ public class TaskieLogic {
 				}
 				Collections.sort(deadline, comparator);
 				return deadline;
+				*/
 			default:
 				return new ArrayList<IndexTaskPair>();
 		}
