@@ -140,7 +140,7 @@ public class TaskieLogic {
 				ArrayList<IndexTaskPair> deadline = new ArrayList<IndexTaskPair>();
 				for (int i = 0; i < deadlineRaw.size(); i++) {
 					TaskieTask task = deadlineRaw.get(i);
-					if (task.getType().equals(TaskieEnum.TaskType.EVENT))
+					if (task.getType().equals(TaskieEnum.TaskType.DEADLINE))
 						deadline.add(new IndexTaskPair(i, task));
 				}
 				Collections.sort(deadline, comparator);
@@ -179,11 +179,10 @@ public class TaskieLogic {
 	 * 
 	 */
 	private static String[][] add(TaskieTask task) {
-		IndexTaskPair added = TaskieStorage.addTask(task);
+		TaskieStorage.addTask(task);
 		retrieve(task.getType());
 		
 		if (!isUndoAction) {
-			int index = added.getIndex();
 			TaskieTask undo = new TaskieTask("");
 			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, task.getType(), searchResult.indexOf(task) + 1, undo);
 			undoAction.setTaskType(task.getType());
