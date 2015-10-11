@@ -7,9 +7,9 @@
 
 <AnchorPane prefHeight="700.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fancy4.taskie.view.TaskieOverviewController">
    <children>
-      <SplitPane dividerPositions="0.9083094555873925" layoutX="254.0" layoutY="66.0" orientation="VERTICAL" prefHeight="300.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <SplitPane dividerPositions="0.9083094555873925" layoutX="254.0" layoutY="66.0" orientation="VERTICAL" prefHeight="700.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="640.0" prefWidth="600.0">
                <children>
                   <SplitPane dividerPositions="0.4899328859060403" prefHeight="346.0" prefWidth="598.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>
@@ -52,9 +52,9 @@
                   </SplitPane>
                </children>
             </AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="60.0" prefWidth="600.0">
                <children>
-                  <TextField fx:id="textInput" layoutX="208.0" layoutY="120.0" maxHeight="15.0" onKeyPressed="#inputEnter" prefHeight="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                  <TextField fx:id="textInput" layoutX="208.0" layoutY="120.0" maxHeight="15.0" onKeyPressed="#inputEnter" prefHeight="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
                   <Label fx:id="textOutput" layoutX="107.0" layoutY="6.0" prefHeight="61.0" prefWidth="598.0" text="Label" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
