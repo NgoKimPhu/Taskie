@@ -4,6 +4,7 @@ import javafx.beans.value.ObservableValue;
 //import javafx.collections.FXCollections;
 //import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 //import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
@@ -30,11 +31,13 @@ public class TaskieOverviewController {
 	private TableView<String> fTaskTable;
 	@FXML
 	private TableColumn<String, String> fTaskColumn;
+	@FXML
+	private Label textOutput;
 
 	@FXML
 	private TextField textInput;
-	@FXML
-	private TextArea textOutput;
+	//@FXML
+	//private TextArea textOutput;
 
 	private MainApp mainApp;
 
@@ -96,7 +99,7 @@ public class TaskieOverviewController {
 			updateFTable(fData);
 			
 			textOutputResponse += "> " + input + "\n" + response + "\n";
-			textOutput.setText(textOutputResponse);
+			textOutput.setText(response);
 			
 			/*
 			 * console print out for testing
