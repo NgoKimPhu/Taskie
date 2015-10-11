@@ -357,10 +357,26 @@ public class TaskieStorage {
 		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
 			eventDeadlineTaskList.get(index).setStatus(true);
 			Collections.sort(eventDeadlineTaskList, tc);
+			rewriteEventDeadlineFile();
 			return eventDeadlineTaskList;
 		} else {
 			floatTaskList.get(index).setStatus(true);
 			Collections.sort(floatTaskList, tc);
+			rewriteFloatFile();
+			return floatTaskList;
+		}
+	}
+	
+	public static ArrayList<TaskieTask> markNotDown(int index, TaskieEnum.TaskType type) {
+		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
+			eventDeadlineTaskList.get(index).setStatus(false);
+			Collections.sort(eventDeadlineTaskList, tc);
+			rewriteEventDeadlineFile();
+			return eventDeadlineTaskList;
+		} else {
+			floatTaskList.get(index).setStatus(false);
+			Collections.sort(floatTaskList, tc);
+			rewriteFloatFile();
 			return floatTaskList;
 		}
 	}
