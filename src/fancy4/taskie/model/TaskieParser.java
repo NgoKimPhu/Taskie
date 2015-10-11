@@ -72,7 +72,9 @@ public final class TaskieParser {
 		}
 		
 		public void detectTime() {
-			matchStartPos = dataString.length()-1;
+			if (!dataString.equals("")) {
+				matchStartPos = dataString.length()-1;
+			}
 			matchEndPos = 0;
 			if (isMatchFound(getTimeRangePattern(PATTERN_DAY, PATTERN_TIME), dataString)) {
 				System.out.println("Date range detected: "+matcher.group());
