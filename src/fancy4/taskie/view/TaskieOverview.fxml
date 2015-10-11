@@ -39,7 +39,7 @@
                                        <children>
                                           <TableView fx:id="fTaskTable" layoutX="61.0" layoutY="-6.0" prefHeight="168.0" prefWidth="299.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <columns>
-                                              <TableColumn fx:id="fTaskColumn" prefWidth="286.0" text="Float Task" />
+                                              <TableColumn fx:id="fTaskColumn" prefWidth="278.0" text="Floating Task" />
                                             </columns>
                                           </TableView>
                                        </children>

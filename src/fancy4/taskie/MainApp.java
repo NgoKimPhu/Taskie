@@ -27,6 +27,10 @@ public class MainApp extends Application {
     	//data = TaskieLogic.execute("add order a pizza")[0];
     	//TaskieLogic.initialise();
     	TaskieLogic.initialise();
+    	iniAllTable();
+
+    }
+    private void iniAllTable() {
     	String[][] iniDisplay = TaskieLogic.execute("search");
     	mdata = iniDisplay[1];
     	taskData.addAll(mdata);
@@ -34,7 +38,6 @@ public class MainApp extends Application {
     	dTaskData.addAll(ddata);
     	fdata = iniDisplay[3];
     	fTaskData.addAll(fdata);
-
     }
     
    /* public static void refresh(String cmd) {

@@ -117,8 +117,8 @@ public class TaskieOverviewController {
 				System.out.print(s+" ");
 			}
 			
-			textOutput.selectPositionCaret(textOutput.getLength());
-			textOutput.deselect();
+		//	textOutput.selectPositionCaret(textOutput.getLength());
+		//	textOutput.deselect();
 
 			textInput.clear();
 		}
@@ -135,9 +135,7 @@ public class TaskieOverviewController {
 	}
 	public void updateDTable(String[] data) {
 		
-		if (data == null) {	
-	
-			
+		if (data == null) {			
 		} else {
 			dTaskTable.getItems().removeAll(mainApp.getDTaskData());
 			dTaskTable.getItems().addAll(data);
@@ -145,18 +143,12 @@ public class TaskieOverviewController {
 	}
 
 	public void updateFTable(String[] data) {
-		
 		if (data == null) {	
-			
 		} else {
 			fTaskTable.getItems().removeAll(mainApp.getFTaskData());
 			fTaskTable.getItems().addAll(data);
 		}
 	}
-
-
-
-
 
 
 	public void setMainApp(MainApp mainApp) {
