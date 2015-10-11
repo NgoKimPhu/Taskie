@@ -204,11 +204,6 @@ public class TaskieLogic {
 			
 			// updating the real id
 			retrieve(type);
-			/*for (int i = index - 1; i < searchResult.size(); i++) {
-				if (searchResult.get(i).getType().equals(type)) {
-					indexSave.set(i, indexSave.get(i) - 1);
-				}
-			}*/
 			
 			// Construct undo values
 			if (!isUndoAction) {
@@ -224,11 +219,26 @@ public class TaskieLogic {
 		}
 	}
 
-	private static String[][] search(TaskieAction action)
-			throws UnrecognisedCommandException {
-		TaskieEnum.TaskType type = action.getTask().getType();
+	private static String[][] search(TaskieAction action) throws UnrecognisedCommandException {
 		Object searchKey = action.getSearch();
-		Collection<IndexTaskPair> indexTaskList;
+		ArrayList<IndexTaskPair> cache = new ArrayList<IndexTaskPair>();
+		cache.addAll(primarySearch(TaskieEnum.TaskType.FLOAT, searchKey));
+		cache.addAll(primarySearch(TaskieEnum.TaskType.DEADLINE, searchKey));
+		//cache.addAll(primarySearch(TaskieEnum.TaskType.EVENT, searchKey));
+		searchResult.clear();
+		indexSave.clear();
+		for (IndexTaskPair pair : cache) {
+			searchResult.add(pair.getTask());
+			indexSave.add(pair.getIndex());
+		}
+		double time = Math.random() * Math.random() / 1000;
+		String feedback = new String("Search finished in " + String.format("%.5f", time) + " seconds.");
+		return display(searchResult, feedback);
+	}
+	
+	private static ArrayList<IndexTaskPair> primarySearch(TaskieEnum.TaskType type, Object searchKey)
+			throws UnrecognisedCommandException {
+		ArrayList<IndexTaskPair> indexTaskList;
 		if (searchKey instanceof String) {
 			ArrayList<String> searchList = new ArrayList<String>();
 			searchList.add((String) searchKey);
@@ -243,15 +253,7 @@ public class TaskieLogic {
 		} else {
 			throw new UnrecognisedCommandException("Unrecognised search key.");
 		}
-		searchResult.clear();
-		indexSave.clear();
-		for (IndexTaskPair pair : indexTaskList) {
-			searchResult.add(pair.getTask());
-			indexSave.add(pair.getIndex());
-		}
-		double time = Math.random() * Math.random() / 1000;
-		String feedback = new String("Search finished in " + String.format("%.5f", time) + " seconds.");
-		return display(searchResult, feedback);
+		return indexTaskList;
 	}
 
 	private static String[][] update(int index, TaskieTask task) throws UnrecognisedCommandException {
