@@ -203,7 +203,12 @@ public class TaskieStorage {
 				boolean check = true;
 				String stringForCompare = new String(task.getTitle());
 				for (String keyWord : keyWords) {
-					if (!stringForCompare.toLowerCase().contains(keyWord.toLowerCase())) {
+					ArrayList<String> stringForCompareList = new ArrayList<String>();
+					String[] temp = stringForCompare.toLowerCase().split(" ");
+					for(String word : temp){
+						stringForCompareList.add(word);
+					}
+					if (!stringForCompareList.contains(keyWord.toLowerCase())) {
 						check = false;
 					}
 				}
