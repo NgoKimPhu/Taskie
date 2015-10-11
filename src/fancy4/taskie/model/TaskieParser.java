@@ -28,7 +28,7 @@ public final class TaskieParser {
 			+ "(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)?\\b|"
 			+ "(?:\\b(?:(?<=fr(?:om)?|-|~|to|till|until)|at|by|due))\\s?(\\d{1,2})\\b";
 	private static final String PATTERN_TIMERANGE_FORMAT = "(?:fr(?:om)?\\s?)?"
-			+ "(?:%1$s)\\s?(?:%2$s)?\\s?(?:-|~|to|till|until)\\s?(?:%2$s)?\\s?(?:%1$s)";
+			+ "(?:%1$s)\\s?(?:%2$s)?\\s?(?:-|~|to|till|until)?\\s?(?:%2$s)?\\s?(?:%1$s)";
 	
 	private static final HashMap<String, Integer> weekDays = new HashMap<String, Integer>();
 	private static final HashMap<String, Integer> months = new HashMap<String, Integer>();
