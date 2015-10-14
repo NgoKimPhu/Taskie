@@ -353,7 +353,7 @@ public class TaskieStorage {
 	} 
 	
 
-	public static ArrayList<TaskieTask> markDone(int index, TaskieEnum.TaskType type) {
+	public static ArrayList<TaskieTask> markDown(int index, TaskieEnum.TaskType type) {
 		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
 			eventDeadlineTaskList.get(index).setStatus(true);
 			Collections.sort(eventDeadlineTaskList, tc);
@@ -367,7 +367,7 @@ public class TaskieStorage {
 		}
 	}
 	
-	public static ArrayList<TaskieTask> markNotDone(int index, TaskieEnum.TaskType type) {
+	public static ArrayList<TaskieTask> markNotDown(int index, TaskieEnum.TaskType type) {
 		if (type.equals(TaskieEnum.TaskType.EVENT) || type.equals(TaskieEnum.TaskType.DEADLINE)) {
 			eventDeadlineTaskList.get(index).setStatus(false);
 			Collections.sort(eventDeadlineTaskList, tc);
