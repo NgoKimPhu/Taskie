@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TaskieLogic {
 
@@ -21,6 +23,8 @@ public class TaskieLogic {
 	private static Stack<TaskieAction> commandSave;
 	private static boolean isUndoAction; 
 	private static Comparator<IndexTaskPair> comparator;
+	
+	private static final Logger log = Logger.getLogger( TaskieLogic.class.getName() );
 
 	
 	/*****
@@ -43,6 +47,7 @@ public class TaskieLogic {
 					return first.getTask().getTitle().compareTo(second.getTask().getTitle());
 		        }
 			};
+			log.fine("Initialisation Completed.");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -205,6 +210,8 @@ public class TaskieLogic {
 			TaskieTask deleted = TaskieStorage.deleteTask(id, type);
 			String title = deleted.getTitle();
 			
+			assert title.equals(searchResult.get(index - 1).getTitle());
+			
 			// updating the real id
 			retrieve(type);
 			
@@ -260,34 +267,35 @@ public class TaskieLogic {
 	}
 
 	private static String[][] update(int index, TaskieTask task) throws UnrecognisedCommandException {
-		if (task.getTitle() != null)
+		if (task.getTitle() != null) {
 			TaskieStorage.updateTaskTitle(index, task.getType(), task.getTitle());
-		else if (task.getType() == TaskieEnum.TaskType.FLOAT &&
-				 task.getStartTime() == null && task.getEndTime() != null)
+		} else if (task.getType() == TaskieEnum.TaskType.FLOAT &&
+				 task.getStartTime() == null && task.getEndTime() != null) {
 			TaskieStorage.updateFloatToDeadline(index, task.getEndTime());
-		else if (task.getType() == TaskieEnum.TaskType.FLOAT &&
-				task.getStartTime() != null && task.getEndTime() != null)
+		} else if (task.getType() == TaskieEnum.TaskType.FLOAT &&
+				task.getStartTime() != null && task.getEndTime() != null) {
 			TaskieStorage.updateFloatToEvent(index, task.getStartTime(), task.getEndTime());
-		else if ((task.getType() == TaskieEnum.TaskType.EVENT ||
+		} else if ((task.getType() == TaskieEnum.TaskType.EVENT ||
 				 task.getType() == TaskieEnum.TaskType.EVENT) && 
-				 task.getStartTime() == null && task.getEndTime() == null)
+				 task.getStartTime() == null && task.getEndTime() == null) {
 			TaskieStorage.updateEventDeadlineToFloat(index);
-		else if (task.getType() == TaskieEnum.TaskType.EVENT &&
-				 task.getStartTime() == null && task.getEndTime() == null)
+		} else if (task.getType() == TaskieEnum.TaskType.EVENT &&
+				 task.getStartTime() == null && task.getEndTime() == null) {
 			TaskieStorage.updateEventToDeadline(index);
-		else if (task.getType() == TaskieEnum.TaskType.DEADLINE &&
-				 task.getStartTime() != null)
+		} else if (task.getType() == TaskieEnum.TaskType.DEADLINE &&
+				 task.getStartTime() != null) {
 			TaskieStorage.updateDeadlineToEvent(index, task.getStartTime());
-		else if (task.getEndTime() != null)
+		} else if (task.getEndTime() != null) {
 			TaskieStorage.updateEventDeadlineEnd(index, task.getEndTime());
-		else if (task.getType() == TaskieEnum.TaskType.EVENT &&
-				 task.getStartTime() != null && task.getEndTime() == null)
+		} else if (task.getType() == TaskieEnum.TaskType.EVENT &&
+				 task.getStartTime() != null && task.getEndTime() == null) {
 			TaskieStorage.updateEventStart(index, task.getStartTime());
-		else if (task.getType() == TaskieEnum.TaskType.EVENT &&
-				 task.getStartTime() != null && task.getEndTime() != null)
+		} else if (task.getType() == TaskieEnum.TaskType.EVENT &&
+				 task.getStartTime() != null && task.getEndTime() != null) {
 			TaskieStorage.updateEventStartEnd(index, task.getStartTime(), task.getEndTime());
-		else 
+		} else {
 			throw new UnrecognisedCommandException("Unrecognised update criterion.");
+		}
 		searchResult = retrieveTaskList(task.getType());
 		indexSave = retrieveIndexList(task.getType());
 		String feedback = new String("Updated successfully");
