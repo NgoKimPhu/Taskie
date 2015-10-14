@@ -196,6 +196,9 @@ public class TaskieTask {
 	public TaskieEnum.TaskPriority getPriority(){
 		return this.priority;
 	}
+	public String toString(){
+		return this.title;
+	}
 	public static boolean isEvent(TaskieTask task){
 		return task.getType().equals(TaskieEnum.TaskType.EVENT);
 	}
