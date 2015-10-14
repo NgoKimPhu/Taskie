@@ -11,28 +11,38 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Stack;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TaskieLogic {
 
-	private static ArrayList<TaskieTask> searchResult;
-	private static ArrayList<Integer> indexSave;
-	private static Stack<TaskieAction> undoStack;
-	private static Stack<TaskieAction> redoStack;
-	private static Stack<TaskieAction> commandSave;
-	private static boolean isUndoAction; 
-	private static Comparator<IndexTaskPair> comparator;
+	private ArrayList<TaskieTask> searchResult;
+	private ArrayList<Integer> indexSave;
+	private Stack<TaskieAction> undoStack;
+	private Stack<TaskieAction> redoStack;
+	private Stack<TaskieAction> commandSave;
+	private boolean isUndoAction; 
+	private Comparator<IndexTaskPair> comparator;
+	private static TaskieLogic logic;
 	
-	private static final Logger log = Logger.getLogger( TaskieLogic.class.getName() );
+	private final Logger log = Logger.getLogger( TaskieLogic.class.getName() );
+	
+	public static TaskieLogic logic() {
+		if (logic == null) {
+			logic = new TaskieLogic();
+		}
+		return logic;
+	}
 
+	protected TaskieLogic() {
+		initialise();
+	}
 	
 	/*****
 	 * Below are backbone functions.
 	 * 
 	 * 
 	 */
-	public static void initialise() {
+	public void initialise() {
 		try {
 			TaskieStorage.load("");
 			isUndoAction = false;
@@ -53,7 +63,7 @@ public class TaskieLogic {
 		}
 	}
 
-	public static String[][] execute(String str) throws UnrecognisedCommandException {
+	public String[][] execute(String str) throws UnrecognisedCommandException {
 		if (str.equals("")) {
 			throw new UnrecognisedCommandException("Empty command.");
 		}
@@ -69,7 +79,7 @@ public class TaskieLogic {
 		return screen;
 	}
 	
-	private static String[][] takeAction(TaskieAction action) {
+	private String[][] takeAction(TaskieAction action) {
 		try {
 			switch (action.getType()) {
 			case ADD:
@@ -107,7 +117,7 @@ public class TaskieLogic {
 	 * 
 	 * 
 	 */
-	private static String[][] display(Collection<TaskieTask> taskList, String message) {
+	private String[][] display(Collection<TaskieTask> taskList, String message) {
 		String[] feedback = new String[] {message};
 		String[] tasks = toStringArray(taskList);
 		String[] deadlines = toStringArray(retrieveTaskList(TaskieEnum.TaskType.DEADLINE));
@@ -115,7 +125,7 @@ public class TaskieLogic {
 		return new String[][] { feedback, tasks, deadlines, floats };
 	}
 
-	private static String[] toStringArray(Collection<TaskieTask> taskList) {
+	private String[] toStringArray(Collection<TaskieTask> taskList) {
 		String[] ary = new String[taskList.size()];
 		int index = 0;
 		for (TaskieTask task : taskList) {
@@ -124,7 +134,7 @@ public class TaskieLogic {
 		return ary;
 	}
 	
-	private static ArrayList<IndexTaskPair> powerRetrieve(TaskieEnum.TaskType type) {
+	private ArrayList<IndexTaskPair> powerRetrieve(TaskieEnum.TaskType type) {
 		switch (type) {
 			case DEADLINE:
 			case EVENT:
@@ -161,7 +171,7 @@ public class TaskieLogic {
 		}
 	}
 	
-	private static ArrayList<TaskieTask> retrieveTaskList(TaskieEnum.TaskType type) {
+	private ArrayList<TaskieTask> retrieveTaskList(TaskieEnum.TaskType type) {
 		ArrayList<IndexTaskPair> raw = powerRetrieve(type);
 		ArrayList<TaskieTask> result = new ArrayList<TaskieTask>();
 		for (IndexTaskPair pair : raw)
@@ -169,7 +179,7 @@ public class TaskieLogic {
 		return result;
 	}
 	
-	private static ArrayList<Integer> retrieveIndexList(TaskieEnum.TaskType type) {
+	private ArrayList<Integer> retrieveIndexList(TaskieEnum.TaskType type) {
 		ArrayList<IndexTaskPair> raw = powerRetrieve(type);
 		ArrayList<Integer> result = new ArrayList<Integer>();
 		for (IndexTaskPair pair : raw)
@@ -177,7 +187,7 @@ public class TaskieLogic {
 		return result;
 	}
 	
-	private static void retrieve(TaskieEnum.TaskType type) {
+	private void retrieve(TaskieEnum.TaskType type) {
 		searchResult = retrieveTaskList(type);
 		indexSave = retrieveIndexList(type);
 	}
@@ -189,7 +199,7 @@ public class TaskieLogic {
 	 * Including add, delete, search, update.
 	 * 
 	 */
-	private static String[][] add(TaskieTask task) {
+	private String[][] add(TaskieTask task) {
 		TaskieStorage.addTask(task);
 		retrieve(task.getType());
 		
@@ -203,7 +213,7 @@ public class TaskieLogic {
 		return display(searchResult, feedback);
 	}
 
-	private static String[][] delete(int index) {
+	private String[][] delete(int index) {
 		try {
 			int id = indexSave.get(index - 1);
 			TaskieEnum.TaskType type = searchResult.get(index - 1).getType();
@@ -229,7 +239,7 @@ public class TaskieLogic {
 		}
 	}
 
-	private static String[][] search(TaskieAction action) throws UnrecognisedCommandException {
+	private String[][] search(TaskieAction action) throws UnrecognisedCommandException {
 		Object searchKey = action.getSearch();
 		ArrayList<IndexTaskPair> cache = new ArrayList<IndexTaskPair>();
 		cache.addAll(primarySearch(TaskieEnum.TaskType.FLOAT, searchKey));
@@ -246,7 +256,7 @@ public class TaskieLogic {
 		return display(searchResult, feedback);
 	}
 	
-	private static ArrayList<IndexTaskPair> primarySearch(TaskieEnum.TaskType type, Object searchKey)
+	private ArrayList<IndexTaskPair> primarySearch(TaskieEnum.TaskType type, Object searchKey)
 			throws UnrecognisedCommandException {
 		ArrayList<IndexTaskPair> indexTaskList;
 		if (searchKey instanceof String) {
@@ -266,7 +276,7 @@ public class TaskieLogic {
 		return indexTaskList;
 	}
 
-	private static String[][] update(int index, TaskieTask task) throws UnrecognisedCommandException {
+	private String[][] update(int index, TaskieTask task) throws UnrecognisedCommandException {
 		if (task.getTitle() != null) {
 			TaskieStorage.updateTaskTitle(index, task.getType(), task.getTitle());
 		} else if (task.getType() == TaskieEnum.TaskType.FLOAT &&
@@ -302,7 +312,7 @@ public class TaskieLogic {
 		return display(searchResult, feedback);
 	}
 	
-	private static String[][] deleteAll() {
+	private String[][] deleteAll() {
 		for (int i = searchResult.size(); i > 0; i--)
 			delete(i);
 		String feedback = new String("All deleted.");
@@ -311,7 +321,7 @@ public class TaskieLogic {
 		return display(new ArrayList<TaskieTask>(), feedback);
 	}
 	
-	private static String[][] reset() {
+	private String[][] reset() {
 		TaskieStorage.deleteAll();
 		String feedback = new String("Restored to factory settings.");
 		return display(new ArrayList<TaskieTask>(), feedback);
@@ -320,7 +330,7 @@ public class TaskieLogic {
 	/*****
 	 * Below are undo/redo methods.
 	 */
-	private static String[][] undo() {
+	private String[][] undo() {
 		isUndoAction = true;
 		if (undoStack.isEmpty()) {
 			String feedback = "No more action to undo.";
@@ -331,7 +341,7 @@ public class TaskieLogic {
 		return takeAction(action);
 	}
 	
-	private static String[][] redo() {
+	private String[][] redo() {
 		if (redoStack.isEmpty()) {
 			String feedback = "No more action to redo.";
 			return display(new ArrayList<TaskieTask>(), feedback);
