@@ -31,13 +31,20 @@ public class MainApp extends Application {
 
     }
     private void iniAllTable() {
-    	String[][] iniDisplay = TaskieLogic.execute("search");
-    	mdata = iniDisplay[1];
-    	taskData.addAll(mdata);
-    	ddata = iniDisplay[2];
-    	dTaskData.addAll(ddata);
-    	fdata = iniDisplay[3];
-    	fTaskData.addAll(fdata);
+    	String[][] iniDisplay;
+		try {
+			iniDisplay = TaskieLogic.execute("search");
+			mdata = iniDisplay[1];
+	    	taskData.addAll(mdata);
+	    	ddata = iniDisplay[2];
+	    	dTaskData.addAll(ddata);
+	    	fdata = iniDisplay[3];
+	    	fTaskData.addAll(fdata);
+		} catch (UnrecognisedCommandException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
     }
     
    /* public static void refresh(String cmd) {

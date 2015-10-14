@@ -22,9 +22,16 @@ public class TaskieUIBackup {
 	public static void run() {
 		while(true) {
 			String command = read();
-			String[][] screen = TaskieLogic.execute(command);
-			display(screen[0]);
-			display(screen[1]);
+			String[][] screen;
+			try {
+				screen = TaskieLogic.execute(command);
+				display(screen[0]);
+				display(screen[1]);
+			} catch (UnrecognisedCommandException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 	}
 	
