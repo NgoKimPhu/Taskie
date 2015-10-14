@@ -9,6 +9,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.regex.*;
 import java.text.*;
+import java.util.logging.*;
 
 import org.json.*;
 
@@ -26,6 +27,7 @@ public class TaskieStorage {
 	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> floatPriorityMap;
 	private static Stack<HashMap<String, Object>> commandStack;
 	private static TaskComparator tc = new TaskComparator();
+	private static Logger logger = Logger.getLogger(TaskieStorage.class.getName());
 
 	public static void load(String pathName) throws Exception {
 		File folder;
@@ -666,6 +668,7 @@ public class TaskieStorage {
 		return tasks.size() == 0;
 	}
 	private static void addToEventMap(TaskieTask task){
+		assert TaskieTask.isEvent(task);
 		Date start = task.getStartTime();
 		Date end = task.getEndTime();
 		TaskieEnum.TaskPriority priority = task.getPriority();
@@ -693,6 +696,7 @@ public class TaskieStorage {
 		eventPriorityMap.get(priority).add(task);
 	}
 	private static void addToDeadlineMap(TaskieTask task){
+		assert TaskieTask.isDeadline(task);
 		Date end = task.getEndTime();
 		Date endKey = createDateKey(end);
 		TaskieEnum.TaskPriority priority = task.getPriority();
@@ -710,6 +714,7 @@ public class TaskieStorage {
 		deadlinePriorityMap.get(priority).add(task);
 	}
 	private static void addToFloatMap(TaskieTask task){
+		assert TaskieTask.isFloat(task);
 		TaskieEnum.TaskPriority priority = task.getPriority();
 		if(!floatPriorityMap.containsKey(priority)){
 			floatPriorityMap.put(priority, new ArrayList<TaskieTask>());
@@ -816,10 +821,12 @@ public class TaskieStorage {
 class FileHandler {
 	private static final SimpleDateFormat sdf = new SimpleDateFormat(
 			"dd-MM-yyyy HH:mm");
+	private static Logger logger = Logger.getLogger(FileHandler.class.getName());
 
 	public static ArrayList<TaskieTask> readEventDeadlineFile(File file) throws Exception {
 		String line = new String();
 		ArrayList<TaskieTask> fileContent = new ArrayList<TaskieTask>();
+		assert file.exists() && file!=null;
 		try {
 			BufferedReader in = new BufferedReader(new FileReader(file));
 			line = in.readLine();
@@ -839,13 +846,14 @@ class FileHandler {
 			}
 			in.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, "Cannot read from event and deadline file.", e);
 		}
 		return fileContent;
 	}
 	public static ArrayList<TaskieTask> readFloatFile(File file) throws Exception {
 		String line = new String();
 		ArrayList<TaskieTask> fileContent = new ArrayList<TaskieTask>();
+		assert file.exists() && file!=null;
 		try {
 			BufferedReader in = new BufferedReader(new FileReader(file));
 			line = in.readLine();
@@ -864,7 +872,7 @@ class FileHandler {
 			}
 			in.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, "Cannot read from floating task file.", e);
 		}
 		return fileContent;
 	}
@@ -906,7 +914,7 @@ class FileHandler {
 				writer.write("\n");
 				writer.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.log(Level.SEVERE, "Cannot write to event and deadline file.", e);
 			}
 		}
 		else{
@@ -941,19 +949,20 @@ class FileHandler {
 				writer.write("\n");
 				writer.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.log(Level.SEVERE, "Cannot write to floating task file.", e);
 			}
 		}
 	}
 	
 	public static void clearFile(File file){
 		//String fileName = file.getName();
+		assert file.exists() &&  file!=null;
 		try {
 			FileWriter writer = new FileWriter(file);
 			writer.write("");
 			writer.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, "Cannot clear file.", e);
 		}
 	}
 
