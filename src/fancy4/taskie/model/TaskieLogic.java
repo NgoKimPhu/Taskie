@@ -48,7 +48,10 @@ public class TaskieLogic {
 		}
 	}
 
-	public static String[][] execute(String str) {
+	public static String[][] execute(String str) throws UnrecognisedCommandException {
+		if (str.equals("")) {
+			throw new UnrecognisedCommandException("Empty command.");
+		}
 		isUndoAction = false;
 		TaskieAction action = TaskieParser.parse(str);
 		// command stack
