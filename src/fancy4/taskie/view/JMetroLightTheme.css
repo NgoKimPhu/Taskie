@@ -50,7 +50,7 @@
 
 .table-view .column-header .label {
     -fx-font-size: 20pt;
-    -fx-font-family: "Segoe UI Light";
+    -fx-font-family: "Segoe UI Semibold";
     -fx-text-fill: white;
     -fx-alignment: center-left;
     -fx-opacity: 1;
@@ -92,11 +92,13 @@
     -fx-background-color: black;
 }
 
+
 .text-field {
+    -fx-background-color: derive(#1d1d1d,10%);
+    -fx-text-fill: white;
     -fx-font-size: 12pt;
     -fx-font-family: "Segoe UI Semibold";
 }
-
 /* 
  * Metro style Push Button
  * Author: Pedro Duque Vieira

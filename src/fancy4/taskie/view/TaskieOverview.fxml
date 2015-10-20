@@ -26,7 +26,7 @@
                         </AnchorPane>
                       <AnchorPane maxHeight="630.0" maxWidth="400.0" minHeight="630.0" minWidth="400.0" prefHeight="630.0" prefWidth="400.0" stylesheets="@JMetroLightTheme.css">
                            <children>
-                              <SplitPane dividerPositions="0.5" layoutX="57.0" layoutY="72.0" maxHeight="630.0" maxWidth="400.0" minHeight="630.0" minWidth="400.0" orientation="VERTICAL" prefHeight="630.0" prefWidth="400.0" styleClass="background" stylesheets="@JMetroLightTheme.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <SplitPane dividerPositions="0.49528301886792453" layoutX="57.0" layoutY="72.0" maxHeight="630.0" maxWidth="400.0" minHeight="630.0" minWidth="400.0" orientation="VERTICAL" prefHeight="630.0" prefWidth="400.0" styleClass="background" stylesheets="@JMetroLightTheme.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <items>
                                   <AnchorPane maxHeight="315.0" maxWidth="400.0" minHeight="315.0" minWidth="400.0" prefHeight="315.0" prefWidth="400.0" styleClass="background" stylesheets="@JMetroLightTheme.css">
                                        <children>
@@ -54,9 +54,9 @@
                   </SplitPane>
                </children>
             </AnchorPane>
-          <AnchorPane maxHeight="60.0" maxWidth="800.0" minHeight="60.0" minWidth="800.0" prefHeight="60.0" prefWidth="800.0" stylesheets="@JMetroLightTheme.css">
+          <AnchorPane maxHeight="60.0" maxWidth="800.0" minHeight="60.0" minWidth="800.0" prefHeight="60.0" prefWidth="800.0">
                <children>
-                  <TextField fx:id="textInput" layoutX="208.0" layoutY="120.0" maxHeight="35.0" maxWidth="800.0" minHeight="35.0" minWidth="800.0" onKeyPressed="#inputEnter" prefHeight="35.0" prefWidth="800.0" styleClass="text-field" stylesheets="@JMetroLightTheme.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
+                  <TextField fx:id="textInput" layoutX="208.0" layoutY="120.0" maxHeight="35.0" maxWidth="800.0" minHeight="35.0" minWidth="800.0" onKeyPressed="#inputEnter" prefHeight="35.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
                   <Label fx:id="textOutput" alignment="CENTER" layoutX="400.0" layoutY="6.0" maxHeight="40.0" maxWidth="800.0" minHeight="40.0" minWidth="800.0" prefHeight="40.0" prefWidth="800.0" styleClass="label-bright" stylesheets="@JMetroLightTheme.css" text="Welcome to Taskie!" textAlignment="CENTER" textFill="#00c8ff" wrapText="true" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <font>
                         <Font name="Calibri Italic" size="15.0" />
