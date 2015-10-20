@@ -34,13 +34,11 @@ public class TaskieStorage {
 		if(pathName.trim().length()==0){
 			pathName = "TaskieData";
 			folder = new File(pathName);
-		}
-		else{
+		}else{
 			File userPath = new File(pathName);
 			if(!userPath.exists()){
 				throw new Exception("Ooops! Invalid user path.");
-			}
-			else{
+			}else{
 				folder = new File(pathName+"/TaskieData");
 				if(!folder.exists()){
 					folder.mkdir();
@@ -65,14 +63,11 @@ public class TaskieStorage {
 					//keep two copies of date-task pair in map, one with specific time one without
 					//event start time
 					addToEventMap(task);
-				}
-				
-				else{
+				}else{
 					addToDeadlineMap(task);
 				}			
 			}		
-		}
-		else{
+		}else{
 			eventDeadlineTask.createNewFile();
 			eventDeadlineTaskList = new ArrayList<TaskieTask>();
 		}
@@ -81,8 +76,7 @@ public class TaskieStorage {
 			for(TaskieTask task: floatTaskList){
 				addToFloatMap(task);
 			}
-		}
-		else{
+		}else{
 			floatTask.createNewFile();
 			floatTaskList = new ArrayList<TaskieTask>();
 		}
@@ -215,9 +209,19 @@ public class TaskieStorage {
 					}
 				}
 				if (check == true) {
-					IndexTaskPair pair = new IndexTaskPair(
-							eventDeadlineTaskList.indexOf(task), task);
-					searchResult.add(pair);
+					if(type.equals(TaskieEnum.TaskType.EVENT)){
+						if(TaskieTask.isEvent(task)){
+							IndexTaskPair pair = new IndexTaskPair(
+								eventDeadlineTaskList.indexOf(task), task);
+							searchResult.add(pair);
+						}
+					}else{
+						if(TaskieTask.isDeadline(task)){
+							IndexTaskPair pair = new IndexTaskPair(
+								eventDeadlineTaskList.indexOf(task), task);
+							searchResult.add(pair);
+						}
+					}
 				}
 			}
 			return searchResult;
@@ -240,13 +244,12 @@ public class TaskieStorage {
 			return searchResult;
 		}
 	}
-	
+	//search event based on start time 
 	public static ArrayList<IndexTaskPair> searchTask(Date start){
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 		if(!eventStartDateMap.containsKey(start)){
 			return searchResult;
-		}
-		else{
+		}else{
 			ArrayList<TaskieTask> tasks = eventStartDateMap.get(start);
 			for(TaskieTask task: tasks){
 				IndexTaskPair pair = new IndexTaskPair(eventDeadlineTaskList.indexOf(task), task);
@@ -255,6 +258,7 @@ public class TaskieStorage {
 			return searchResult;
 		}
 	}
+	// search event/deadline based on end time
 	public static ArrayList<IndexTaskPair> searchTask(Date end, TaskieEnum.TaskType type){
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 		if(type.equals(TaskieEnum.TaskType.EVENT)){
