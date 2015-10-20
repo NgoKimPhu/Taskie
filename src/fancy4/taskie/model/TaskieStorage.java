@@ -197,6 +197,7 @@ public class TaskieStorage {
 			ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 			for (TaskieTask task : eventDeadlineTaskList) {
 				boolean check = true;
+				/*
 				String stringForCompare = new String(task.getTitle());
 				for (String keyWord : keyWords) {
 					ArrayList<String> stringForCompareList = new ArrayList<String>();
@@ -205,6 +206,13 @@ public class TaskieStorage {
 						stringForCompareList.add(word);
 					}
 					if (!stringForCompareList.contains(keyWord.toLowerCase())) {
+						check = false;
+					}
+				}
+				*/
+				String stringForCompare = new String(task.getTitle());
+				for (String keyWord : keyWords) {
+					if (!stringForCompare.toLowerCase().contains(keyWord.toLowerCase())) {
 						check = false;
 					}
 				}
