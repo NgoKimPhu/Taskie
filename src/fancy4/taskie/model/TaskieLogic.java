@@ -213,7 +213,7 @@ public class TaskieLogic {
 			undoAction.setTaskType(task.getType());
 			undoStack.push(undoAction);
 		}
-		String feedback = new String(task.getTitle() + " is added");
+		String feedback = new String("\"" + task.getTitle() + "\"" + " is added");
 		return display(searchResult, feedback);
 	}
 
@@ -235,7 +235,7 @@ public class TaskieLogic {
 				undoStack.push(action);
 			}
 			
-			String feedback = new String(title + " is deleted");
+			String feedback = new String("\"" + title + "\"" + " is deleted");
 			return display(searchResult, feedback);
 		} catch (IndexOutOfBoundsException e) {
 			String feedback = "Could not find index " + index;
