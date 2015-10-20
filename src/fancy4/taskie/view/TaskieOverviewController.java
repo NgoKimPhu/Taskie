@@ -95,13 +95,13 @@ public class TaskieOverviewController {
 				mainData = fromLogic[1];
 				dData = fromLogic[2];
 				fData = fromLogic[3];
-				response =  fromLogic[0][0];
+				response =  fromLogic[0][0] ;
 				
 				updateMainTable(mainData);
 				updateDTable(dData);
 				updateFTable(fData);
 				
-				textOutputResponse += "> " + input + "\n" + response + "\n";
+			//	textOutputResponse += "> " + input + "\n" + response + "\n";
 				textOutput.setText(response);
 				
 				/*
