@@ -76,7 +76,7 @@ public class TaskieOverviewController {
 		String input;
 		if (event.getCode() == KeyCode.ENTER) {
 			input = textInput.getText();	
-			String[] mainData, dData, fData;
+			String[] mainData, dData, fData, dTaskStart;
 			String response;
 			//String[][] fromLogic = null;
 			String[][] fromLogic;
@@ -101,7 +101,7 @@ public class TaskieOverviewController {
 				dData = fromLogic[2];
 				fData = fromLogic[3];
 				response =  fromLogic[0][0];
-				
+				dTaskStart = new String[]{"123","456","789"};
 				updateMainTable(mainData);
 				updateDTable(dData);
 				updateFTable(fData);
@@ -167,6 +167,7 @@ public class TaskieOverviewController {
 
 		// Add observable list data to the table
 		mainTaskTable.setItems(mainApp.getTaskData());
+		dTaskTable.setItems(mainApp.getDTaskStart());
 		dTaskTable.setItems(mainApp.getDTaskData());
 		fTaskTable.setItems(mainApp.getFTaskData());
 	}
