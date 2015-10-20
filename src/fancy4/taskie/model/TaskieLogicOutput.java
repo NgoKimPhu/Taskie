@@ -3,21 +3,12 @@ package fancy4.taskie.model;
 import java.util.*;
 
 public class TaskieLogicOutput {
-	
-	private static TaskieLogicOutput output;
 
 	private String feedback;
 	private ArrayList<TaskieTask> all;
 	private ArrayList<TaskieTask> main;
 	
-	public static TaskieLogicOutput output() {
-		if (output == null) {
-			output = new TaskieLogicOutput();
-		}
-		return output;
-	}
-	
-	protected TaskieLogicOutput() {
+	public TaskieLogicOutput() {
 		feedback = new String();
 		all = new ArrayList<TaskieTask>();
 		main = new ArrayList<TaskieTask>();
