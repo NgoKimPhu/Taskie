@@ -15,6 +15,8 @@ import java.util.logging.Logger;
 
 public class TaskieLogic {
 
+	private static TaskieLogic logic;
+	
 	private Comparator<IndexTaskPair> comparator;
 	private ArrayList<TaskieTask> searchResult;
 	private ArrayList<Integer> indexSave;
@@ -22,8 +24,6 @@ public class TaskieLogic {
 	private Stack<TaskieAction> undoStack;
 	private Stack<TaskieAction> redoStack;
 	private boolean isUndoAction;
-
-	private static TaskieLogic logic;
 	
 	private final Logger log = Logger.getLogger( TaskieLogic.class.getName() );
 	
@@ -34,6 +34,7 @@ public class TaskieLogic {
 		return logic;
 	}
 
+	/* Constructor 深藏功与名 */
 	protected TaskieLogic() {
 		initialise();
 	}
@@ -71,16 +72,16 @@ public class TaskieLogic {
 		isUndoAction = false;
 		TaskieAction action = TaskieParser.parse(str);
 		// command stack
-		redoStack.clear();
-		if (!action.getType().equals(TaskieEnum.Actions.UNDO) ||
-			!action.getType().equals(TaskieEnum.Actions.REDO)) {
-			commandSave.push(action);
-		}
+		//redoStack.clear();
 		String[][] screen = takeAction(action);
 		return screen;
 	}
 	
 	private String[][] takeAction(TaskieAction action) {
+		if (!action.getType().equals(TaskieEnum.Actions.UNDO) ||
+				!action.getType().equals(TaskieEnum.Actions.REDO)) {
+				//commandSave.push(action);
+		}
 		try {
 			switch (action.getType()) {
 			case ADD:
@@ -337,9 +338,8 @@ public class TaskieLogic {
 			String feedback = "No more action to undo.";
 			return display(searchResult, feedback);
 		}
-		TaskieAction action = undoStack.pop();
 		redoStack.push(commandSave.pop());
-		return takeAction(action);
+		return takeAction(undoStack.pop());
 	}
 	
 	private String[][] redo() {
