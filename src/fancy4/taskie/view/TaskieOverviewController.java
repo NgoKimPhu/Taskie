@@ -66,7 +66,6 @@ public class TaskieOverviewController {
 		});
 	}
 
-
 	public void inputEnter(KeyEvent event) {
 		String input;
 		if (event.getCode() == KeyCode.ENTER) {
@@ -106,7 +105,7 @@ public class TaskieOverviewController {
 				
 				/*
 				 * console print out for testing
-				 */
+				 
 				System.out.println("main display:");
 				for (String s:mainData) {
 					System.out.print(s+" ");
@@ -118,7 +117,7 @@ public class TaskieOverviewController {
 				System.out.println("\n  float display:");
 				for (String s:fData) {
 					System.out.print(s+" ");
-				}
+				}*/
 			} catch (UnrecognisedCommandException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
