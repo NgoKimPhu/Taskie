@@ -71,17 +71,19 @@ public class TaskieLogic {
 		}
 		isUndoAction = false;
 		TaskieAction action = TaskieParser.parse(str);
-		// command stack
-		redoStack.clear();
+		if (action.getType().equals(TaskieEnum.Actions.ADD) ||
+			action.getType().equals(TaskieEnum.Actions.DELETE)) {
+			commandSave.push(action);
+		}
+		if (action.getType() != TaskieEnum.Actions.UNDO &&
+			action.getType() != TaskieEnum.Actions.REDO) {
+			redoStack.clear();
+		}
 		String[][] screen = takeAction(action);
 		return screen;
 	}
 	
 	private String[][] takeAction(TaskieAction action) {
-		if (!action.getType().equals(TaskieEnum.Actions.UNDO) ||
-				!action.getType().equals(TaskieEnum.Actions.REDO)) {
-				commandSave.push(action);
-		}
 		try {
 			switch (action.getType()) {
 			case ADD:
@@ -325,6 +327,9 @@ public class TaskieLogic {
 	
 	private String[][] reset() {
 		TaskieStorage.deleteAll();
+		undoStack.clear();
+		redoStack.clear();
+		commandSave.clear();
 		String feedback = new String("Restored to factory settings.");
 		return display(new ArrayList<TaskieTask>(), feedback);
 	}
@@ -338,16 +343,20 @@ public class TaskieLogic {
 			String feedback = "No more action to undo.";
 			return display(searchResult, feedback);
 		}
+		TaskieAction action = undoStack.pop();
 		redoStack.push(commandSave.pop());
-		return takeAction(undoStack.pop());
+		return takeAction(action);
 	}
 	
 	private String[][] redo() {
+		isUndoAction = false;
 		if(redoStack.isEmpty()) {
 			String feedback = "No more action to redo.";
 			return display(new ArrayList<TaskieTask>(), feedback);
 		} else {
-			return takeAction(redoStack.pop());
+			TaskieAction action = redoStack.pop();
+			commandSave.push(action);
+			return takeAction(action);
 		} 
 		
 	}
