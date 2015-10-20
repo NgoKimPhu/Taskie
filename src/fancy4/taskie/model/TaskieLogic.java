@@ -15,13 +15,14 @@ import java.util.logging.Logger;
 
 public class TaskieLogic {
 
+	private Comparator<IndexTaskPair> comparator;
 	private ArrayList<TaskieTask> searchResult;
 	private ArrayList<Integer> indexSave;
+	private Stack<TaskieAction> commandSave;
 	private Stack<TaskieAction> undoStack;
 	private Stack<TaskieAction> redoStack;
-	private Stack<TaskieAction> commandSave;
-	private boolean isUndoAction; 
-	private Comparator<IndexTaskPair> comparator;
+	private boolean isUndoAction;
+
 	private static TaskieLogic logic;
 	
 	private final Logger log = Logger.getLogger( TaskieLogic.class.getName() );
@@ -342,12 +343,13 @@ public class TaskieLogic {
 	}
 	
 	private String[][] redo() {
-		if (redoStack.isEmpty()) {
+		if(redoStack.isEmpty()) {
 			String feedback = "No more action to redo.";
 			return display(new ArrayList<TaskieTask>(), feedback);
-		}
-		TaskieAction action = redoStack.pop();
-		return takeAction(action);
+		} else {
+			return takeAction(redoStack.pop());
+		} 
+		
 	}
 
 }

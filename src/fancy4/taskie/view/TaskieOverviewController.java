@@ -76,7 +76,7 @@ public class TaskieOverviewController {
 			//String[][] fromLogic = null;
 			String[][] fromLogic;
 			try {
-				fromLogic = TaskieLogic.execute(input);
+				fromLogic = TaskieLogic.logic().execute(input);
 				
 				/*if (input.equals("test1")) {
 					fromLogic[0][0] = "test response 1";

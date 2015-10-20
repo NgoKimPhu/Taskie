@@ -15,7 +15,7 @@ public class TaskieUIBackup {
 	}
 	
 	public static void initialise() {
-		TaskieLogic.initialise();
+		TaskieLogic.logic().initialise();
 		sc = new Scanner(System.in);
 	}
 	
@@ -24,7 +24,7 @@ public class TaskieUIBackup {
 			String command = read();
 			String[][] screen;
 			try {
-				screen = TaskieLogic.execute(command);
+				screen = TaskieLogic.logic().execute(command);
 				display(screen[0]);
 				display(screen[1]);
 			} catch (UnrecognisedCommandException e) {
