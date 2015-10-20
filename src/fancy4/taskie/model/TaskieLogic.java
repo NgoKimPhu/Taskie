@@ -265,7 +265,7 @@ public class TaskieLogic {
 		ArrayList<IndexTaskPair> indexTaskList;
 		if (searchKey instanceof String) {
 			ArrayList<String> searchList = new ArrayList<String>();
-			searchList.add((String) searchKey);
+			searchList.add((String)searchKey);
 			indexTaskList = TaskieStorage.searchTask(searchList, type);
 		} else if (searchKey instanceof Date) {
 			indexTaskList = TaskieStorage.searchTask((Date) searchKey, type);
