@@ -72,7 +72,7 @@ public class TaskieLogic {
 		isUndoAction = false;
 		TaskieAction action = TaskieParser.parse(str);
 		// command stack
-		//redoStack.clear();
+		redoStack.clear();
 		String[][] screen = takeAction(action);
 		return screen;
 	}
@@ -80,7 +80,7 @@ public class TaskieLogic {
 	private String[][] takeAction(TaskieAction action) {
 		if (!action.getType().equals(TaskieEnum.Actions.UNDO) ||
 				!action.getType().equals(TaskieEnum.Actions.REDO)) {
-				//commandSave.push(action);
+				commandSave.push(action);
 		}
 		try {
 			switch (action.getType()) {
