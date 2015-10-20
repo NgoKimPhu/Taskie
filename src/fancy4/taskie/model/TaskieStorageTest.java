@@ -12,6 +12,7 @@ public class TaskieStorageTest {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
 		}
+		TaskieStorage.deleteAll();
 		TaskieTask float1 = new TaskieTask("finish tutorial");
 		TaskieTask float2 = new TaskieTask("go to dinner with misaki");
 		Date deadline = getDate(2015, 10, 6);
@@ -23,6 +24,24 @@ public class TaskieStorageTest {
 		TaskieStorage.addTask(float2);
 		TaskieStorage.addTask(deadline1);
 		TaskieStorage.addTask(event1);
+		ArrayList<String> keyWords = new ArrayList<String>();
+		keyWords.add("");
+		ArrayList<IndexTaskPair> fs = TaskieStorage.searchTask(keyWords, TaskieEnum.TaskType.FLOAT);
+		ArrayList<IndexTaskPair> ds =  TaskieStorage.searchTask(keyWords, TaskieEnum.TaskType.DEADLINE);
+		ArrayList<IndexTaskPair> es = TaskieStorage.searchTask(keyWords, TaskieEnum.TaskType.EVENT);
+		System.out.println("float:");
+		for(IndexTaskPair f: fs){
+			System.out.println(f.getTask().toString());
+		}
+		System.out.println("event");
+		for(IndexTaskPair e: es){
+			System.out.println(e.getTask().toString());
+		}
+		System.out.println("deadline");
+		for(IndexTaskPair d: ds){
+			System.out.println(d.getTask().toString());
+		}
+		
 		//TaskieStorage.deleteTask(2, TaskieEnum.TaskType.FLOAT);
 		//TaskieStorage.deleteTask(2, TaskieEnum.TaskType.EVENT);
 
