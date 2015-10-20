@@ -19,12 +19,10 @@ public class MainApp extends Application {
     public ObservableList<String> taskData = FXCollections.observableArrayList();
     public ObservableList<String> dTaskData = FXCollections.observableArrayList();
     public ObservableList<String> fTaskData = FXCollections.observableArrayList();
-    public ObservableList<String> dTaskStart = FXCollections.observableArrayList();
     
     public static String[] mdata = {};
     public static String[] ddata = {};
     public static String[] fdata = {};
-    public static String[] dstart = {};
     public MainApp() {
     	//data = TaskieLogic.execute("add order a pizza")[0];
     	//TaskieLogic.initialise();
@@ -42,8 +40,6 @@ public class MainApp extends Application {
 	    	dTaskData.addAll(ddata);
 	    	fdata = iniDisplay[3];
 	    	fTaskData.addAll(fdata);
-	    	dstart = new String[] {"123","456"};
-	    	dTaskStart.addAll(dstart);
 		} catch (UnrecognisedCommandException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -66,9 +62,6 @@ public class MainApp extends Application {
     }
     public ObservableList<String> getFTaskData() {
     	return fTaskData;
-    }
-    public ObservableList<String> getDTaskStart() {
-    	return dTaskStart;
     }
     
     @Override
