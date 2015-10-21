@@ -98,7 +98,7 @@ public class TaskieLogic {
 			case SEARCH:
 				return search(action);
 			case UPDATE:
-				return update(action.getIndex(), action.getTask());
+				return update(action.getIndex() - 1, action.getTask());
 			case UNDO:
 				return undo();
 			case REDO:
