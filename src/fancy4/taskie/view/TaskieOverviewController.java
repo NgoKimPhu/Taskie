@@ -13,7 +13,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.text.TextAlignment;
 import javafx.util.Callback;
 import fancy4.taskie.MainApp;
 import fancy4.taskie.model.TaskieLogic;
@@ -25,10 +24,6 @@ public class TaskieOverviewController {
 	private TableView<String> mainTaskTable;
 	@FXML
 	private TableColumn<String, String> taskColumn;
-	@FXML
-	private TableColumn<String, String> dTaskStartColumn;
-	@FXML
-	private TableColumn<String, String> dTaskEndColumn;
 	@FXML
 	private TableView<String> dTaskTable;
 	@FXML
@@ -53,15 +48,15 @@ public class TaskieOverviewController {
 
 	}
 
-
 	@FXML
 	private void initialize() {
+		//TaskieLogic.initialise();
 		iniColumn(taskColumn);
 		iniColumn(dTaskColumn);
 		iniColumn(fTaskColumn);
-		iniColumn(dTaskStartColumn);
-		iniColumn(dTaskEndColumn);
+		
 	}
+	
 	private void iniColumn(TableColumn<String, String> column) {
 		//TaskieLogic.initialise();
 		column.setCellValueFactory(new Callback<CellDataFeatures<String, String>, ObservableValue<String>>() {
@@ -71,12 +66,11 @@ public class TaskieOverviewController {
 		});
 	}
 
-
 	public void inputEnter(KeyEvent event) {
 		String input;
 		if (event.getCode() == KeyCode.ENTER) {
 			input = textInput.getText();	
-			String[] mainData, dData, fData, dTaskStart;
+			String[] mainData, dData, fData;
 			String response;
 			//String[][] fromLogic = null;
 			String[][] fromLogic;
@@ -100,13 +94,13 @@ public class TaskieOverviewController {
 				mainData = fromLogic[1];
 				dData = fromLogic[2];
 				fData = fromLogic[3];
-				response =  fromLogic[0][0];
-				dTaskStart = new String[]{"123","456","789"};
+				response =  fromLogic[0][0] ;
+				
 				updateMainTable(mainData);
 				updateDTable(dData);
 				updateFTable(fData);
 				
-				textOutputResponse += "> " + input + "\n" + response + "\n";
+			//	textOutputResponse += "> " + input + "\n" + response + "\n";
 				textOutput.setText(response);
 				
 				/*
@@ -167,7 +161,6 @@ public class TaskieOverviewController {
 
 		// Add observable list data to the table
 		mainTaskTable.setItems(mainApp.getTaskData());
-		dTaskTable.setItems(mainApp.getDTaskStart());
 		dTaskTable.setItems(mainApp.getDTaskData());
 		fTaskTable.setItems(mainApp.getFTaskData());
 	}

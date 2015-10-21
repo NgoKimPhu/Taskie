@@ -34,7 +34,7 @@ public class TaskieLogic {
 		return logic;
 	}
 
-	/* Constructor 深藏功与名 */
+	/* Constructor 娣辫棌鍔熶笌鍚� */
 	protected TaskieLogic() {
 		initialise();
 	}
@@ -213,7 +213,7 @@ public class TaskieLogic {
 			undoAction.setTaskType(task.getType());
 			undoStack.push(undoAction);
 		}
-		String feedback = new String(task.getTitle() + " is added");
+		String feedback = new String("\"" + task.getTitle() + "\"" + " is added");
 		return display(searchResult, feedback);
 	}
 
@@ -235,7 +235,7 @@ public class TaskieLogic {
 				undoStack.push(action);
 			}
 			
-			String feedback = new String(title + " is deleted");
+			String feedback = new String("\"" + title + "\"" + " is deleted");
 			return display(searchResult, feedback);
 		} catch (IndexOutOfBoundsException e) {
 			String feedback = "Could not find index " + index;
@@ -256,7 +256,7 @@ public class TaskieLogic {
 			indexSave.add(pair.getIndex());
 		}
 		double time = Math.random() * Math.random() / 1000;
-		String feedback = new String("Search finished in " + String.format("%.5f", time) + " seconds.");
+		String feedback = new String("Search finished in " + String.format("%.5f", time) + " seconds");
 		return display(searchResult, feedback);
 	}
 	
@@ -275,7 +275,7 @@ public class TaskieLogic {
 		} else if (searchKey instanceof Boolean) {
 			indexTaskList = TaskieStorage.searchTask((Boolean) searchKey, type);
 		} else {
-			throw new UnrecognisedCommandException("Unrecognised search key.");
+			throw new UnrecognisedCommandException("Unrecognised search key");
 		}
 		return indexTaskList;
 	}
@@ -308,7 +308,7 @@ public class TaskieLogic {
 				 task.getStartTime() != null && task.getEndTime() != null) {
 			TaskieStorage.updateEventStartEnd(index, task.getStartTime(), task.getEndTime());
 		} else {
-			throw new UnrecognisedCommandException("Unrecognised update criterion.");
+			throw new UnrecognisedCommandException("Unrecognised update criterion");
 		}
 		searchResult = retrieveTaskList(task.getType());
 		indexSave = retrieveIndexList(task.getType());
@@ -319,7 +319,7 @@ public class TaskieLogic {
 	private String[][] deleteAll() {
 		for (int i = searchResult.size(); i > 0; i--)
 			delete(i);
-		String feedback = new String("All deleted.");
+		String feedback = new String("All deleted");
 		undoStack.clear();
 		redoStack.clear();
 		return display(new ArrayList<TaskieTask>(), feedback);
@@ -330,7 +330,7 @@ public class TaskieLogic {
 		undoStack.clear();
 		redoStack.clear();
 		commandSave.clear();
-		String feedback = new String("Restored to factory settings.");
+		String feedback = new String("Restored to factory settings");
 		return display(new ArrayList<TaskieTask>(), feedback);
 	}
 	
@@ -340,7 +340,7 @@ public class TaskieLogic {
 	private String[][] undo() {
 		isUndoAction = true;
 		if (undoStack.isEmpty()) {
-			String feedback = "No more action to undo.";
+			String feedback = "No more action to undo";
 			return display(searchResult, feedback);
 		}
 		TaskieAction action = undoStack.pop();
@@ -351,7 +351,7 @@ public class TaskieLogic {
 	private String[][] redo() {
 		isUndoAction = false;
 		if(redoStack.isEmpty()) {
-			String feedback = "No more action to redo.";
+			String feedback = "No more action to redo";
 			return display(new ArrayList<TaskieTask>(), feedback);
 		} else {
 			TaskieAction action = redoStack.pop();

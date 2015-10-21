@@ -1,6 +1,9 @@
 package fancy4.taskie;
 
 import java.io.IOException;
+
+
+
 import fancy4.taskie.model.*;
 import fancy4.taskie.view.TaskieOverviewController;
 import javafx.application.Application;
@@ -8,6 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -19,12 +23,10 @@ public class MainApp extends Application {
     public ObservableList<String> taskData = FXCollections.observableArrayList();
     public ObservableList<String> dTaskData = FXCollections.observableArrayList();
     public ObservableList<String> fTaskData = FXCollections.observableArrayList();
-    public ObservableList<String> dTaskStart = FXCollections.observableArrayList();
     
     public static String[] mdata = {};
     public static String[] ddata = {};
     public static String[] fdata = {};
-    public static String[] dstart = {};
     public MainApp() {
     	//data = TaskieLogic.execute("add order a pizza")[0];
     	//TaskieLogic.initialise();
@@ -42,8 +44,6 @@ public class MainApp extends Application {
 	    	dTaskData.addAll(ddata);
 	    	fdata = iniDisplay[3];
 	    	fTaskData.addAll(fdata);
-	    	dstart = new String[] {"123","456"};
-	    	dTaskStart.addAll(dstart);
 		} catch (UnrecognisedCommandException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -67,15 +67,13 @@ public class MainApp extends Application {
     public ObservableList<String> getFTaskData() {
     	return fTaskData;
     }
-    public ObservableList<String> getDTaskStart() {
-    	return dTaskStart;
-    }
     
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("Taskie");
-
+        Image icon = new Image(getClass().getResourceAsStream("view/TaskieIcon.png"));
+        this.primaryStage.getIcons().add(icon);
         initRootLayout();
 
         showTaskieOverview();
