@@ -20,21 +20,31 @@ public class LogicUnitTest {
 	
 	@Test
 	public void testUndo() throws Exception {
+		TaskieLogic.logic().execute("reset");
+		TaskieLogic.logic().execute("pizza");
+		TaskieLogic.logic().execute("coffee");
+		
 		test = TaskieLogic.logic().execute("undo");
 		assertTrue(Arrays.equals(test[1], new String[]{"1. pizza"}));
 		test = TaskieLogic.logic().execute("undo");
 		assertTrue(Arrays.equals(test[1], new String[]{}));
+		// Boundary testing
+		TaskieLogic.logic().execute("undo");
 		test = TaskieLogic.logic().execute("undo");
-		assertTrue(Arrays.equals(test[0], new String[]{"No more action to undo."}));
-		
-		test = TaskieLogic.logic().execute("redo");
-		assertTrue(Arrays.equals(test[1], new String[]{"1. pizza"}));
+		assertTrue(Arrays.equals(test[0], new String[]{"No more action to undo"}));
 	}
 	
 	@Test
 	public void testRedo() throws Exception {
+		TaskieLogic.logic().execute("reset");
+		TaskieLogic.logic().execute("pizza");
+		TaskieLogic.logic().execute("coffee");
+		
 		test = TaskieLogic.logic().execute("redo");
-		assertTrue(Arrays.equals(test[0], new String[]{"No more action to redo."}));
+		// assertTrue(Arrays.equals(test[1], new String[]{"1. pizza"}));
+		// Boundary testing
+		test = TaskieLogic.logic().execute("redo");
+		assertTrue(Arrays.equals(test[0], new String[]{"No more action to redo"}));
 	}
 
 }
