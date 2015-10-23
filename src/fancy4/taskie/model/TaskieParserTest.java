@@ -18,7 +18,15 @@ public class TaskieParserTest {
 	@Test
 	public void testAdd() {
 		TaskieAction action;
+		// null and empty
+		action = TaskieParser.parse(null);
+		assertEquals(null, action.getTask());
+		action = TaskieParser.parse("");
+		assertEquals(null, action.getTask());
+		
 		// no time partition
+		action = TaskieParser.parse("anything");
+		assertEquals("anything", action.getTask().getTitle());
 		action = TaskieParser.parse("buy 5 apples");
 		assertEquals("buy 5 apples", action.getTask().getTitle());
 		action = TaskieParser.parse("+ i want to float");
@@ -43,6 +51,7 @@ public class TaskieParserTest {
 		// time range, specific date partition
 		action = TaskieParser.parse("reflection 2 due 23.59 tmr");
 		assertEquals("reflection 2", action.getTask().getTitle());
+		
 		action = TaskieParser.parse("reflection 2 deadline 23h59 tmr");
 		assertEquals("reflection 2", action.getTask().getTitle());
 		action = TaskieParser.parse("reflection 2 -deadline 23:59 tmr");
