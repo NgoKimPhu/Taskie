@@ -71,18 +71,19 @@ public final class TaskieParser {
 			detectTime();
 		}
 		
+		// expected taskType: FLOAT / DEADLINE or EVENT
 		public void detectTime() {
 			if (!dataString.equals("")) {
 				matchStartPos = dataString.length()-1;
 			}
 			matchEndPos = 0;
 			if (isMatchFound(getTimeRangePattern(PATTERN_DAY, PATTERN_TIME), dataString)) {
-				System.out.println("Date range detected: "+matcher.group());
+				System.out.println("Date range detected: \"" + matcher.group() + "\"");
 				taskType = TaskType.EVENT;
 				setDate(startTime, 1);
 				setDate(endTime, 18);
 			} else if (isMatchFound(PATTERN_DAY, dataString)) {
-				System.out.println("Date detected: "+matcher.group());
+				System.out.println("Date detected: \"" + matcher.group() + "\"");
 				taskType = TaskType.DEADLINE;
 				setDate(startTime, 1);
 				setDate(endTime, 1);
@@ -91,12 +92,12 @@ public final class TaskieParser {
 			}
 			
 			if (isMatchFound(getTimeRangePattern(PATTERN_TIME, PATTERN_DAY), dataString)) {
-				System.out.println("Time range detected: "+matcher.group());
+				System.out.println("Time range detected: \"" + matcher.group() + "\"");
 				taskType = TaskType.EVENT;
 				setTime(startTime, 1);
 				setTime(endTime, 20);
 			} else if (isMatchFound(PATTERN_TIME, dataString)) {
-				System.out.println("Time detected: "+matcher.group());
+				System.out.println("Time detected: \"" + matcher.group() + "\"");
 				if (taskType != TaskType.EVENT) {
 					taskType = TaskType.DEADLINE;
 				}
@@ -104,14 +105,21 @@ public final class TaskieParser {
 			} else {
 				System.out.println("No match found for time!");
 			}
+			
+			if (taskType != TaskieEnum.TaskType.EVENT) {
+				startTime = null;
+			}
+			if (taskType == TaskieEnum.TaskType.FLOAT) {
+				endTime = null;
+			}
 		}
 		
 		public String removeTime() {
 			String dataWithoutTime = dataString;
 			if (matchStartPos < matchEndPos) {
-				dataWithoutTime = dataWithoutTime.replaceAll(PATTERN_TYPE + timeMatchSubstr(), "");
+				dataWithoutTime = dataWithoutTime.replaceAll(PATTERN_TYPE + timeMatchSubstr(), " ");
 			}
-			return dataWithoutTime.trim().replaceAll("\\s{2,}", "\\s");
+			return dataWithoutTime.trim().replaceAll("\\s{2,}", " ");
 		}
 		
 		private boolean isMatchFound(String patternString, String dataString) {
@@ -221,6 +229,7 @@ public final class TaskieParser {
 		public static TaskieTask compileTask(String commandData) {
 			TimeDetector timeDetector = new TimeDetector();
 			timeDetector.detectTime(commandData);
+			// TODO: error-prone
 			String title = timeDetector.removeTime().replaceAll("\\s?-(\\w+)", "");
 			System.err.println("Title: \"" + title + "\"");
 			
@@ -328,6 +337,10 @@ public final class TaskieParser {
 	
 	protected static TaskieAction parse (String inputString) {
 		System.err.println("\"" + inputString + "\"");
+		if (inputString == null) {
+			return new TaskieAction(TaskieEnum.Actions.INVALID, (TaskieTask) null);
+		}
+		
 		String command = inputString.trim();
 		
 		if (command.isEmpty()) {
