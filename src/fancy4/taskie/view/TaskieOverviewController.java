@@ -1,4 +1,5 @@
 package fancy4.taskie.view;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 //import javafx.collections.FXCollections;
@@ -70,9 +71,15 @@ public class TaskieOverviewController {
 		iniColumn(dTaskColumn);
 		iniColumn(fTaskColumn);
 		 */
+		Platform.runLater(new Runnable() {
+	        @Override
+	        public void run() {
+	    		textInput.requestFocus();
+	        }
+	    });
 	}
 
-	private void iniColumn(TableColumn<String, String> column) {
+	private void initColumn(TableColumn<String, String> column) {
 		//TaskieLogic.initialise();
 		column.setCellValueFactory(new Callback<CellDataFeatures<String, String>, ObservableValue<String>>() {
 			public ObservableValue<String> call(CellDataFeatures<String, String> p) {
