@@ -1,9 +1,12 @@
-package fancy4.taskie.model;
+package fancy4.taskie;
 /**
  * @author Qin_ShiHuang 
  *
  */
 import java.util.*;
+
+import fancy4.taskie.model.TaskieLogic;
+import fancy4.taskie.model.UnrecognisedCommandException;
 
 public class TaskieUIBackup {
 	

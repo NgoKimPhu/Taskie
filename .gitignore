@@ -1,8 +1,43 @@
-.classpath
-*.classpath
+bin/
+tmp/
+.settings/
 *.class
 *.json
 *.project
-bin/
-.settings/
+*.pydevproject
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.metadata
+.gradle
+.loadpath
 .DS_Store
+
+# Eclipse Core
+.project
+
+# External tool builders
+.externalToolBuilders/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# CDT-specific
+.cproject
+
+# JDT-specific (Eclipse Java Development Tools)
+.classpath
+
+# Java annotation processor (APT)
+.factorypath
+
+# PDT-specific
+.buildpath
+
+# sbteclipse plugin
+.target
+
+# TeXlipse plugin
+.texlipse
