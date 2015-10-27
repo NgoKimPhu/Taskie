@@ -157,8 +157,8 @@ public class TaskieLogic {
 				return redo();
 			case RESET:
 				return reset();
-			//case EXIT:
-			//	return exit();
+			case EXIT:
+				exit();
 			default:
 				return add(action.getTask());
 			}
@@ -279,7 +279,7 @@ public class TaskieLogic {
 	}
 
 	private void exit() {
-		//return 
+		System.exit(0);
 	}
 	
 	
