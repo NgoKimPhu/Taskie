@@ -5,24 +5,24 @@ import java.util.*;
 public class LogicOutput {
 
 	private String feedback;
-	private ArrayList<TaskieTask> all;
-	private ArrayList<TaskieTask> main;
+	private ArrayList<String> all;
+	private ArrayList<String> main;
 	
-	public LogicOutput() {
-		feedback = new String();
-		all = new ArrayList<TaskieTask>();
-		main = new ArrayList<TaskieTask>();
+	public LogicOutput(String feedback, ArrayList<String> all, ArrayList<String> main) {
+		this.feedback = feedback;
+		this.all = all;
+		this.main = main;
 	}
 	
 	public void setFeedback(String str) {
 		this.feedback = str;
 	}
 	
-	public void setAll(ArrayList<TaskieTask> list) {
+	public void setAll(ArrayList<String> list) {
 		this.all = list;
 	}
 	
-	public void setMain(ArrayList<TaskieTask> list) {
+	public void setMain(ArrayList<String> list) {
 		this.main = list;
 	}
 	
@@ -30,11 +30,11 @@ public class LogicOutput {
 		return feedback;
 	}
 	
-	public ArrayList<TaskieTask> getAll() {
+	public ArrayList<String> getAll() {
 		return all;
 	}
 	
-	public ArrayList<TaskieTask> getMain() {
+	public ArrayList<String> getMain() {
 		return main;
 	}
 
