@@ -62,6 +62,10 @@ public class TaskieAction {
 		return index;
 	}
 	
+	public String getScreen() {
+		return screen;
+	}
+	
 	public TaskieTask getTask() {
 		return task;
 	}

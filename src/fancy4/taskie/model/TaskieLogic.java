@@ -132,10 +132,11 @@ public class TaskieLogic {
 			case ADD:
 				return add(action.getTask());
 			case DELETE:
-				if (action.getTask() != null) {
+				/*if (action.getTask() != null) {
 					retrieve(action.getTaskType());
 				}
-				return delete(action.getTaskType(), action.getIndex());
+				return delete(action.getTaskType(), action.getIndex());*/
+				return delete(action.getScreen(), action.getIndex() - 1);
 			case DELETEALL:
 				return deleteAll();
 			case SEARCH:
@@ -266,7 +267,7 @@ public class TaskieLogic {
 		String feedback = new String("\"" + task.getTitle() + "\"" + " is added");
 		return display(searchResult, feedback);
 	}
-
+/*
 	private String[][] delete(TaskieEnum.TaskType type, int index) {
 		try {
 			if (type != null) {
@@ -295,7 +296,35 @@ public class TaskieLogic {
 			return display(searchResult, feedback);
 		}
 	}
-
+*/
+	private String[][] delete(String screen, int index) throws UnrecognisedCommandException {
+		TaskieEnum.TaskType type;
+		int realIndex;
+		if (screen.equalsIgnoreCase("left")) {
+			type = mainTasks.get(index).getTask().getType();
+			realIndex = mainTasks.get(index).getIndex();
+		} else if (screen.equalsIgnoreCase("right")) {
+			type = allTasks.get(index).getTask().getType();
+			realIndex = allTasks.get(index).getIndex();
+		} else {
+			throw new UnrecognisedCommandException("Screen preference not indicated.");
+		}
+		
+		TaskieTask deleted = TaskieStorage.deleteTask(realIndex, type);
+		String title = deleted.getTitle();
+		retrieve(type);
+		
+		String feedback = new String("\"" + title + "\"" + " is deleted");
+		
+		// Construct undo action
+		if (!isUndoAction) {
+			TaskieAction action = new TaskieAction(TaskieEnum.Actions.ADD, deleted);
+			undoStack.push(action);
+		}
+					
+		return display(searchResult, feedback);
+	}
+	
 	private String[][] search(TaskieAction action) throws UnrecognisedCommandException {
 		Object searchKey = action.getSearch();
 		ArrayList<IndexTaskPair> cache = new ArrayList<IndexTaskPair>();
@@ -399,9 +428,9 @@ public class TaskieLogic {
 		return display(searchResult, feedback);
 	}
 	
-	private String[][] deleteAll() {
+	private String[][] deleteAll() throws UnrecognisedCommandException {
 		for (int i = searchResult.size(); i > 0; i--)
-			delete(null, i);
+			delete("left", i);
 		String feedback = new String("All deleted");
 		undoStack.clear();
 		redoStack.clear();
