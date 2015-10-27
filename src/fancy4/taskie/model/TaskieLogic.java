@@ -185,8 +185,8 @@ public class TaskieLogic {
 
 	private String[] toStringArray(Collection<TaskieTask> taskList) {
 		String[] ary = new String[taskList.size()];
-		SimpleDateFormat sdf = new SimpleDateFormat("E dd-MM hh:mm");
-		SimpleDateFormat sdf2 = new SimpleDateFormat("hh:mm");
+		SimpleDateFormat sdf = new SimpleDateFormat("E dd-MM HH:mm");
+		SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
 		SimpleDateFormat sdf3 = new SimpleDateFormat("dd-MM-YYYY");
 		Calendar c1 = Calendar.getInstance();
 		Calendar c2 = Calendar.getInstance();
