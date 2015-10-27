@@ -21,11 +21,11 @@ public final class TaskieParser {
 			+ "(?:(\\d{1,2}\\s?)?(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|"
 			+ "Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|(?:Nov|Dec)(?:ember)?)"
 			+ "\\s?(\\d{1,2})?)";
-	private static final String PATTERN_TIME = "(?:\\b(?:(?<=fr(?:om)?|-|~|to|till|until)|at|by|due))"
-			+ "?\\s?(\\d{1,2})\\s?"
+	private static final String PATTERN_TIME = "(?:\\b(?:(?<=fr(?:om)?|-|~|to|till|until)|at|by|due))?"
+			+ "\\s?(?:(?:(\\d{1,2})\\s?"
 			+ "(?=[.:h ]\\s?\\d{1,2}\\s?m?|am|pm|tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)"
 			+ "(?:[.:h ]\\s?(\\d{1,2})\\s?m?)?\\s?(am|pm)?\\s?"
-			+ "(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)?\\b|"
+			+ "(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)?)\\b|(now|(?:to|tmr |tomorrow )night)\\b)|"
 			+ "(?:\\b(?:(?<=fr(?:om)?|-|~|to|till|until)|at|by|due))\\s?(\\d{1,2})\\b";
 	private static final String PATTERN_TIMERANGE_FORMAT = "(?:fr(?:om)?\\s?)?"
 			+ "(?:%1$s)\\s?(?:%2$s)?\\s?(?:-|~|to|till|until)?\\s?(?:%2$s)?\\s?(?:%1$s)";
@@ -81,7 +81,7 @@ public final class TaskieParser {
 				System.out.println("Date range detected: \"" + matcher.group() + "\"");
 				taskType = TaskType.EVENT;
 				setDate(startTime, 1);
-				setDate(endTime, 18);
+				setDate(endTime, 20);
 			} else if (isMatchFound(PATTERN_DAY, dataString)) {
 				System.out.println("Date detected: \"" + matcher.group() + "\"");
 				taskType = TaskType.DEADLINE;
@@ -90,12 +90,12 @@ public final class TaskieParser {
 			} else {
 				System.out.println("No match found for date!");
 			}
-			
+			System.err.println(PATTERN_TIME);
 			if (isMatchFound(getTimeRangePattern(PATTERN_TIME, PATTERN_DAY), dataString)) {
 				System.out.println("Time range detected: \"" + matcher.group() + "\"");
 				taskType = TaskType.EVENT;
 				setTime(startTime, 1);
-				setTime(endTime, 20);
+				setTime(endTime, 21);
 			} else if (isMatchFound(PATTERN_TIME, dataString)) {
 				System.out.println("Time detected: \"" + matcher.group() + "\"");
 				if (taskType != TaskType.EVENT) {
@@ -194,8 +194,14 @@ public final class TaskieParser {
 					int minute = Integer.parseInt(matcher.group(groupOffset + 1));
 					time.set(Calendar.MINUTE, minute);
 				}
-			} else {
-				int hour = Integer.parseInt(matcher.group(groupOffset + 4));
+			} else if (matcher.group(groupOffset + 4) != null) { // now|(?:to|tmr |tomorrow )night
+				if (matcher.group(groupOffset + 4).equals("now")) {
+					time.setTime(Calendar.getInstance().getTime());
+				} else {
+					time.set(Calendar.HOUR_OF_DAY, 20); // TODO magic 8pm
+				}
+			} else { // \d{1,2}
+				int hour = Integer.parseInt(matcher.group(groupOffset + 5));
 				time.set(Calendar.HOUR_OF_DAY, hour);
 				if (time.get(Calendar.HOUR) < 7) {
 					time.set(Calendar.AM_PM, Calendar.PM);
