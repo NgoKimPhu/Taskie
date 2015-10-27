@@ -453,7 +453,7 @@ public final class TaskieParser {
 	}
 	
 	private String getFirstWord (String inputString) {
-		return inputString.split("\\s+")[0];
+		return inputString.split("\\s+|(?<=[+-])(?=\\w)")[0];
 	}
 	
 	private String removeFirstWord(String inputString) {
