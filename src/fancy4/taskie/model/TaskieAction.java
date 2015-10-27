@@ -9,8 +9,14 @@ public class TaskieAction {
 	private TaskieEnum.TaskType taskType; // used to select Task among the 3 display windows
 											// null = main, deadline = deadline+event, float = float
 	private TaskieTask task;
+	private String screen; // left or right
 	private	int index = -1;
 	private Object keyword;
+	
+	public TaskieAction(String str, int index) {
+		this.screen = str;
+		this.index = index;
+	}
 	
 	public TaskieAction(TaskieEnum.Actions type, TaskieTask task) {
 		this.type = type;
