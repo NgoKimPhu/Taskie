@@ -9,3 +9,4 @@ sort
 update
 displayall viewall
 reset
+exit
