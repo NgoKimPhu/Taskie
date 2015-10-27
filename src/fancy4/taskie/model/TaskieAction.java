@@ -13,11 +13,6 @@ public class TaskieAction {
 	private	int index = -1;
 	private Object keyword;
 	
-	public TaskieAction(String str, int index) {
-		this.screen = str;
-		this.index = index;
-	}
-	
 	public TaskieAction(TaskieEnum.Actions type, TaskieTask task) {
 		this.type = type;
 		this.task = task;
@@ -27,18 +22,19 @@ public class TaskieAction {
 		this(type, index, null);
 	}
 	
+	public TaskieAction(TaskieEnum.Actions type, String scr, int index) {
+		this(type, index);
+		this.screen = scr;
+	}
+	
 	public TaskieAction(TaskieEnum.Actions type, int index, TaskieTask task) {
 		this(type, task);
 		this.index = index;
 	}
 	
-	public TaskieAction(TaskieEnum.Actions type, TaskieEnum.TaskType taskType, int index) {
-		this(type, taskType, index, null);
-	}
-	
-	public TaskieAction(TaskieEnum.Actions type, TaskieEnum.TaskType taskType, int index, TaskieTask task) {
+	public TaskieAction(TaskieEnum.Actions type, String scr, int index, TaskieTask task) {
 		this(type, index, task);
-		this.taskType = taskType;
+		this.screen = scr;
 	}
 	
 	public TaskieAction(TaskieEnum.Actions type, TaskieTask task, Object obj) {

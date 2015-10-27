@@ -84,23 +84,23 @@ public class TaskieParserTest {
 		TaskieParser parser = TaskieParser.getInstance();
 		
 		action = parser.parse("- 1");
-		assertAction(action, TaskieEnum.Actions.DELETE, null, 1);
-		action = parser.parse("- d2");
-		assertAction(action, TaskieEnum.Actions.DELETE, TaskieEnum.TaskType.DEADLINE, 2);
-		action = parser.parse("- d 0");
-		assertAction(action, TaskieEnum.Actions.DELETE, TaskieEnum.TaskType.DEADLINE, 0);
-		action = parser.parse("- f1");
-		assertAction(action, TaskieEnum.Actions.DELETE, TaskieEnum.TaskType.FLOAT, 1);
-		action = parser.parse("- -f9");
-		assertAction(action, TaskieEnum.Actions.DELETE, TaskieEnum.TaskType.FLOAT, 9);
-		action = parser.parse("- /f 1");
-		assertAction(action, TaskieEnum.Actions.DELETE, TaskieEnum.TaskType.FLOAT, 1);
+		assertAction(action, TaskieEnum.Actions.DELETE, "left", 1);
+		action = parser.parse("- l2");
+		assertAction(action, TaskieEnum.Actions.DELETE, "left", 2);
+		action = parser.parse("- /left 0");
+		assertAction(action, TaskieEnum.Actions.DELETE, "left", 0);
+		action = parser.parse("- -r 1");
+		assertAction(action, TaskieEnum.Actions.DELETE, "right", 1);
+		action = parser.parse("- r 9");
+		assertAction(action, TaskieEnum.Actions.DELETE, "right", 9);
+		action = parser.parse("- right 1");
+		assertAction(action, TaskieEnum.Actions.DELETE, "right", 1);
 	}
 
-	private void assertAction(TaskieAction action, TaskieEnum.Actions type, TaskieEnum.TaskType taskType,
+	private void assertAction(TaskieAction action, TaskieEnum.Actions type, String scr,
 			int index) {
 		assertEquals(type, action.getType());
-		assertEquals(taskType, action.getTaskType());
+		assertEquals(scr, action.getScreen());
 		assertEquals(index, action.getIndex());
 	}
 

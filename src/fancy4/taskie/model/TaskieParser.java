@@ -45,7 +45,7 @@ public final class TaskieParser {
 	private class TaskSelectorDetector {
 		private final String PATTERN_DELIMITER = "\\s+|(?<=\\D)(?=\\d)";
 		private String taskDataString;
-		private TaskieEnum.TaskType taskType = TaskieEnum.TaskType.UNKNOWN;
+		private String screen = "left";
 		private int index = -1;
 		
 		public TaskSelectorDetector(String dataString) {
@@ -53,15 +53,13 @@ public final class TaskieParser {
 			sc.useDelimiter(PATTERN_DELIMITER);
 				
 			if (sc.hasNextInt()) {
-				taskType = null;
 				index = sc.nextInt();
-			} else if (sc.hasNext("[-/]?d")) {
+			} else if (sc.hasNext("[-/]?(r|right|a|all)")) {
 				sc.next();
-				taskType = TaskieEnum.TaskType.DEADLINE;
+				screen = "right";
 				index = sc.nextInt();
-			} else if (sc.hasNext("[-/]?f")) {
+			} else {
 				sc.next();
-				taskType = TaskieEnum.TaskType.FLOAT;
 				index = sc.nextInt();
 			}
 
@@ -69,8 +67,8 @@ public final class TaskieParser {
 			sc.close();
 		}
 
-		public TaskieEnum.TaskType getTaskType() {
-			return taskType;
+		public String getScreen() {
+			return screen;
 		}
 
 		public int getIndex() {
@@ -161,11 +159,7 @@ public final class TaskieParser {
 	private TaskieAction parseDelete(String commandData) {
 		TaskSelectorDetector tSD = new TaskSelectorDetector(commandData);
 		
-		if (tSD.getTaskType() == TaskieEnum.TaskType.UNKNOWN) {
-			return new TaskieAction(TaskieEnum.Actions.DELETE, null);
-		} else {
-			return new TaskieAction(TaskieEnum.Actions.DELETE, tSD.getTaskType(), tSD.getIndex());
-		}
+		return new TaskieAction(TaskieEnum.Actions.DELETE, tSD.getScreen(), tSD.getIndex());
 	}
 
 	private TaskieAction parseSearch(String commandData) {
@@ -179,10 +173,10 @@ public final class TaskieParser {
 		TaskCompiler tC = new TaskCompiler();
 		TaskieTask task = tC.compileTask(tSD.getTaskDataString());
 		
-		if (tSD.getTaskType() == TaskieEnum.TaskType.UNKNOWN) {
+		if (tSD.getIndex() < 0) {
 			return new TaskieAction(TaskieEnum.Actions.UPDATE, null);
 		} else {
-			return new TaskieAction(TaskieEnum.Actions.UPDATE, tSD.getTaskType(), tSD.getIndex(), task);
+			return new TaskieAction(TaskieEnum.Actions.UPDATE, tSD.getScreen(), tSD.getIndex(), task);
 		}
 	}
 

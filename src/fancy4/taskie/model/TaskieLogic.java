@@ -258,8 +258,9 @@ public class TaskieLogic {
 		retrieve(task.getType());
 		
 		if (!isUndoAction) {
-			TaskieTask undo = new TaskieTask("");
-			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, task.getType(), searchResult.indexOf(task) + 1, undo);
+			// TaskieTask undo = new TaskieTask("");
+			// TODO: replace searchResult with allTasksInRightWindow_List
+			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, "right", searchResult.indexOf(task) + 1);
 			undoAction.setTaskType(task.getType());
 			undoStack.push(undoAction);
 		}
