@@ -85,13 +85,13 @@ public class TaskieParserTest {
 		
 		action = parser.parse("- 1");
 		assertAction(action, TaskieEnum.Actions.DELETE, "left", 1);
-		action = parser.parse("- l2");
+		action = parser.parse("dElEtE l2");
 		assertAction(action, TaskieEnum.Actions.DELETE, "left", 2);
 		action = parser.parse("- /left 0");
 		assertAction(action, TaskieEnum.Actions.DELETE, "left", 0);
-		action = parser.parse("- -r 1");
+		action = parser.parse("del -all 1");
 		assertAction(action, TaskieEnum.Actions.DELETE, "right", 1);
-		action = parser.parse("- r 9");
+		action = parser.parse("-r9");
 		assertAction(action, TaskieEnum.Actions.DELETE, "right", 9);
 		action = parser.parse("- right 1");
 		assertAction(action, TaskieEnum.Actions.DELETE, "right", 1);
