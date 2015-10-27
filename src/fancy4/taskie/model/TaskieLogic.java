@@ -106,6 +106,8 @@ public class TaskieLogic {
 				return redo();
 			case RESET:
 				return reset();
+			//case EXIT:
+			//	return exit();
 			default:
 				return add(action.getTask());
 			}
@@ -197,6 +199,10 @@ public class TaskieLogic {
 		indexSave = retrieveIndexList(type);
 	}
 
+	private void exit() {
+		//return 
+	}
+	
 	
 	
 	/*****
@@ -365,9 +371,12 @@ public class TaskieLogic {
 		undoStack.clear();
 		redoStack.clear();
 		commandSave.clear();
+		searchResult.clear();
+		indexSave.clear();
 		String feedback = new String("Restored to factory settings");
 		return display(new ArrayList<TaskieTask>(), feedback);
 	}
+	
 	
 	/*****
 	 * Below are undo/redo methods.

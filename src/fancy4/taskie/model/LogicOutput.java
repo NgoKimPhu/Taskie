@@ -2,13 +2,13 @@ package fancy4.taskie.model;
 
 import java.util.*;
 
-public class TaskieLogicOutput {
+public class LogicOutput {
 
 	private String feedback;
 	private ArrayList<TaskieTask> all;
 	private ArrayList<TaskieTask> main;
 	
-	public TaskieLogicOutput() {
+	public LogicOutput() {
 		feedback = new String();
 		all = new ArrayList<TaskieTask>();
 		main = new ArrayList<TaskieTask>();
