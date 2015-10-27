@@ -5,6 +5,7 @@ package fancy4.taskie.model;
  *
  */
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -54,18 +55,20 @@ public class TaskieLogic {
 		try {
 			TaskieStorage.load("");
 			isUndoAction = false;
+			all = new ArrayList<String>();
+			main = new ArrayList<String>();
+			indexSave = new ArrayList<Integer>();
 			undoStack = new Stack<TaskieAction>();
 			redoStack = new Stack<TaskieAction>();
 			commandSave = new Stack<TaskieAction>();
-			searchResult = new ArrayList<TaskieTask>();
-			indexSave = new ArrayList<Integer>();
 			allTasks = new ArrayList<IndexTaskPair>();
+			searchResult = new ArrayList<TaskieTask>();
 			mainTasks = new ArrayList<IndexTaskPair>(); 
-			main = new ArrayList<String>();
-			all = new ArrayList<String>();
 			comparator = new Comparator<IndexTaskPair>() {
 				@Override
 		        public int compare(IndexTaskPair first, IndexTaskPair second) {
+					if (first.getTask().getEndTime() == null || second.getTask().getEndTime() == null)
+						return first.getTask().getTitle().compareTo(second.getTask().getTitle());
 					return first.getTask().getEndTime().compareTo(second.getTask().getEndTime());
 		        }
 			};
@@ -95,15 +98,16 @@ public class TaskieLogic {
 	}
 
 	private LogicOutput output(String[][] screen) throws UnrecognisedCommandException {
-		main.clear();
 		all.clear();
-		mainTasks.clear();
+		main.clear();
 		allTasks.clear();
+		mainTasks.clear();
 		String feedback = screen[0][0];
 		for (String task : screen[1]) {
 			main.add(task);
 		}
 		Calendar cal = Calendar.getInstance();
+		DateFormat df = DateFormat.getDateInstance();
 		int today = cal.DATE;
 		for (int i = 0; i < 3; i++) {
 			cal.set(today, today + i);
@@ -112,7 +116,7 @@ public class TaskieLogic {
 			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.EVENT, date));
 			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.DEADLINE, date));
 			Collections.sort(todayTasks, comparator);
-			all.add(date.toString());
+			all.add(df.format(date));
 			for (int j = 1; j <= todayTasks.size(); j++) {
 				TaskieTask task = todayTasks.get(j).getTask();
 				all.add(j + "  " + task.getStartTime() + "  " + task.getEndTime() + "  " + task.getTitle());
@@ -307,6 +311,7 @@ public class TaskieLogic {
 		} else if (screen.equalsIgnoreCase("right")) {
 			type = allTasks.get(index).getTask().getType();
 			realIndex = allTasks.get(index).getIndex();
+			allTasks.remove(index);
 		} else {
 			throw new UnrecognisedCommandException("Screen preference not indicated.");
 		}
@@ -445,6 +450,8 @@ public class TaskieLogic {
 		commandSave.clear();
 		searchResult.clear();
 		indexSave.clear();
+		mainTasks.clear();
+		allTasks.clear();
 		String feedback = new String("Restored to factory settings");
 		return display(new ArrayList<TaskieTask>(), feedback);
 	}
