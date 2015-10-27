@@ -71,7 +71,7 @@ public class MainApp extends Application {
 		*/
     	
     }
-    public static void updateDisplay(ArrayList<String> all, ArrayList<String> main) {
+    public static void updateDisplay(ArrayList<String> main, ArrayList<String> all) {
     	
     	mainDisplay.removeAll(mainDisplay);
     	mainDisplay.addAll(main);
