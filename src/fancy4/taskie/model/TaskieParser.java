@@ -112,13 +112,13 @@ public final class TaskieParser {
 	public TaskieAction parse(String inputString) {
 		System.err.println("\"" + inputString + "\"");
 		if (inputString == null) {
-			return new TaskieAction(TaskieEnum.Actions.INVALID, (TaskieTask) null);
+			return new TaskieAction(TaskieEnum.Actions.INVALID, null);
 		}
 		
 		String command = inputString.trim();
 		
 		if (command.isEmpty()) {
-			return new TaskieAction(TaskieEnum.Actions.INVALID, (TaskieTask) null);
+			return new TaskieAction(TaskieEnum.Actions.INVALID, null);
 		}
 		
 		String actionTypeString = getFirstWord(command);
