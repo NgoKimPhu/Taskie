@@ -6,6 +6,7 @@ package fancy4.taskie.model;
  */
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -30,6 +31,8 @@ public class TaskieLogic {
 	private ArrayList<String> main;
 	private ArrayList<String> all;
 	private boolean isUndoAction;
+
+	private DateFormat df = DateFormat.getDateInstance();
 	
 	private final Logger log = Logger.getLogger( TaskieLogic.class.getName() );
 	
@@ -107,19 +110,20 @@ public class TaskieLogic {
 			main.add(task);
 		}
 		Calendar cal = Calendar.getInstance();
-		DateFormat df = DateFormat.getDateInstance();
-		int today = cal.DATE;
+		cal.add(cal.DATE, -1);
 		for (int i = 0; i < 3; i++) {
-			cal.set(today, today + i);
+			cal.add(cal.DATE, 1);
 			Date date = cal.getTime();
 			ArrayList<IndexTaskPair> todayTasks = new ArrayList<IndexTaskPair>();
 			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.EVENT, date));
 			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.DEADLINE, date));
 			Collections.sort(todayTasks, comparator);
-			all.add(df.format(date));
-			for (int j = 1; j <= todayTasks.size(); j++) {
+			if (todayTasks.size() != 0) {
+				all.add(df.format(date));
+			}
+			for (int j = 0; j < todayTasks.size(); j++) {
 				TaskieTask task = todayTasks.get(j).getTask();
-				all.add(j + "  " + task.getStartTime() + "  " + task.getEndTime() + "  " + task.getTitle());
+				all.add(j+1 + "  " + task.getStartTime() + "  " + task.getEndTime() + "  " + task.getTitle());
 			}
 			allTasks.addAll(todayTasks);
 		}
@@ -181,9 +185,37 @@ public class TaskieLogic {
 
 	private String[] toStringArray(Collection<TaskieTask> taskList) {
 		String[] ary = new String[taskList.size()];
+		SimpleDateFormat sdf = new SimpleDateFormat("E dd-MM hh:mm");
+		SimpleDateFormat sdf2 = new SimpleDateFormat("hh:mm");
+		SimpleDateFormat sdf3 = new SimpleDateFormat("dd-MM-YYYY");
+		Calendar c1 = Calendar.getInstance();
+		Calendar c2 = Calendar.getInstance();
+		boolean isSameDay = false;
 		int index = 0;
 		for (TaskieTask task : taskList) {
-			ary[index++] = index + ". " + task.getTitle();
+			Date st = task.getStartTime();
+			Date et = task.getEndTime();
+			String sst, set;
+			
+			if (st != null && et != null && sdf3.format(st).equals(sdf3.format(et))) {
+				isSameDay = true;
+			}
+			
+			if (st != null) {
+				sst = sdf.format(st);
+			} else {
+				sst = " -- ";
+			}
+			if (et != null) {
+				set = sdf.format(et);
+			} else {
+				set = " -- ";
+			}
+			if (isSameDay) {
+				ary[index++] = index + ".  " + sst + " ~ " + sdf2.format(et) + "  " + task.getTitle();
+			} else {
+				ary[index++] = index + ".  " + sst + "  " + set + "  " + task.getTitle();
+			}
 		}
 		return ary;
 	}
@@ -264,7 +296,7 @@ public class TaskieLogic {
 		if (!isUndoAction) {
 			// TaskieTask undo = new TaskieTask("");
 			// TODO: replace searchResult with allTasksInRightWindow_List
-			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, "right", searchResult.indexOf(task) + 1);
+			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, "left", searchResult.indexOf(task) + 1);
 			undoAction.setTaskType(task.getType());
 			undoStack.push(undoAction);
 		}
@@ -303,6 +335,7 @@ public class TaskieLogic {
 	}
 */
 	private String[][] delete(String screen, int index) throws UnrecognisedCommandException {
+		try {
 		TaskieEnum.TaskType type;
 		int realIndex;
 		if (screen.equalsIgnoreCase("left")) {
@@ -329,6 +362,9 @@ public class TaskieLogic {
 		}
 					
 		return display(searchResult, feedback);
+		} catch (IndexOutOfBoundsException e) {
+			return display(searchResult, "Invalid index number");
+		}
 	}
 	
 	private String[][] search(TaskieAction action) throws UnrecognisedCommandException {
