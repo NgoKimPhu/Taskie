@@ -6,6 +6,7 @@ package fancy4.taskie.model;
  */
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,6 +24,8 @@ public class TaskieLogic {
 	private Stack<TaskieAction> commandSave;
 	private Stack<TaskieAction> undoStack;
 	private Stack<TaskieAction> redoStack;
+	private ArrayList<String> main;
+	private ArrayList<String> all;
 	private boolean isUndoAction;
 	
 	private final Logger log = Logger.getLogger( TaskieLogic.class.getName() );
@@ -54,6 +57,8 @@ public class TaskieLogic {
 			commandSave = new Stack<TaskieAction>();
 			searchResult = new ArrayList<TaskieTask>();
 			indexSave = new ArrayList<Integer>();
+			main = new ArrayList<String>();
+			all = new ArrayList<String>();
 			comparator = new Comparator<IndexTaskPair>() {
 				@Override
 		        public int compare(IndexTaskPair first, IndexTaskPair second) {
@@ -66,7 +71,7 @@ public class TaskieLogic {
 		}
 	}
 
-	public String[][] execute(String str) throws UnrecognisedCommandException {
+	public LogicOutput execute(String str) throws UnrecognisedCommandException {
 		if (str.equals("")) {
 			throw new UnrecognisedCommandException("Empty command.");
 		}
@@ -81,7 +86,27 @@ public class TaskieLogic {
 			redoStack.clear();
 		}
 		String[][] screen = takeAction(action);
-		return screen;
+		
+		main.clear();
+		all.clear();
+		String feedback = screen[0][0];
+		for (String task : screen[1]) {
+			main.add(task);
+		}
+		Calendar cal = Calendar.getInstance();
+		int today = cal.DATE;
+		for (int i = 0; i < 3; i++) {
+			cal.set(today, today + i);
+			Date date = cal.getTime();
+			ArrayList<IndexTaskPair> todayTasks = new ArrayList<IndexTaskPair>();
+			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.EVENT, date));
+			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.DEADLINE, date));
+			all.add(date.toString());
+			for (IndexTaskPair pair : todayTasks) {
+				all.add(pair.getTask().getTitle());
+			}
+		}
+		return new LogicOutput(feedback, main, all);
 	}
 
 	private String[][] takeAction(TaskieAction action) {

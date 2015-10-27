@@ -8,10 +8,10 @@ public class LogicOutput {
 	private ArrayList<String> all;
 	private ArrayList<String> main;
 	
-	public LogicOutput(String feedback, ArrayList<String> all, ArrayList<String> main) {
+	public LogicOutput(String feedback, ArrayList<String> main, ArrayList<String> all) {
 		this.feedback = feedback;
-		this.all = all;
 		this.main = main;
+		this.all = all;
 	}
 	
 	public void setFeedback(String str) {
