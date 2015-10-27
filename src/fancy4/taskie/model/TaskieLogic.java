@@ -21,6 +21,8 @@ public class TaskieLogic {
 	private Comparator<IndexTaskPair> comparator;
 	private ArrayList<TaskieTask> searchResult;
 	private ArrayList<Integer> indexSave;
+	private ArrayList<IndexTaskPair> mainTasks;
+	private ArrayList<IndexTaskPair> allTasks;
 	private Stack<TaskieAction> commandSave;
 	private Stack<TaskieAction> undoStack;
 	private Stack<TaskieAction> redoStack;
@@ -57,12 +59,14 @@ public class TaskieLogic {
 			commandSave = new Stack<TaskieAction>();
 			searchResult = new ArrayList<TaskieTask>();
 			indexSave = new ArrayList<Integer>();
+			allTasks = new ArrayList<IndexTaskPair>();
+			mainTasks = new ArrayList<IndexTaskPair>(); 
 			main = new ArrayList<String>();
 			all = new ArrayList<String>();
 			comparator = new Comparator<IndexTaskPair>() {
 				@Override
 		        public int compare(IndexTaskPair first, IndexTaskPair second) {
-					return first.getTask().getTitle().compareTo(second.getTask().getTitle());
+					return first.getTask().getEndTime().compareTo(second.getTask().getEndTime());
 		        }
 			};
 			log.fine("Initialisation Completed.");
@@ -85,10 +89,15 @@ public class TaskieLogic {
 			action.getType() != TaskieEnum.Actions.REDO) {
 			redoStack.clear();
 		}
-		String[][] screen = takeAction(action);
-		
+		String[][] screen = takeAction(action);	
+		return output(screen);
+	}
+
+	private LogicOutput output(String[][] screen) throws UnrecognisedCommandException {
 		main.clear();
 		all.clear();
+		mainTasks.clear();
+		allTasks.clear();
 		String feedback = screen[0][0];
 		for (String task : screen[1]) {
 			main.add(task);
@@ -101,11 +110,18 @@ public class TaskieLogic {
 			ArrayList<IndexTaskPair> todayTasks = new ArrayList<IndexTaskPair>();
 			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.EVENT, date));
 			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.DEADLINE, date));
+			Collections.sort(todayTasks, comparator);
 			all.add(date.toString());
-			for (IndexTaskPair pair : todayTasks) {
-				all.add(pair.getTask().getTitle());
+			for (int j = 1; j <= todayTasks.size(); j++) {
+				TaskieTask task = todayTasks.get(j).getTask();
+				all.add(j + "  " + task.getStartTime() + "  " + task.getEndTime() + "  " + task.getTitle());
 			}
+			allTasks.addAll(todayTasks);
 		}
+		for (int i = 0; i < searchResult.size(); i++) {
+			mainTasks.add(new IndexTaskPair(indexSave.get(i), searchResult.get(i)));
+		}
+		//Collections.sort(allTasks, comparator);
 		return new LogicOutput(feedback, main, all);
 	}
 
