@@ -186,7 +186,7 @@ public final class TaskieParser {
 		}
 
 		for (TaskieEnum.Actions action : TaskieEnum.Actions.values()) {
-			if (STRING_COMMANDS[action.ordinal()].contains(actionTypeString)) {
+			if (STRING_COMMANDS[action.ordinal()].contains(actionTypeString.toLowerCase())) {
 				return action;
 			}
 		}
