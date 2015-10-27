@@ -76,7 +76,8 @@ public class TaskieLogic {
 			throw new UnrecognisedCommandException("Empty command.");
 		}
 		isUndoAction = false;
-		TaskieAction action = TaskieParser.parse(str);
+		TaskieParser parser = TaskieParser.getInstance();
+		TaskieAction action = parser.parse(str);
 		if (action.getType().equals(TaskieEnum.Actions.ADD) ||
 			action.getType().equals(TaskieEnum.Actions.DELETE)) {
 			commandSave.push(action);

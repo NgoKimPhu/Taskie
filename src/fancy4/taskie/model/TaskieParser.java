@@ -12,30 +12,32 @@ import fancy4.taskie.model.TaskieEnum.TaskType;
  * @author Ngo Kim Phu
  */
 public final class TaskieParser {
-	private static final String MESSAGE_INVALID_COMMAND_FORMAT = "invalid command format : %1$s";
-	private static final String PATTERN_TYPE = "(?:(?:-)?\\b(?:float|event|deadline))?\\s?";
-	private static final String PATTERN_DAY = "\\b(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)|"
+	private final String MESSAGE_INVALID_COMMAND_FORMAT = "invalid command format : %1$s";
+	private final String PATTERN_TYPE = "(?:(?:-)?\\b(?:float|event|deadline))?\\s?";
+	private final String PATTERN_DAY = "\\b(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)|"
 			+ "(?:(?:next\\s)?((?:Mon|Fri|Sun)(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|"
 			+ "Thu(?:rsday)?|Sat(?:urday)?))|"
 			+ "(?:(\\d{1,2})\\s?[\\\\\\/-]\\s?(\\d{1,2}))|"
 			+ "(?:(\\d{1,2}\\s?)?(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|"
 			+ "Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|(?:Nov|Dec)(?:ember)?)"
 			+ "\\s?(\\d{1,2})?)";
-	private static final String PATTERN_TIME = "(?:\\b(?:(?<=fr(?:om)?|-|~|to|till|until)|at|by|due))?"
+	private final String PATTERN_TIME = "(?:\\b(?:(?<=fr(?:om)?|-|~|to|till|until)|at|by|due))?"
 			+ "\\s?(?:(?:(\\d{1,2})\\s?"
 			+ "(?=[.:h ]\\s?\\d{1,2}\\s?m?|am|pm|tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)"
 			+ "(?:[.:h ]\\s?(\\d{1,2})\\s?m?)?\\s?(am|pm)?\\s?"
 			+ "(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)?)\\b|(now|(?:to|tmr |tomorrow )night)\\b)|"
 			+ "(?:\\b(?:(?<=fr(?:om)?|-|~|to|till|until)|at|by|due))\\s?(\\d{1,2})\\b";
-	private static final String PATTERN_TIMERANGE_FORMAT = "(?:fr(?:om)?\\s?)?"
+	private final String PATTERN_TIMERANGE_FORMAT = "(?:fr(?:om)?\\s?)?"
 			+ "(?:%1$s)\\s?(?:%2$s)?\\s?(?:-|~|to|till|until)?\\s?(?:%2$s)?\\s?(?:%1$s)";
 	
-	private static final HashMap<String, Integer> weekDays = new HashMap<String, Integer>();
-	private static final HashMap<String, Integer> months = new HashMap<String, Integer>();
+	private final HashMap<String, Integer> MAP_WEEKDAYS = new HashMap<String, Integer>();
+	private final HashMap<String, Integer> MAP_MONTHS = new HashMap<String, Integer>();
 	
-	private static ArrayList<String>[] commandStrings;
+	private ArrayList<String>[] STRING_COMMANDS;
 	
-	static private class TimeDetector {
+	private static TaskieParser parser;
+	
+	private class TimeDetector {
 		private String dataString;
 		private TaskieEnum.TaskType taskType;
 		private Calendar startTime, endTime;
@@ -90,7 +92,7 @@ public final class TaskieParser {
 			} else {
 				System.out.println("No match found for date!");
 			}
-			System.err.println(PATTERN_TIME);
+			
 			if (isMatchFound(getTimeRangePattern(PATTERN_TIME, PATTERN_DAY), dataString)) {
 				System.out.println("Time range detected: \"" + matcher.group() + "\"");
 				taskType = TaskType.EVENT;
@@ -144,7 +146,7 @@ public final class TaskieParser {
 				}
 			} else if (matcher.group(groupOffset + 1) != null) { // weekday
 				time.set(Calendar.DAY_OF_WEEK, 
-						weekDays.get(matcher.group(groupOffset + 1).substring(0, 3).toLowerCase()));
+						MAP_WEEKDAYS.get(matcher.group(groupOffset + 1).substring(0, 3).toLowerCase()));
 				if (time.before(Calendar.getInstance())) {
 					time.add(Calendar.DATE, 7);
 				}
@@ -160,7 +162,7 @@ public final class TaskieParser {
 				}
 			} else { // (\d{1,2}) (month) (\d{1,2})
 				time.set(Calendar.MONTH, 
-						months.get(matcher.group(groupOffset + 5).substring(0, 3).toLowerCase()));
+						MAP_MONTHS.get(matcher.group(groupOffset + 5).substring(0, 3).toLowerCase()));
 				int date;
 				if (matcher.group(groupOffset + 4) != null) {
 					date = Integer.parseInt(matcher.group(groupOffset + 4));
@@ -198,7 +200,7 @@ public final class TaskieParser {
 				if (matcher.group(groupOffset + 4).equals("now")) {
 					time.setTime(Calendar.getInstance().getTime());
 				} else {
-					time.set(Calendar.HOUR_OF_DAY, 20); // TODO magic 8pm
+					time.set(Calendar.HOUR_OF_DAY, 19); // TODO magic 7pm
 				}
 			} else { // \d{1,2}
 				int hour = Integer.parseInt(matcher.group(groupOffset + 5));
@@ -231,8 +233,11 @@ public final class TaskieParser {
 
 	}
 	
-	static private class TaskCompiler {
-		public static TaskieTask compileTask(String commandData) {
+	private class TaskCompiler {
+		public TaskCompiler() {
+		}
+		
+		public TaskieTask compileTask(String commandData) {
 			TimeDetector timeDetector = new TimeDetector();
 			timeDetector.detectTime(commandData);
 			// TODO: error-prone
@@ -256,7 +261,7 @@ public final class TaskieParser {
 		}
 	}
 	
-	static private class TaskSelectorDetector {
+	private class TaskSelectorDetector {
 		private final String PATTERN_DELIMITER = "\\s+|(?<=\\D)(?=\\d)";
 		private String taskDataString;
 		private TaskieEnum.TaskType taskType = TaskieEnum.TaskType.UNKNOWN;
@@ -297,51 +302,54 @@ public final class TaskieParser {
 		
 	}
 	
-	// TODO consider public TaskieParser getInstance() return/create the sole instance
-	private TaskieParser() {
+	protected static TaskieParser getInstance() {
+		if (parser == null) {
+			parser = new TaskieParser();
+		}
+		return parser;
 	}
 	
-	static {
-		weekDays.put("mon", Calendar.MONDAY);
-		weekDays.put("tue", Calendar.TUESDAY);
-		weekDays.put("wed", Calendar.WEDNESDAY);
-		weekDays.put("thu", Calendar.THURSDAY);
-		weekDays.put("fri", Calendar.FRIDAY);
-		weekDays.put("sat", Calendar.SATURDAY);
-		weekDays.put("sun", Calendar.SUNDAY);
+	private TaskieParser() {
+		MAP_WEEKDAYS.put("mon", Calendar.MONDAY);
+		MAP_WEEKDAYS.put("tue", Calendar.TUESDAY);
+		MAP_WEEKDAYS.put("wed", Calendar.WEDNESDAY);
+		MAP_WEEKDAYS.put("thu", Calendar.THURSDAY);
+		MAP_WEEKDAYS.put("fri", Calendar.FRIDAY);
+		MAP_WEEKDAYS.put("sat", Calendar.SATURDAY);
+		MAP_WEEKDAYS.put("sun", Calendar.SUNDAY);
 		
-		months.put("jan", Calendar.JANUARY);
-		months.put("feb", Calendar.FEBRUARY);
-		months.put("mar", Calendar.MARCH);
-		months.put("apr", Calendar.APRIL);
-		months.put("may", Calendar.MAY);
-		months.put("jun", Calendar.JUNE);
-		months.put("jul", Calendar.JULY);
-		months.put("aug", Calendar.AUGUST);
-		months.put("sep", Calendar.SEPTEMBER);
-		months.put("oct", Calendar.OCTOBER);
-		months.put("nov", Calendar.NOVEMBER);
-		months.put("dec", Calendar.DECEMBER);
+		MAP_MONTHS.put("jan", Calendar.JANUARY);
+		MAP_MONTHS.put("feb", Calendar.FEBRUARY);
+		MAP_MONTHS.put("mar", Calendar.MARCH);
+		MAP_MONTHS.put("apr", Calendar.APRIL);
+		MAP_MONTHS.put("may", Calendar.MAY);
+		MAP_MONTHS.put("jun", Calendar.JUNE);
+		MAP_MONTHS.put("jul", Calendar.JULY);
+		MAP_MONTHS.put("aug", Calendar.AUGUST);
+		MAP_MONTHS.put("sep", Calendar.SEPTEMBER);
+		MAP_MONTHS.put("oct", Calendar.OCTOBER);
+		MAP_MONTHS.put("nov", Calendar.NOVEMBER);
+		MAP_MONTHS.put("dec", Calendar.DECEMBER);
 		
-		commandStrings = new ArrayList[TaskieEnum.Actions.values().length];
-		for (int i = 0; i < commandStrings.length; i++){
-			commandStrings[i] = new ArrayList<>();
+		STRING_COMMANDS = new ArrayList[TaskieEnum.Actions.values().length];
+		for (int i = 0; i < STRING_COMMANDS.length; i++){
+			STRING_COMMANDS[i] = new ArrayList<>();
 	    }
 
 		try {
 			Scanner commandStringScanner = new Scanner(new FileReader("CommandStrings.txt"));
 			int i = 0;
 			while (commandStringScanner.hasNext()) {
-				Collections.addAll(commandStrings[i++], commandStringScanner.nextLine().split("\\s+"));
+				Collections.addAll(STRING_COMMANDS[i++], commandStringScanner.nextLine().split("\\s+"));
 			}
 			commandStringScanner.close();
 		} catch (FileNotFoundException e) {
 			System.err.println("CommandStrings.txt is missing.");
-			commandStrings[TaskieEnum.Actions.ADD.ordinal()].add("add");		
+			STRING_COMMANDS[TaskieEnum.Actions.ADD.ordinal()].add("add");		
 		}
 	}
 	
-	protected static TaskieAction parse (String inputString) {
+	protected TaskieAction parse(String inputString) {
 		System.err.println("\"" + inputString + "\"");
 		if (inputString == null) {
 			return new TaskieAction(TaskieEnum.Actions.INVALID, (TaskieTask) null);
@@ -372,7 +380,7 @@ public final class TaskieParser {
 				return parseDelete(commandData);
 			
 			case SEARCH:
-				return new TaskieAction(actionType, TaskCompiler.compileTask(commandData), commandData);
+				return parseSearch(commandData);
 			
 			case UPDATE:
 				return parseUpdate(commandData);
@@ -383,13 +391,14 @@ public final class TaskieParser {
 		
 	}
 
-	private static TaskieAction parseAdd(String commandData) throws Error {
-		TaskieTask task = TaskCompiler.compileTask(commandData);
+	private TaskieAction parseAdd(String commandData) throws Error {
+		TaskCompiler tC = new TaskCompiler();
+		TaskieTask task = tC.compileTask(commandData);
 
 		return new TaskieAction(TaskieEnum.Actions.ADD, task);
 	}
 
-	private static TaskieAction parseDelete(String commandData) {
+	private TaskieAction parseDelete(String commandData) {
 		TaskSelectorDetector tSD = new TaskSelectorDetector(commandData);
 		
 		if (tSD.getTaskType() == TaskieEnum.TaskType.UNKNOWN) {
@@ -399,9 +408,16 @@ public final class TaskieParser {
 		}
 	}
 
-	private static TaskieAction parseUpdate(String commandData) {
+	private TaskieAction parseSearch(String commandData) {
+		TaskCompiler tC = new TaskCompiler();
+		
+		return new TaskieAction(TaskieEnum.Actions.SEARCH, tC.compileTask(commandData), commandData);
+	}
+
+	private TaskieAction parseUpdate(String commandData) {
 		TaskSelectorDetector tSD = new TaskSelectorDetector(commandData);
-		TaskieTask task = TaskCompiler.compileTask(tSD.getTaskDataString());
+		TaskCompiler tC = new TaskCompiler();
+		TaskieTask task = tC.compileTask(tSD.getTaskDataString());
 		
 		if (tSD.getTaskType() == TaskieEnum.TaskType.UNKNOWN) {
 			return new TaskieAction(TaskieEnum.Actions.UPDATE, null);
@@ -410,7 +426,7 @@ public final class TaskieParser {
 		}
 	}
 
-	private static String printTime(Calendar time) {
+	private String printTime(Calendar time) {
 		int year = time.get(Calendar.YEAR);
 		int month = time.get(Calendar.MONTH);      // 0 to 11
 		int day = time.get(Calendar.DAY_OF_MONTH);
@@ -422,13 +438,13 @@ public final class TaskieParser {
 				year, month+1, day, hour, minute, second);
 	}
 	
-	private static TaskieEnum.Actions determineTaskieAction(String actionTypeString) {
+	private TaskieEnum.Actions determineTaskieAction(String actionTypeString) {
 		if (actionTypeString == null) {
 			throw new Error(String.format(MESSAGE_INVALID_COMMAND_FORMAT, actionTypeString));
 		}
 
 		for (TaskieEnum.Actions action : TaskieEnum.Actions.values()) {
-			if (commandStrings[action.ordinal()].contains(actionTypeString)) {
+			if (STRING_COMMANDS[action.ordinal()].contains(actionTypeString)) {
 				return action;
 			}
 		}
@@ -436,11 +452,11 @@ public final class TaskieParser {
 		return TaskieEnum.Actions.INVALID;
 	}
 	
-	private static String getFirstWord (String inputString) {
+	private String getFirstWord (String inputString) {
 		return inputString.split("\\s+")[0];
 	}
 	
-	private static String removeFirstWord(String inputString) {
+	private String removeFirstWord(String inputString) {
 		return inputString.substring(getFirstWord(inputString).length()).trim();
 	}
 }
