@@ -118,9 +118,9 @@ public class TaskieLogic {
 			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.EVENT, date));
 			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.DEADLINE, date));
 			Collections.sort(todayTasks, comparator);
-			if (todayTasks.size() != 0) {
+			//if (todayTasks.size() != 0) {
 				all.add(df.format(date));
-			}
+			//}
 			for (int j = 0; j < todayTasks.size(); j++) {
 				TaskieTask task = todayTasks.get(j).getTask();
 				all.add(j+1 + "  " + task.getStartTime() + "  " + task.getEndTime() + "  " + task.getTitle());
