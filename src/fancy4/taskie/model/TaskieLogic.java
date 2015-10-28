@@ -127,6 +127,16 @@ public class TaskieLogic {
 			}
 			allTasks.addAll(todayTasks);
 		}
+		//---
+		all.add("Everything else:");
+		ArrayList<IndexTaskPair> todayTasks = new ArrayList<IndexTaskPair>();
+		todayTasks.addAll(primarySearch(TaskieEnum.TaskType.FLOAT, new String()));
+		for (int j = 0; j < todayTasks.size(); j++) {
+			TaskieTask task = todayTasks.get(j).getTask();
+			all.add(j+1 + ".  " + task.getTitle());
+		}
+		allTasks.addAll(todayTasks);
+		//---
 		for (int i = 0; i < searchResult.size(); i++) {
 			mainTasks.add(new IndexTaskPair(indexSave.get(i), searchResult.get(i)));
 		}
