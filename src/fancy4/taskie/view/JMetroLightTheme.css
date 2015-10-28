@@ -32,7 +32,13 @@
     -fx-control-inner-background: #1d1d1d;
     -fx-background-color: #1d1d1d;
 }
+.list-cell {
+	-fx-font-size: 11pt;
+    -fx-font-family: "Segoe UI Light";
+}
 .table-view {
+	-fx-font-size: 11pt;
+    -fx-font-family: "Segoe UI Light";
     -fx-base: #1d1d1d;
     -fx-control-inner-background: #1d1d1d;
     -fx-background-color: #1d1d1d;
