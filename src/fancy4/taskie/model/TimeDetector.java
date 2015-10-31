@@ -11,16 +11,16 @@ import java.util.regex.Pattern;
 import fancy4.taskie.model.TaskieEnum.TaskType;
 
 class TimeDetector {
-	private static final String PATTERN_TYPE = "(?:(?:-)?\\b(?:float|event|deadline))?\\s?";
+	private static final String PATTERN_TYPE = "(?:(?:-)?\\b(?:float|event|deadline|at|by|due))?\\s?";
 	private static final String PATTERN_DAY = "\\b(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)|"
 		+ "(?:(?:next\\s)?((?:Mon|Fri|Sun)(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|"
-		+ "Thu(?:rsday)?|Sat(?:urday)?))|"
+		+ "Thu(?:rsday)?|Sat(?:urday)?)\\b)|"
 		+ "(?:(\\d{1,2})\\s?[\\\\\\/-]\\s?(\\d{1,2}))|"
 		+ "(?:(\\d{1,2})?\\s?(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|"
 		+ "Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|(?:Nov|Dec)(?:ember)?)"
 		+ "\\s?(\\d{1,2})?)";
 	private static final String PATTERN_TIME = "(?:\\b(?:(?<=fr(?:om)?|-|~|to|till|until)|at|by|due))?"
-		+ "\\s?(?:(?:(\\d{1,2})\\s?"
+		+ "\\s?(?<=fr(?:om)?|-|~|to|till|until|\\b)(?:(?:(\\d{1,2})\\s?"
 		+ "(?=[.:h ]\\s?\\d{1,2}\\s?m?|am|pm|tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)"
 		+ "(?:[.:h ]\\s?(\\d{1,2})\\s?m?)?\\s?(am|pm)?\\s?"
 		+ "(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)?)\\b|(now|(?:to|tmr |tomorrow )night)\\b)|"

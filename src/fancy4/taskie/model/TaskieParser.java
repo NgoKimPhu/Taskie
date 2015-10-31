@@ -33,7 +33,7 @@ public final class TaskieParser {
 					System.out.println(timeDetector.getEndTime() + "\n");
 					return new TaskieTask(title, timeDetector.getEndTime());
 				case EVENT:
-					System.out.println(timeDetector.getStartTime() + " ~> "
+					System.out.println(timeDetector.getStartTime() + " -> "
 							+ timeDetector.getEndTime() + "\n");
 					return new TaskieTask(title, timeDetector.getStartTime(), timeDetector.getEndTime());
 				default:
