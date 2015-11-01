@@ -163,6 +163,8 @@ public class TaskieLogic {
 				return search(action);
 			case UPDATE:
 				return update(action.getIndex() - 1, action.getTask());
+			case MARKDONE:
+				return markdone(action.getScreen(), action.getIndex() - 1);
 			case UNDO:
 				return undo();
 			case REDO:
@@ -377,6 +379,39 @@ public class TaskieLogic {
 		}
 					
 		return display(searchResult, feedback);
+		} catch (IndexOutOfBoundsException e) {
+			return display(searchResult, "Invalid index number");
+		}
+	}
+	
+	private String[][] markdone(String screen, int index) throws UnrecognisedCommandException {
+		try {
+			TaskieEnum.TaskType type;
+			String title;
+			int realIndex;
+			if (screen.equalsIgnoreCase("left")) {
+				type = mainTasks.get(index).getTask().getType();
+				realIndex = mainTasks.get(index).getIndex();
+				title = mainTasks.get(index).getTask().getTitle();
+			} else if (screen.equalsIgnoreCase("right")) {
+				type = allTasks.get(index).getTask().getType();
+				realIndex = allTasks.get(index).getIndex();
+				title = allTasks.get(index).getTask().getTitle();
+			} else {
+				throw new UnrecognisedCommandException("Screen preference not indicated.");
+			}
+			
+			String feedback = new String("\"" + title + "\"" + " is marked done");
+			TaskieStorage.markDone(realIndex, type);
+			
+			// Construct undo action
+			if (!isUndoAction) {
+				TaskieAction action = new TaskieAction(TaskieEnum.Actions.MARKDONE, screen, index + 1);
+				undoStack.push(action);
+			}
+						
+			return display(searchResult, feedback);
+			
 		} catch (IndexOutOfBoundsException e) {
 			return display(searchResult, "Invalid index number");
 		}
