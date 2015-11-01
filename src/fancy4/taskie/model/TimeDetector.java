@@ -248,12 +248,12 @@ class TimeDetector {
 		return taskType;
 	}
 
-	public Date getStartTime() {
-		return startTime.getTime();
+	public Calendar getStartTime() {
+		return startTime;
 	}
 
-	public Date getEndTime() {
-		return endTime.getTime();
+	public Calendar getEndTime() {
+		return endTime;
 	}
 
 }
