@@ -27,7 +27,6 @@ public class TaskieStorage {
 	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> eventPriorityMap;
 	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> deadlinePriorityMap;
 	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> floatPriorityMap;
-	private static Stack<HashMap<String, Object>> commandStack;
 	private static TaskComparator tc = new TaskComparator();
 
 	public static void load(String pathName) throws Exception {
@@ -139,7 +138,6 @@ public class TaskieStorage {
 		allTasks = new ArrayList<TaskieTask>();
 		eventTaskList = new ArrayList<TaskieTask>();
 		deadlineTaskList = new ArrayList<TaskieTask>();
-		;
 		floatTaskList = new ArrayList<TaskieTask>();
 		eventStartDateMap = new HashMap<Calendar, ArrayList<TaskieTask>>();
 		eventEndDateMap = new HashMap<Calendar, ArrayList<TaskieTask>>();
@@ -729,7 +727,7 @@ class FileHandler {
 					events.add(task);
 					all.add(task);
 				} else if (taskLine.has("deadline")) {
-					JSONObject taskData = taskLine.getJSONObject("event");
+					JSONObject taskData = taskLine.getJSONObject("deadline");
 					String title = taskData.getString("title");
 					TaskieEnum.TaskType type = getTaskType(taskData.getInt("type"));
 					Calendar end = getDate(taskData.getString("end-time"));
@@ -740,7 +738,7 @@ class FileHandler {
 					deadlines.add(task);
 					all.add(task);
 				} else if (taskLine.has("float")) {
-					JSONObject taskData = taskLine.getJSONObject("event");
+					JSONObject taskData = taskLine.getJSONObject("float");
 					String title = taskData.getString("title");
 					TaskieEnum.TaskType type = getTaskType(taskData.getInt("type"));
 					TaskieEnum.TaskPriority priority = getTaskPriority(taskData.getInt("priority"));
