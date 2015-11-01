@@ -351,6 +351,7 @@ public class TaskieLogic {
 		if (screen.equalsIgnoreCase("left")) {
 			type = mainTasks.get(index).getTask().getType();
 			realIndex = mainTasks.get(index).getIndex();
+			mainTasks.remove(index);
 		} else if (screen.equalsIgnoreCase("right")) {
 			type = allTasks.get(index).getTask().getType();
 			realIndex = allTasks.get(index).getIndex();
@@ -361,7 +362,9 @@ public class TaskieLogic {
 		
 		TaskieTask deleted = TaskieStorage.deleteTask(realIndex, type);
 		String title = deleted.getTitle();
-		retrieve(type);
+		//retrieve(type);
+		searchResult.remove(index);
+		indexSave.remove(index);
 		
 		String feedback = new String("\"" + title + "\"" + " is deleted");
 		
