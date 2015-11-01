@@ -11,7 +11,7 @@ public class TaskieStorageTest {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
 		}
-		TaskieStorage.deleteAll();
+		//TaskieStorage.deleteAll();
 		TaskieTask float1 = new TaskieTask("finish tutorial");
 		TaskieTask float2 = new TaskieTask("go to dinner with misaki");
 		Calendar deadline = getDate(2015, 11, 1);
