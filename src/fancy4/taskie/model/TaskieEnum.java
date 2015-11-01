@@ -17,5 +17,8 @@ public class TaskieEnum {
 		//from 0 to 4
 		VERY_HIGH, HIGH, MEDIUM, LOW, VERY_LOW;
 	}
+	
+	// Right window rules
+	
 
 }

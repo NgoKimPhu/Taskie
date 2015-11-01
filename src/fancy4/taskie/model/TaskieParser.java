@@ -30,11 +30,11 @@ public final class TaskieParser {
 					System.out.println("Float task\n");
 					return new TaskieTask(title);
 				case DEADLINE:
-					System.out.println(timeDetector.getEndTime() + "\n");
+					System.out.println(timeDetector.getEndTime().getTime() + "\n");
 					return new TaskieTask(title, timeDetector.getEndTime());
 				case EVENT:
-					System.out.println(timeDetector.getStartTime() + " -> "
-							+ timeDetector.getEndTime() + "\n");
+					System.out.println(timeDetector.getStartTime().getTime() + " -> "
+							+ timeDetector.getEndTime().getTime() + "\n");
 					return new TaskieTask(title, timeDetector.getStartTime(), timeDetector.getEndTime());
 				default:
 					throw new Error("Fatal error in TaskieParser#timeDetector");
