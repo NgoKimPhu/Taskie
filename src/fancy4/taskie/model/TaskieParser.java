@@ -141,6 +141,9 @@ public final class TaskieParser {
 			case SEARCH:
 				return parseSearch(commandData);
 			
+			case MARKDONE:
+				return parseMarkDone(commandData);
+			
 			case UPDATE:
 				return parseUpdate(commandData);
 			
@@ -167,6 +170,12 @@ public final class TaskieParser {
 		TaskCompiler tC = new TaskCompiler();
 		
 		return new TaskieAction(TaskieEnum.Actions.SEARCH, tC.compileTask(commandData), commandData);
+	}
+
+	private TaskieAction parseMarkDone(String commandData) {
+		TaskSelectorDetector tSD = new TaskSelectorDetector(commandData);
+		
+		return new TaskieAction(TaskieEnum.Actions.MARKDONE, tSD.getScreen(), tSD.getIndex());
 	}
 
 	private TaskieAction parseUpdate(String commandData) {

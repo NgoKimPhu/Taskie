@@ -1,11 +1,12 @@
 add +
-delete del -
-delall deleteall
+delete del - remove rem rm
+delall deleteall removeall remall rmall
 undo
 redo
 clear clr
 search find view display
 sort
+markdone
 update
 displayall viewall
 reset
