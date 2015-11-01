@@ -1,21 +1,14 @@
 package fancy4.taskie.view;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
 //import javafx.collections.FXCollections;
 //import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 //import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellDataFeatures;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.util.Callback;
 
 import java.util.ArrayList;
 
@@ -55,10 +48,6 @@ public class TaskieOverviewController {
 	//@FXML
 	//private TextArea textOutput;
 
-	private MainApp mainApp;
-
-	private String textOutputResponse = "";
-
 	public TaskieOverviewController() {
 
 	}
@@ -79,15 +68,6 @@ public class TaskieOverviewController {
 	    });
 	}
 
-	private void initColumn(TableColumn<String, String> column) {
-		//TaskieLogic.initialise();
-		column.setCellValueFactory(new Callback<CellDataFeatures<String, String>, ObservableValue<String>>() {
-			public ObservableValue<String> call(CellDataFeatures<String, String> p) {
-				return new SimpleStringProperty(p.getValue());
-			}
-		});
-	}
-
 	public void inputEnter(KeyEvent event) {
 		String input;
 		String response;
@@ -102,7 +82,7 @@ public class TaskieOverviewController {
 				mainData = fromLogic.getMain();
 				allData = fromLogic.getAll();
 				response = fromLogic.getFeedback();
-				mainApp.updateDisplay(mainData, allData);
+				MainApp.updateDisplay(mainData, allData);
 				textOutput.setText(response);
 				textInput.clear();
 			} catch (UnrecognisedCommandException e) {
@@ -170,8 +150,7 @@ public class TaskieOverviewController {
 
 
 	public void setMainApp(MainApp mainApp) {
-		this.mainApp = mainApp;
-
+		
 		// Add observable list data to the table
 		MainList.setItems(mainApp.getMainDisplay());
 		AllList.setItems(mainApp.getAllDisplay());

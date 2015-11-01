@@ -12,8 +12,8 @@ public class TaskieTask {
 	private String title;
 	//private long id;
 	private String description;
-	private Date startTime;
-	private Date endTime;
+	private Calendar startTime;
+	private Calendar endTime;
 	// we provide 5 levels of priorities;
 	private TaskieEnum.TaskPriority priority;
 	// true==done, false==haven't done;
@@ -58,7 +58,7 @@ public class TaskieTask {
 		}
 	}
 	// create deadline task.
-	public TaskieTask(String title, Date endTime){
+	public TaskieTask(String title, Calendar endTime){
 		this.type = TaskieEnum.TaskType.DEADLINE;
 		this.title = title;
 		this.description = new String();
@@ -68,7 +68,7 @@ public class TaskieTask {
 		this.status = false;
 	}
 	// create deadline task with specific priority.
-	public TaskieTask(String title, Date endTime, TaskieEnum.TaskPriority priority){
+	public TaskieTask(String title, Calendar endTime, TaskieEnum.TaskPriority priority){
 		this.type = TaskieEnum.TaskType.DEADLINE;
 		this.title = title;
 		this.description = new String();
@@ -78,7 +78,7 @@ public class TaskieTask {
 		this.status = false;
 	}
 	// create event.
-	public TaskieTask(String title, Date startTime, Date endTime){
+	public TaskieTask(String title, Calendar startTime, Calendar endTime){
 		this.type = TaskieEnum.TaskType.EVENT;
 		this.title = title;
 		this.description = new String();
@@ -88,7 +88,7 @@ public class TaskieTask {
 		this.status = false;
 	}
 	// create event with specific priority.
-	public TaskieTask(String title, Date startTime, Date endTime, TaskieEnum.TaskPriority priority){
+	public TaskieTask(String title, Calendar startTime, Calendar endTime, TaskieEnum.TaskPriority priority){
 		this.type = TaskieEnum.TaskType.EVENT;
 		this.title = title;
 		this.description = new String();
@@ -98,7 +98,7 @@ public class TaskieTask {
 		this.status = false;
 	}
 	// load deadline task
-	public TaskieTask(String title, TaskieEnum.TaskType type, Date endTime, TaskieEnum.TaskPriority priority, boolean status, String description) throws Exception{
+	public TaskieTask(String title, TaskieEnum.TaskType type, Calendar endTime, TaskieEnum.TaskPriority priority, boolean status, String description) throws Exception{
 		if(type.equals(TaskieEnum.TaskType.FLOAT)){
 			throw new Exception("Task type not match.");
 		}
@@ -113,7 +113,7 @@ public class TaskieTask {
 		}
 	}
 	//load event
-	public TaskieTask(String title, TaskieEnum.TaskType type, Date startTime, Date endTime, TaskieEnum.TaskPriority priority, boolean status, String description) throws Exception{
+	public TaskieTask(String title, TaskieEnum.TaskType type, Calendar startTime, Calendar endTime, TaskieEnum.TaskPriority priority, boolean status, String description) throws Exception{
 		if(type.equals(TaskieEnum.TaskType.FLOAT)){
 			throw new Exception("Task type not match.");
 		}
@@ -138,17 +138,17 @@ public class TaskieTask {
 		this.endTime = null;
 		this.type = TaskieEnum.TaskType.FLOAT;
 	}
-	public void setToDeadline(Date endTime){
+	public void setToDeadline(Calendar endTime){
 		this.startTime = null;
 		this.endTime = endTime;
 		this.type = TaskieEnum.TaskType.DEADLINE;
 	}
-	public void setToEvent(Date startTime, Date endTime){
+	public void setToEvent(Calendar startTime, Calendar endTime){
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.type = TaskieEnum.TaskType.EVENT;
 	}
-	public boolean setStartTime(Date startTime){
+	public boolean setStartTime(Calendar startTime){
 		// only reasonable to change the start time of an event;
 		if(this.type.equals(TaskieEnum.TaskType.EVENT)){
 			this.startTime = startTime;
@@ -160,7 +160,7 @@ public class TaskieTask {
 			return false;
 		}
 	}
-	public boolean setEndTime(Date endTime){
+	public boolean setEndTime(Calendar endTime){
 		if(this.type.equals(TaskieEnum.TaskType.EVENT) || this.type.equals(TaskieEnum.TaskType.DEADLINE)){
 			this.endTime = endTime;
 			return true;
@@ -184,10 +184,10 @@ public class TaskieTask {
 	public String getDescription(){
 		return this.description;
 	}
-	public Date getStartTime(){
+	public Calendar getStartTime(){
 		return this.startTime;
 	}
-	public Date getEndTime(){
+	public Calendar getEndTime(){
 		return this.endTime;
 	}
 	public boolean getStatus(){

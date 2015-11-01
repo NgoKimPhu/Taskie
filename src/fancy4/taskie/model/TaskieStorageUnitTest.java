@@ -10,6 +10,7 @@ import org.junit.Test;
 public class TaskieStorageUnitTest {
 
 	@Test	
+	// add a float task partition 
 	public void testAddFloat() {
 		try {
 			TaskieStorage.load("unit/");
@@ -29,12 +30,13 @@ public class TaskieStorageUnitTest {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
-		TaskieTask float2 = new TaskieTask("finish tutorial");
+		TaskieTask float2 = new TaskieTask("finish tutorial again");
 		TaskieStorage.addTask(float2);
 		assertEquals(TaskieStorage.displayFloatTask().size(), 2);
 	}
 	
 	@Test
+	// add a deadline task partition
 	public void testAddDeadline() {
 		try {
 			TaskieStorage.load("unit/");
@@ -43,7 +45,7 @@ public class TaskieStorageUnitTest {
 		}
 		TaskieTask deadline = new TaskieTask("study", new Date());
 		TaskieStorage.addTask(deadline);
-		assertEquals(TaskieStorage.displayEventDeadline().size(), 1);
+		assertEquals(TaskieStorage.displayDeadlineTask().size(), 1);
 	}
 	
 	@Test
@@ -53,7 +55,7 @@ public class TaskieStorageUnitTest {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
-		TaskieStorage.deleteTask(1, TaskieEnum.TaskType.FLOAT);
+		TaskieStorage.deleteTask(0, TaskieEnum.TaskType.FLOAT);
 		assertEquals(TaskieStorage.displayFloatTask().size(), 1);
 	}
 	

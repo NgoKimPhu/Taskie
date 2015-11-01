@@ -100,7 +100,7 @@ public class TaskieLogic {
 		String[][] screen = takeAction(action);	
 		return output(screen);
 	}
-
+/*
 	private LogicOutput output(String[][] screen) throws UnrecognisedCommandException {
 		all.clear();
 		main.clear();
@@ -111,12 +111,15 @@ public class TaskieLogic {
 			main.add(task);
 		}
 		Calendar cal = Calendar.getInstance();
-		cal.add(cal.DATE, -1);
+		cal.add(Calendar.DATE, -1);
 		
 		/*
+=======
+		cal.add(Calendar.DATE, -1);
+>>>>>>> ef3f3bf0b5af09cf337208a9b19a9ba1418d7b0d
 		int index = 0, save = 0;
 		for (int i = 0; i < 3; i++) {
-			cal.add(cal.DATE, 1);
+			cal.add(Calendar.DATE, 1);
 			Date date = cal.getTime();
 			ArrayList<IndexTaskPair> todayTasks = new ArrayList<IndexTaskPair>();
 			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.EVENT, date));
@@ -207,8 +210,12 @@ public class TaskieLogic {
 		SimpleDateFormat sdf = new SimpleDateFormat("E dd-MM HH:mm");
 		SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
 		SimpleDateFormat sdf3 = new SimpleDateFormat("dd-MM-YYYY");
+<<<<<<< HEAD
 		Calendar c1 = Calendar.getInstance();
 		Calendar c2 = Calendar.getInstance();
+=======
+		boolean isSameDay = false;
+>>>>>>> ef3f3bf0b5af09cf337208a9b19a9ba1418d7b0d
 		int index = 0;
 		for (TaskieTask task : taskList) {
 			Date st = task.getStartTime();

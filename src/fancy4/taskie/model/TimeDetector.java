@@ -16,9 +16,9 @@ class TimeDetector {
 		+ "(?:(?:next\\s)?((?:Mon|Fri|Sun)(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|"
 		+ "Thu(?:rsday)?|Sat(?:urday)?)\\b)|"
 		+ "(?:(\\d{1,2})\\s?[\\\\\\/-]\\s?(\\d{1,2}))|"
-		+ "(?:(\\d{1,2})?\\s?(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|"
-		+ "Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|(?:Nov|Dec)(?:ember)?)"
-		+ "\\s?(\\d{1,2})?)";
+		+ "(?=\\S*\\s?\\S*\\d{1,2})(\\d{1,2})?\\s?(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|"
+		+ "May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|(?:Nov|Dec)(?:ember)?)"
+		+ "\\b\\s?(\\d{1,2})?";
 	private static final String PATTERN_TIME = "(?:\\b(?:(?<=fr(?:om)?|-|~|to|till|until)|at|by|due))?"
 		+ "\\s?(?<=fr(?:om)?|-|~|to|till|until|\\b)(?:(?:(\\d{1,2})\\s?"
 		+ "(?=[.:h ]\\s?\\d{1,2}\\s?m?|am|pm|tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)"
@@ -192,6 +192,9 @@ class TimeDetector {
 				date = Integer.parseInt(matcher.group(groupOffset + 6));
 			}
 			time.set(Calendar.DATE, date);
+			if (time.before(Calendar.getInstance())) {
+				time.add(Calendar.YEAR, 1);
+			}
 		}
 	}
 	
@@ -245,12 +248,12 @@ class TimeDetector {
 		return taskType;
 	}
 
-	public Date getStartTime() {
-		return startTime.getTime();
+	public Calendar getStartTime() {
+		return startTime;
 	}
 
-	public Date getEndTime() {
-		return endTime.getTime();
+	public Calendar getEndTime() {
+		return endTime;
 	}
 
 }
