@@ -27,8 +27,9 @@
                         </AnchorPane>
                       <AnchorPane maxHeight="630.0" maxWidth="400.0" minHeight="630.0" minWidth="400.0" prefHeight="630.0" prefWidth="400.0" stylesheets="@JMetroLightTheme.css">
                            <children>
-                              <ListView fx:id="AllList" layoutY="43.0" prefHeight="587.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="43.0" />
+                              <ListView fx:id="AllList" layoutY="43.0" prefHeight="240.0" prefWidth="400.0" AnchorPane.bottomAnchor="347.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="43.0" />
                               <Label layoutX="14.0" layoutY="14.0" prefHeight="30.0" prefWidth="381.0" styleClass="label-big" stylesheets="@JMetroLightTheme.css" text="All" />
+                              <TreeView fx:id="AllTree" layoutX="5.0" layoutY="271.0" prefHeight="358.0" prefWidth="390.0" />
                            </children>
                         </AnchorPane>
                     </items>
