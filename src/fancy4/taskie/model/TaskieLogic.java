@@ -111,6 +111,7 @@ public class TaskieLogic {
 		}
 		Calendar cal = Calendar.getInstance();
 		cal.add(cal.DATE, -1);
+		int index = 0, save = 0;
 		for (int i = 0; i < 3; i++) {
 			cal.add(cal.DATE, 1);
 			Date date = cal.getTime();
@@ -121,19 +122,20 @@ public class TaskieLogic {
 			//if (todayTasks.size() != 0) {
 				all.add(df.format(date));
 			//}
-			for (int j = 0; j < todayTasks.size(); j++) {
-				TaskieTask task = todayTasks.get(j).getTask();
-				all.add(j+1 + "  " + task.getStartTime() + "  " + task.getEndTime() + "  " + task.getTitle());
+			for (; index < todayTasks.size() + save; index++) {
+				TaskieTask task = todayTasks.get(index).getTask();
+				all.add(index+1 + "  " + task.getStartTime() + "  " + task.getEndTime() + "  " + task.getTitle());
 			}
+			save = index;
 			allTasks.addAll(todayTasks);
 		}
 		//---
 		all.add("Everything else:");
 		ArrayList<IndexTaskPair> todayTasks = new ArrayList<IndexTaskPair>();
 		todayTasks.addAll(primarySearch(TaskieEnum.TaskType.FLOAT, new String()));
-		for (int j = 0; j < todayTasks.size(); j++) {
-			TaskieTask task = todayTasks.get(j).getTask();
-			all.add(j+1 + ".  " + task.getTitle());
+		for (; index < todayTasks.size() + save; index++) {
+			TaskieTask task = todayTasks.get(index).getTask();
+			all.add(index+1 + ".  " + task.getTitle());
 		}
 		allTasks.addAll(todayTasks);
 		//---
@@ -351,6 +353,7 @@ public class TaskieLogic {
 		if (screen.equalsIgnoreCase("left")) {
 			type = mainTasks.get(index).getTask().getType();
 			realIndex = mainTasks.get(index).getIndex();
+			mainTasks.remove(index);
 		} else if (screen.equalsIgnoreCase("right")) {
 			type = allTasks.get(index).getTask().getType();
 			realIndex = allTasks.get(index).getIndex();
@@ -361,7 +364,9 @@ public class TaskieLogic {
 		
 		TaskieTask deleted = TaskieStorage.deleteTask(realIndex, type);
 		String title = deleted.getTitle();
-		retrieve(type);
+		//retrieve(type);
+		searchResult.remove(index);
+		indexSave.remove(index);
 		
 		String feedback = new String("\"" + title + "\"" + " is deleted");
 		
