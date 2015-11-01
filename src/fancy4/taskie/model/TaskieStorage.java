@@ -781,10 +781,10 @@ class FileHandler {
 				jWriter.value(task.getType().ordinal());
 
 				jWriter.key("start-time");
-				jWriter.value(sdf.format(task.getStartTime()));
+				jWriter.value(sdf.format(task.getStartTime().getTime()));
 
 				jWriter.key("end-time");
-				jWriter.value(sdf.format(task.getEndTime()));
+				jWriter.value(sdf.format(task.getEndTime().getTime()));
 
 				jWriter.key("priority");
 				jWriter.value(task.getPriority().ordinal());
@@ -816,7 +816,7 @@ class FileHandler {
 				jWriter.value(task.getType().ordinal());
 
 				jWriter.key("end-time");
-				jWriter.value(sdf.format(task.getEndTime()));
+				jWriter.value(sdf.format(task.getEndTime().getTime()));
 
 				jWriter.key("priority");
 				jWriter.value(task.getPriority().ordinal());
@@ -839,7 +839,7 @@ class FileHandler {
 				FileWriter writer = new FileWriter(file, true);
 				JSONWriter jWriter = new JSONWriter(writer);
 				jWriter.object();
-				jWriter.key("task");
+				jWriter.key("float");
 
 				jWriter.object();
 				jWriter.key("title");
