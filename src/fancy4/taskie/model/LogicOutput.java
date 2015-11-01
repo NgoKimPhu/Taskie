@@ -5,10 +5,10 @@ import java.util.*;
 public class LogicOutput {
 
 	private String feedback;
-	private ArrayList<String> all;
+	private ArrayList<ArrayList<String>> all;
 	private ArrayList<String> main;
 	
-	public LogicOutput(String feedback, ArrayList<String> main, ArrayList<String> all) {
+	public LogicOutput(String feedback, ArrayList<String> main, ArrayList<ArrayList<String>> all) {
 		this.feedback = feedback;
 		this.main = main;
 		this.all = all;
@@ -18,7 +18,7 @@ public class LogicOutput {
 		this.feedback = str;
 	}
 	
-	public void setAll(ArrayList<String> list) {
+	public void setAll(ArrayList<ArrayList<String>> list) {
 		this.all = list;
 	}
 	
@@ -30,7 +30,7 @@ public class LogicOutput {
 		return feedback;
 	}
 	
-	public ArrayList<String> getAll() {
+	public ArrayList<ArrayList<String>> getAll() {
 		return all;
 	}
 	

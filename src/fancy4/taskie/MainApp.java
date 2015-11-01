@@ -35,7 +35,7 @@ public class MainApp extends Application {
     public MainApp() {
     	//data = TaskieLogic.execute("add order a pizza")[0];
     	//TaskieLogic.initialise();
-    	TaskieLogic.logic().initialise();
+    	Logic.logic().initialise();
     	iniAllTable();
 
     }
@@ -43,7 +43,7 @@ public class MainApp extends Application {
     	
     	LogicOutput iniDisplay;
 		try {
-			iniDisplay = TaskieLogic.logic().execute("search");
+			iniDisplay = Logic.logic().execute("search");
 			mainData = iniDisplay.getMain();
 			mainDisplay.addAll(mainData);
 			
