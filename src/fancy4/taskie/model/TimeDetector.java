@@ -16,9 +16,9 @@ class TimeDetector {
 		+ "(?:(?:next\\s)?((?:Mon|Fri|Sun)(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|"
 		+ "Thu(?:rsday)?|Sat(?:urday)?)\\b)|"
 		+ "(?:(\\d{1,2})\\s?[\\\\\\/-]\\s?(\\d{1,2}))|"
-		+ "(?:(\\d{1,2})?\\s?(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|"
-		+ "Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|(?:Nov|Dec)(?:ember)?)"
-		+ "\\s?(\\d{1,2})?)";
+		+ "(?=\\S*\\s?\\S*\\d{1,2})(\\d{1,2})?\\s?(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|"
+		+ "May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|(?:Nov|Dec)(?:ember)?)"
+		+ "\\b\\s?(\\d{1,2})?";
 	private static final String PATTERN_TIME = "(?:\\b(?:(?<=fr(?:om)?|-|~|to|till|until)|at|by|due))?"
 		+ "\\s?(?<=fr(?:om)?|-|~|to|till|until|\\b)(?:(?:(\\d{1,2})\\s?"
 		+ "(?=[.:h ]\\s?\\d{1,2}\\s?m?|am|pm|tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)"
@@ -79,8 +79,8 @@ class TimeDetector {
 		startTime.set(Calendar.HOUR_OF_DAY, 12);
 		startTime.set(Calendar.MINUTE, 0);
 		startTime.set(Calendar.SECOND, 0);
-		endTime.set(Calendar.HOUR_OF_DAY, 12);
-		endTime.set(Calendar.MINUTE, 0);
+		endTime.set(Calendar.HOUR_OF_DAY, 23);
+		endTime.set(Calendar.MINUTE, 59);
 		endTime.set(Calendar.SECOND, 0);
 		
 		matcher = Pattern.compile("").matcher("");
@@ -101,12 +101,12 @@ class TimeDetector {
 			matchStartPos = dataString.length()-1;
 		}
 		matchEndPos = 0;
-		if (isMatchFound(getTimeRangePattern(PATTERN_DAY, PATTERN_TIME), dataString)) {
+		if (hasMatchFound(getTimeRangePattern(PATTERN_DAY, PATTERN_TIME), dataString)) {
 			System.out.println("Date range detected: \"" + matcher.group() + "\"");
 			taskType = TaskType.EVENT;
 			setDate(startTime, 1);
 			setDate(endTime, 20);
-		} else if (isMatchFound(PATTERN_DAY, dataString)) {
+		} else if (hasMatchFound(PATTERN_DAY, dataString)) {
 			System.out.println("Date detected: \"" + matcher.group() + "\"");
 			taskType = TaskType.DEADLINE;
 			setDate(startTime, 1);
@@ -115,12 +115,12 @@ class TimeDetector {
 			System.out.println("No match found for date!");
 		}
 		
-		if (isMatchFound(getTimeRangePattern(PATTERN_TIME, PATTERN_DAY), dataString)) {
+		if (hasMatchFound(getTimeRangePattern(PATTERN_TIME, PATTERN_DAY), dataString)) {
 			System.out.println("Time range detected: \"" + matcher.group() + "\"");
 			taskType = TaskType.EVENT;
 			setTime(startTime, 1);
 			setTime(endTime, 21);
-		} else if (isMatchFound(PATTERN_TIME, dataString)) {
+		} else if (hasMatchFound(PATTERN_TIME, dataString)) {
 			System.out.println("Time detected: \"" + matcher.group() + "\"");
 			if (taskType != TaskType.EVENT) {
 				taskType = TaskType.DEADLINE;
@@ -146,7 +146,7 @@ class TimeDetector {
 		return dataWithoutTime.trim().replaceAll("\\s{2,}", " ");
 	}
 	
-	private boolean isMatchFound(String patternString, String dataString) {
+	private boolean hasMatchFound(String patternString, String dataString) {
 		matcher.usePattern(Pattern.compile(patternString, Pattern.CASE_INSENSITIVE));
 		matcher.reset(dataString);
 		boolean matchFound = matcher.find();
@@ -192,6 +192,9 @@ class TimeDetector {
 				date = Integer.parseInt(matcher.group(groupOffset + 6));
 			}
 			time.set(Calendar.DATE, date);
+			if (time.before(Calendar.getInstance())) {
+				time.add(Calendar.YEAR, 1);
+			}
 		}
 	}
 	

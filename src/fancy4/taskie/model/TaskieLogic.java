@@ -110,9 +110,10 @@ public class TaskieLogic {
 			main.add(task);
 		}
 		Calendar cal = Calendar.getInstance();
-		cal.add(cal.DATE, -1);
+		cal.add(Calendar.DATE, -1);
+		int index = 0, save = 0;
 		for (int i = 0; i < 3; i++) {
-			cal.add(cal.DATE, 1);
+			cal.add(Calendar.DATE, 1);
 			Date date = cal.getTime();
 			ArrayList<IndexTaskPair> todayTasks = new ArrayList<IndexTaskPair>();
 			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.EVENT, date));
@@ -121,19 +122,20 @@ public class TaskieLogic {
 			//if (todayTasks.size() != 0) {
 				all.add(df.format(date));
 			//}
-			for (int j = 0; j < todayTasks.size(); j++) {
-				TaskieTask task = todayTasks.get(j).getTask();
-				all.add(j+1 + "  " + task.getStartTime() + "  " + task.getEndTime() + "  " + task.getTitle());
+			for (; index < todayTasks.size() + save; index++) {
+				TaskieTask task = todayTasks.get(index).getTask();
+				all.add(index+1 + "  " + task.getStartTime() + "  " + task.getEndTime() + "  " + task.getTitle());
 			}
+			save = index;
 			allTasks.addAll(todayTasks);
 		}
 		//---
 		all.add("Everything else:");
 		ArrayList<IndexTaskPair> todayTasks = new ArrayList<IndexTaskPair>();
 		todayTasks.addAll(primarySearch(TaskieEnum.TaskType.FLOAT, new String()));
-		for (int j = 0; j < todayTasks.size(); j++) {
-			TaskieTask task = todayTasks.get(j).getTask();
-			all.add(j+1 + ".  " + task.getTitle());
+		for (; index < todayTasks.size() + save; index++) {
+			TaskieTask task = todayTasks.get(index).getTask();
+			all.add(index+1 + ".  " + task.getTitle());
 		}
 		allTasks.addAll(todayTasks);
 		//---
@@ -161,6 +163,8 @@ public class TaskieLogic {
 				return search(action);
 			case UPDATE:
 				return update(action.getIndex() - 1, action.getTask());
+			case MARKDONE:
+				return markdone(action.getScreen(), action.getIndex() - 1);
 			case UNDO:
 				return undo();
 			case REDO:
@@ -198,8 +202,6 @@ public class TaskieLogic {
 		SimpleDateFormat sdf = new SimpleDateFormat("E dd-MM HH:mm");
 		SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
 		SimpleDateFormat sdf3 = new SimpleDateFormat("dd-MM-YYYY");
-		Calendar c1 = Calendar.getInstance();
-		Calendar c2 = Calendar.getInstance();
 		boolean isSameDay = false;
 		int index = 0;
 		for (TaskieTask task : taskList) {
@@ -351,6 +353,7 @@ public class TaskieLogic {
 		if (screen.equalsIgnoreCase("left")) {
 			type = mainTasks.get(index).getTask().getType();
 			realIndex = mainTasks.get(index).getIndex();
+			mainTasks.remove(index);
 		} else if (screen.equalsIgnoreCase("right")) {
 			type = allTasks.get(index).getTask().getType();
 			realIndex = allTasks.get(index).getIndex();
@@ -361,7 +364,9 @@ public class TaskieLogic {
 		
 		TaskieTask deleted = TaskieStorage.deleteTask(realIndex, type);
 		String title = deleted.getTitle();
-		retrieve(type);
+		//retrieve(type);
+		searchResult.remove(index);
+		indexSave.remove(index);
 		
 		String feedback = new String("\"" + title + "\"" + " is deleted");
 		
@@ -372,6 +377,39 @@ public class TaskieLogic {
 		}
 					
 		return display(searchResult, feedback);
+		} catch (IndexOutOfBoundsException e) {
+			return display(searchResult, "Invalid index number");
+		}
+	}
+	
+	private String[][] markdone(String screen, int index) throws UnrecognisedCommandException {
+		try {
+			TaskieEnum.TaskType type;
+			String title;
+			int realIndex;
+			if (screen.equalsIgnoreCase("left")) {
+				type = mainTasks.get(index).getTask().getType();
+				realIndex = mainTasks.get(index).getIndex();
+				title = mainTasks.get(index).getTask().getTitle();
+			} else if (screen.equalsIgnoreCase("right")) {
+				type = allTasks.get(index).getTask().getType();
+				realIndex = allTasks.get(index).getIndex();
+				title = allTasks.get(index).getTask().getTitle();
+			} else {
+				throw new UnrecognisedCommandException("Screen preference not indicated.");
+			}
+			
+			String feedback = new String("\"" + title + "\"" + " is marked done");
+			TaskieStorage.markDone(realIndex, type);
+			
+			// Construct undo action
+			if (!isUndoAction) {
+				TaskieAction action = new TaskieAction(TaskieEnum.Actions.MARKDONE, screen, index + 1);
+				undoStack.push(action);
+			}
+						
+			return display(searchResult, feedback);
+			
 		} catch (IndexOutOfBoundsException e) {
 			return display(searchResult, "Invalid index number");
 		}

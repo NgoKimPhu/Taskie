@@ -2,20 +2,19 @@ package fancy4.taskie.model;
 
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
-
 import org.junit.Test;
 
 public class LogicUnitTest {
 	
-	private static String[][] test;
+	private static LogicOutput test;
 
 	@Test
 	public void testAdd() throws Exception {
 		TaskieLogic.logic().execute("reset");
 		TaskieLogic.logic().execute("pizza");
 		test = TaskieLogic.logic().execute("coffee");
-		assertTrue(Arrays.equals(test[1], new String[]{"1. coffee", "2. pizza"}));
+		assertArrayEquals(new String[]{"1.   --    --   coffee", "2.   --    --   pizza"},
+				test.getMain().toArray());
 	}
 	
 	@Test
@@ -25,13 +24,13 @@ public class LogicUnitTest {
 		TaskieLogic.logic().execute("coffee");
 		
 		test = TaskieLogic.logic().execute("undo");
-		assertTrue(Arrays.equals(test[1], new String[]{"1. pizza"}));
+		assertArrayEquals(new String[]{"1.   --    --   pizza"}, test.getMain().toArray());
 		test = TaskieLogic.logic().execute("undo");
-		assertTrue(Arrays.equals(test[1], new String[]{}));
+		assertArrayEquals(new String[0], test.getMain().toArray());
 		// Boundary testing
 		TaskieLogic.logic().execute("undo");
 		test = TaskieLogic.logic().execute("undo");
-		assertTrue(Arrays.equals(test[0], new String[]{"No more action to undo"}));
+		assertEquals("No more action to undo", test.getFeedback());
 	}
 	
 	@Test
@@ -41,10 +40,10 @@ public class LogicUnitTest {
 		TaskieLogic.logic().execute("coffee");
 		
 		test = TaskieLogic.logic().execute("redo");
-		// assertTrue(Arrays.equals(test[1], new String[]{"1. pizza"}));
+
 		// Boundary testing
 		test = TaskieLogic.logic().execute("redo");
-		assertTrue(Arrays.equals(test[0], new String[]{"No more action to redo"}));
+		assertEquals("No more action to redo", test.getFeedback());
 	}
 
 }
