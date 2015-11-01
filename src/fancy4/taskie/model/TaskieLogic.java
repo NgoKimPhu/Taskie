@@ -110,10 +110,10 @@ public class TaskieLogic {
 			main.add(task);
 		}
 		Calendar cal = Calendar.getInstance();
-		cal.add(cal.DATE, -1);
+		cal.add(Calendar.DATE, -1);
 		int index = 0, save = 0;
 		for (int i = 0; i < 3; i++) {
-			cal.add(cal.DATE, 1);
+			cal.add(Calendar.DATE, 1);
 			Date date = cal.getTime();
 			ArrayList<IndexTaskPair> todayTasks = new ArrayList<IndexTaskPair>();
 			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.EVENT, date));
@@ -202,8 +202,6 @@ public class TaskieLogic {
 		SimpleDateFormat sdf = new SimpleDateFormat("E dd-MM HH:mm");
 		SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
 		SimpleDateFormat sdf3 = new SimpleDateFormat("dd-MM-YYYY");
-		Calendar c1 = Calendar.getInstance();
-		Calendar c2 = Calendar.getInstance();
 		boolean isSameDay = false;
 		int index = 0;
 		for (TaskieTask task : taskList) {

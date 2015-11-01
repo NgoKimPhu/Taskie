@@ -88,6 +88,7 @@ public final class TaskieParser {
 		return parser;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private TaskieParser() {
 		STRING_COMMANDS = new ArrayList[TaskieEnum.Actions.values().length];
 		for (int i = 0; i < STRING_COMMANDS.length; i++){

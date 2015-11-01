@@ -6,8 +6,6 @@ package fancy4.taskie.model;
  */
 import java.util.*;
 import java.io.*;
-import java.nio.file.Files;
-import java.util.regex.*;
 import java.text.*;
 import java.util.logging.*;
 
@@ -27,7 +25,6 @@ public class TaskieStorage {
 	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> floatPriorityMap;
 	private static Stack<HashMap<String, Object>> commandStack;
 	private static TaskComparator tc = new TaskComparator();
-	private static Logger logger = Logger.getLogger(TaskieStorage.class.getName());
 
 	public static void load(String pathName) throws Exception {
 		File folder;
@@ -978,11 +975,6 @@ class FileHandler {
 		}
 	}
 
-	private static boolean isValidDate(String string) {
-		boolean isValid = true;
-		return isValid;
-	}
-
 	private static Date getDate(String string) {
 		Date date = null;
 		Calendar calendar = Calendar.getInstance();
@@ -1015,10 +1007,6 @@ class FileHandler {
 
 	private static boolean isDeadline(int type) {
 		return type == 1;
-	}
-
-	private static boolean isFloat(int type) {
-		return type == 2;
 	}
 
 	private static TaskieEnum.TaskPriority getTaskPriority(int priority) {
