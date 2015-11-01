@@ -21,9 +21,9 @@ public class TaskieStorage {
 	private static ArrayList<TaskieTask> eventTaskList;
 	private static ArrayList<TaskieTask> deadlineTaskList;
 	private static ArrayList<TaskieTask> floatTaskList;
-	private static HashMap<Date, ArrayList<TaskieTask>> eventStartDateMap;
-	private static HashMap<Date, ArrayList<TaskieTask>> eventEndDateMap;
-	private static HashMap<Date, ArrayList<TaskieTask>> deadlineEndDateMap;
+	private static HashMap<Calendar, ArrayList<TaskieTask>> eventStartDateMap;
+	private static HashMap<Calendar, ArrayList<TaskieTask>> eventEndDateMap;
+	private static HashMap<Calendar, ArrayList<TaskieTask>> deadlineEndDateMap;
 	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> eventPriorityMap;
 	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> deadlinePriorityMap;
 	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> floatPriorityMap;
@@ -48,9 +48,9 @@ public class TaskieStorage {
 		}
 		taskList = new File(folder, "/taskList.json");
 		// System.out.println(folder.toPath());
-		eventStartDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
-		eventEndDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
-		deadlineEndDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
+		eventStartDateMap = new HashMap<Calendar, ArrayList<TaskieTask>>();
+		eventEndDateMap = new HashMap<Calendar, ArrayList<TaskieTask>>();
+		deadlineEndDateMap = new HashMap<Calendar, ArrayList<TaskieTask>>();
 		eventPriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
 		deadlinePriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
 		floatPriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
@@ -141,9 +141,9 @@ public class TaskieStorage {
 		deadlineTaskList = new ArrayList<TaskieTask>();
 		;
 		floatTaskList = new ArrayList<TaskieTask>();
-		eventStartDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
-		eventEndDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
-		deadlineEndDateMap = new HashMap<Date, ArrayList<TaskieTask>>();
+		eventStartDateMap = new HashMap<Calendar, ArrayList<TaskieTask>>();
+		eventEndDateMap = new HashMap<Calendar, ArrayList<TaskieTask>>();
+		deadlineEndDateMap = new HashMap<Calendar, ArrayList<TaskieTask>>();
 		eventPriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
 		deadlinePriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
 		floatPriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
@@ -343,7 +343,7 @@ public class TaskieStorage {
 	}
 
 	// index 0-eventdeadline 1-float
-	public static ArrayList<TaskieTask> updateFloatToDeadline(int index, Date end) throws IndexOutOfBoundsException {
+	public static ArrayList<TaskieTask> updateFloatToDeadline(int index, Calendar end) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
 			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
 		} else {
@@ -359,7 +359,7 @@ public class TaskieStorage {
 		}
 	}
 
-	public static ArrayList<TaskieTask> updateFloatToEvent(int index, Date start, Date end)
+	public static ArrayList<TaskieTask> updateFloatToEvent(int index, Calendar start, Calendar end)
 			throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
 			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
@@ -414,7 +414,7 @@ public class TaskieStorage {
 
 	}
 
-	public static ArrayList<TaskieTask> updateDeadlineToEvent(int index, Date start) throws IndexOutOfBoundsException {
+	public static ArrayList<TaskieTask> updateDeadlineToEvent(int index, Calendar start) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
 			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
 		} else {
@@ -430,7 +430,7 @@ public class TaskieStorage {
 		}
 	}
 
-	public static ArrayList<TaskieTask> updateEventDeadlineEnd(int index, Date end) throws IndexOutOfBoundsException {
+	public static ArrayList<TaskieTask> updateEventDeadlineEnd(int index, Calendar end) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
 			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
 		} else {
@@ -452,7 +452,7 @@ public class TaskieStorage {
 		}
 	}
 
-	public static ArrayList<TaskieTask> updateEventStart(int index, Date start) throws IndexOutOfBoundsException {
+	public static ArrayList<TaskieTask> updateEventStart(int index, Calendar start) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
 			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
 		} else {
@@ -468,7 +468,7 @@ public class TaskieStorage {
 		}
 	}
 
-	public static ArrayList<TaskieTask> updateEventStartEnd(int index, Date start, Date end)
+	public static ArrayList<TaskieTask> updateEventStartEnd(int index, Calendar start, Calendar end)
 			throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
 			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
@@ -510,17 +510,13 @@ public class TaskieStorage {
 
 	}
 
-	private static Date createDateKey(Date date) {
-		Calendar calendar = Calendar.getInstance();
+	private static Calendar createDateKey(Calendar calendar) {
 		Calendar calendarForKey = Calendar.getInstance();
-		calendar.clear();
 		calendarForKey.clear();
-		calendar.setTime(date);
 		calendarForKey.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
 		calendarForKey.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
 		calendarForKey.set(Calendar.DATE, calendar.get(Calendar.DATE));
-		Date key = calendarForKey.getTime();
-		return key;
+		return calendarForKey;
 	}
 
 	private static boolean isEmpty(ArrayList<TaskieTask> tasks) {
@@ -529,14 +525,14 @@ public class TaskieStorage {
 
 	private static void addToEventMap(TaskieTask task) {
 		assert TaskieTask.isEvent(task);
-		Date start = task.getStartTime();
-		Date end = task.getEndTime();
+		Calendar start = task.getStartTime();
+		Calendar end = task.getEndTime();
 		TaskieEnum.TaskPriority priority = task.getPriority();
 		if (!eventStartDateMap.containsKey(start)) {
 			eventStartDateMap.put(start, new ArrayList<TaskieTask>());
 		}
 		eventStartDateMap.get(start).add(task);
-		Date startKey = createDateKey(start);
+		Calendar startKey = createDateKey(start);
 		if (!eventStartDateMap.containsKey(startKey)) {
 			eventStartDateMap.put(startKey, new ArrayList<TaskieTask>());
 		}
@@ -545,7 +541,7 @@ public class TaskieStorage {
 			eventEndDateMap.put(end, new ArrayList<TaskieTask>());
 		}
 		eventEndDateMap.get(end).add(task);
-		Date endKey = createDateKey(task.getStartTime());
+		Calendar endKey = createDateKey(task.getStartTime());
 		if (!eventStartDateMap.containsKey(endKey)) {
 			eventStartDateMap.put(endKey, new ArrayList<TaskieTask>());
 		}
@@ -558,8 +554,8 @@ public class TaskieStorage {
 
 	private static void addToDeadlineMap(TaskieTask task) {
 		assert TaskieTask.isDeadline(task);
-		Date end = task.getEndTime();
-		Date endKey = createDateKey(end);
+		Calendar end = task.getEndTime();
+		Calendar endKey = createDateKey(end);
 		TaskieEnum.TaskPriority priority = task.getPriority();
 		if (!deadlineEndDateMap.containsKey(end)) {
 			deadlineEndDateMap.put(end, new ArrayList<TaskieTask>());
@@ -585,8 +581,8 @@ public class TaskieStorage {
 	}
 
 	private static void removeFromEventMap(TaskieTask task) {
-		Date start = task.getStartTime();
-		Date end = task.getEndTime();
+		Calendar start = task.getStartTime();
+		Calendar end = task.getEndTime();
 		TaskieEnum.TaskPriority priority = task.getPriority();
 		eventStartDateMap.get(start).remove(task);
 		if (isEmpty(eventStartDateMap.get(start))) {
@@ -603,7 +599,7 @@ public class TaskieStorage {
 	}
 
 	private static void removeFromDeadlineMap(TaskieTask task) {
-		Date end = task.getEndTime();
+		Calendar end = task.getEndTime();
 		TaskieEnum.TaskPriority priority = task.getPriority();
 		deadlineEndDateMap.get(end).remove(task);
 		if (isEmpty(deadlineEndDateMap.get(end))) {
@@ -623,9 +619,9 @@ public class TaskieStorage {
 		}
 	}
 
-	private static void addToStartDateMap(HashMap<Date, ArrayList<TaskieTask>> map, TaskieTask task) {
+	private static void addToStartDateMap(HashMap<Calendar, ArrayList<TaskieTask>> map, TaskieTask task) {
 		if (TaskieTask.isEvent(task)) {
-			Date start = task.getStartTime();
+			Calendar start = task.getStartTime();
 			if (!map.containsKey(start)) {
 				map.put(start, new ArrayList<TaskieTask>());
 			}
@@ -633,8 +629,8 @@ public class TaskieStorage {
 		}
 	}
 
-	private static void addToEndDateMap(HashMap<Date, ArrayList<TaskieTask>> map, TaskieTask task) {
-		Date end = task.getEndTime();
+	private static void addToEndDateMap(HashMap<Calendar, ArrayList<TaskieTask>> map, TaskieTask task) {
+		Calendar end = task.getEndTime();
 		if (!map.containsKey(end)) {
 			map.put(end, new ArrayList<TaskieTask>());
 		}
@@ -649,9 +645,9 @@ public class TaskieStorage {
 		map.get(priority).add(task);
 	}
 
-	private static void removeFromStartDateMap(HashMap<Date, ArrayList<TaskieTask>> map, TaskieTask task) {
+	private static void removeFromStartDateMap(HashMap<Calendar, ArrayList<TaskieTask>> map, TaskieTask task) {
 		if (TaskieTask.isEvent(task)) {
-			Date start = task.getStartTime();
+			Calendar start = task.getStartTime();
 			map.get(start).remove(task);
 			if (isEmpty(map.get(start))) {
 				map.remove(start);
@@ -659,8 +655,8 @@ public class TaskieStorage {
 		}
 	}
 
-	private static void removeFromEndDateMap(HashMap<Date, ArrayList<TaskieTask>> map, TaskieTask task) {
-		Date end = task.getStartTime();
+	private static void removeFromEndDateMap(HashMap<Calendar, ArrayList<TaskieTask>> map, TaskieTask task) {
+		Calendar end = task.getStartTime();
 		map.get(end).remove(task);
 		if (isEmpty(map.get(end))) {
 			map.remove(end);
@@ -724,8 +720,8 @@ class FileHandler {
 					JSONObject taskData = taskLine.getJSONObject("event");
 					String title = taskData.getString("title");
 					TaskieEnum.TaskType type = getTaskType(taskData.getInt("type"));
-					Date start = getDate(taskData.getString("start-time"));
-					Date end = getDate(taskData.getString("end-time"));
+					Calendar start = getDate(taskData.getString("start-time"));
+					Calendar end = getDate(taskData.getString("end-time"));
 					TaskieEnum.TaskPriority priority = getTaskPriority(taskData.getInt("priority"));
 					boolean status = taskData.getBoolean("status");
 					String description = taskData.getString("description");
@@ -736,7 +732,7 @@ class FileHandler {
 					JSONObject taskData = taskLine.getJSONObject("event");
 					String title = taskData.getString("title");
 					TaskieEnum.TaskType type = getTaskType(taskData.getInt("type"));
-					Date end = getDate(taskData.getString("end-time"));
+					Calendar end = getDate(taskData.getString("end-time"));
 					TaskieEnum.TaskPriority priority = getTaskPriority(taskData.getInt("priority"));
 					boolean status = taskData.getBoolean("status");
 					String description = taskData.getString("description");
@@ -883,8 +879,7 @@ class FileHandler {
 		}
 	}
 
-	private static Date getDate(String string) {
-		Date date = null;
+	private static Calendar getDate(String string) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.clear();
 		String[] splitString = string.split(" ");
@@ -896,8 +891,7 @@ class FileHandler {
 		int hour = Integer.valueOf(hourMinute[0]);
 		int minute = Integer.valueOf(hourMinute[1]);
 		calendar.set(year, month, day, hour, minute);
-		date = calendar.getTime();
-		return date;
+		return calendar;
 	}
 
 	private static TaskieEnum.TaskType getTaskType(int type) {
