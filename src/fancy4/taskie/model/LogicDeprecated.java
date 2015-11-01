@@ -16,9 +16,9 @@ import java.util.Date;
 import java.util.Stack;
 import java.util.logging.Logger;
 
-public class Logic {
+public class LogicDeprecated {
 
-	private static Logic logic;
+	private static TaskieLogic logic;
 	
 	private Comparator<IndexTaskPair> comparator;
 	private ArrayList<TaskieTask> searchResult;
@@ -32,21 +32,20 @@ public class Logic {
 	private ArrayList<ArrayList<String>> all;
 	private boolean isUndoAction;
 	private TaskieAction searchSave;
-	private String feedback;
 
 	private DateFormat df = DateFormat.getDateInstance();
 	
 	private final Logger log = Logger.getLogger( TaskieLogic.class.getName() );
 	
-	public static Logic logic() {
+	public static TaskieLogic logic() {
 		if (logic == null) {
-			logic = new Logic();
+			logic = new TaskieLogic();
 		}
 		return logic;
 	}
 
 	/* Constructor */
-	protected Logic() {
+	protected LogicDeprecated() {
 		initialise();
 	}
 	
@@ -98,30 +97,10 @@ public class Logic {
 			action.getType() != TaskieEnum.Actions.REDO) {
 			redoStack.clear();
 		}
-		takeAction(action);	
-		return output();
+		String[][] screen = takeAction(action);	
+		return output(screen);
 	}
-
-	private LogicOutput output() {
-		if (searchSave != null) {
-			takeAction(searchSave);
-		}
-		main = format(0, mainTasks);
-
-		all.clear();
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.DATE, -1);
-		for (int i = 0; i < 2; i++) {
-			cal.add(Calendar.DATE, 1);
-			Date date = cal.getTime();
-			ArrayList<IndexTaskPair> day = TaskieStorage.searchTask(date);
-			allTasks.addAll(day);
-			all.add(format(all.size(), day));
-		}
-		
-		return new LogicOutput(feedback, main, all);
-	}
-/*	
+/*
 	private LogicOutput output(String[][] screen) throws UnrecognisedCommandException {
 		all.clear();
 		main.clear();
@@ -132,12 +111,15 @@ public class Logic {
 			main.add(task);
 		}
 		Calendar cal = Calendar.getInstance();
-		cal.add(cal.DATE, -1);
+		cal.add(Calendar.DATE, -1);
 		
-		
+		/*
+=======
+		cal.add(Calendar.DATE, -1);
+>>>>>>> ef3f3bf0b5af09cf337208a9b19a9ba1418d7b0d
 		int index = 0, save = 0;
 		for (int i = 0; i < 3; i++) {
-			cal.add(cal.DATE, 1);
+			cal.add(Calendar.DATE, 1);
 			Date date = cal.getTime();
 			ArrayList<IndexTaskPair> todayTasks = new ArrayList<IndexTaskPair>();
 			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.EVENT, date));
@@ -167,43 +149,44 @@ public class Logic {
 			mainTasks.add(new IndexTaskPair(indexSave.get(i), searchResult.get(i)));
 		}
 		//Collections.sort(allTasks, comparator);
-		 
+		 */
 		return new LogicOutput(feedback, main, all);
 	}
-*/
-	private void takeAction(TaskieAction action) {
+
+	private String[][] takeAction(TaskieAction action) {
 		try {
 			switch (action.getType()) {
 			case ADD:
-				add(action.getTask());
+				return add(action.getTask());
 			case DELETE:
 				/*if (action.getTask() != null) {
 					retrieve(action.getTaskType());
 				}
 				return delete(action.getTaskType(), action.getIndex());*/
-				delete(action.getScreen(), action.getIndex() - 1);
+				return delete(action.getScreen(), action.getIndex() - 1);
 			case DELETEALL:
-				deleteAll();
+				return deleteAll();
 			case SEARCH:
 				searchSave = action;
-				search(action);
+				return search(action);
 			case UPDATE:
-				update(action.getIndex() - 1, action.getTask());
+				return update(action.getIndex() - 1, action.getTask());
 			case MARKDONE:
-				markdone(action.getScreen(), action.getIndex() - 1);
+				return markdone(action.getScreen(), action.getIndex() - 1);
 			case UNDO:
-				undo();
+				return undo();
 			case REDO:
-				redo();
+				return redo();
 			case RESET:
-				reset();
+				return reset();
 			case EXIT:
 				exit();
 			default:
-				add(action.getTask());
+				return add(action.getTask());
 			}
 		} catch (UnrecognisedCommandException e) {
 			System.err.println("Unrecognised Command");
+			return new String[][] {{"Fatal error"}, {""}, {""}, {""}};
 		}
 	}
 	
@@ -214,14 +197,27 @@ public class Logic {
 	 * 
 	 * 
 	 */
-	private ArrayList<String> format(int index, ArrayList<IndexTaskPair> list) {
-		ArrayList<String> formatted = new ArrayList<String>();
+	private String[][] display(Collection<TaskieTask> taskList, String message) {
+		String[] feedback = new String[] {message};
+		String[] tasks = toStringArray(taskList);
+		String[] deadlines = toStringArray(retrieveTaskList(TaskieEnum.TaskType.DEADLINE));
+		String[] floats = toStringArray(retrieveTaskList(TaskieEnum.TaskType.FLOAT));
+		return new String[][] { feedback, tasks, deadlines, floats };
+	}
+
+	private String[] toStringArray(Collection<TaskieTask> taskList) {
+		String[] ary = new String[taskList.size()];
 		SimpleDateFormat sdf = new SimpleDateFormat("E dd-MM HH:mm");
 		SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
 		SimpleDateFormat sdf3 = new SimpleDateFormat("dd-MM-YYYY");
-		for (IndexTaskPair pair : list) {
-			index++;
-			TaskieTask task = pair.getTask();
+<<<<<<< HEAD
+		Calendar c1 = Calendar.getInstance();
+		Calendar c2 = Calendar.getInstance();
+=======
+		boolean isSameDay = false;
+>>>>>>> ef3f3bf0b5af09cf337208a9b19a9ba1418d7b0d
+		int index = 0;
+		for (TaskieTask task : taskList) {
 			Date st = task.getStartTime();
 			Date et = task.getEndTime();
 			boolean isSameDay = false;
@@ -242,14 +238,14 @@ public class Logic {
 				set = " -- ";
 			}
 			if (isSameDay) {
-				formatted.add(new String(index + ".  " + sst + " ~ " + sdf2.format(et) + "  " + task.getTitle()));
+				ary[index++] = index + ".  " + sst + " ~ " + sdf2.format(et) + "  " + task.getTitle();
 			} else {
-				formatted.add(new String(index + ".  " + sst + "  " + set + "  " + task.getTitle()));
+				ary[index++] = index + ".  " + sst + "  " + set + "  " + task.getTitle();
 			}
 		}
-		return formatted;
+		return ary;
 	}
-/*	
+	
 	private ArrayList<IndexTaskPair> powerRetrieve(TaskieEnum.TaskType type) {
 		switch (type) {
 			case DEADLINE:
@@ -281,7 +277,7 @@ public class Logic {
 				}
 				Collections.sort(deadline, comparator);
 				return deadline;
-				
+				*/
 			default:
 				return new ArrayList<IndexTaskPair>();
 		}
@@ -307,7 +303,7 @@ public class Logic {
 		searchResult = retrieveTaskList(type);
 		indexSave = retrieveIndexList(type);
 	}
-*/
+
 	private void exit() {
 		System.exit(0);
 	}
@@ -319,8 +315,9 @@ public class Logic {
 	 * Including add, delete, search, update.
 	 * 
 	 */
-	private void add(TaskieTask task) {
+	private String[][] add(TaskieTask task) {
 		TaskieStorage.addTask(task);
+		retrieve(task.getType());
 		
 		if (!isUndoAction) {
 			// TaskieTask undo = new TaskieTask("");
@@ -330,43 +327,76 @@ public class Logic {
 			undoStack.push(undoAction);
 		}
 		
-		feedback = new String("\"" + task.getTitle() + "\"" + " is added");
+		String feedback = new String("\"" + task.getTitle() + "\"" + " is added");
+		return display(searchResult, feedback);
 	}
-	
-	private void delete(String screen, int index) throws UnrecognisedCommandException {
+/*
+	private String[][] delete(TaskieEnum.TaskType type, int index) {
 		try {
-			TaskieEnum.TaskType type;
-			int realIndex;
-			if (screen.equalsIgnoreCase("left")) {
-				type = mainTasks.get(index).getTask().getType();
-				realIndex = mainTasks.get(index).getIndex();
-				mainTasks.remove(index);
-				//searchResult.remove(index);
-				//indexSave.remove(index);
-			} else if (screen.equalsIgnoreCase("right")) {
-				type = allTasks.get(index).getTask().getType();
-				realIndex = allTasks.get(index).getIndex();
-				allTasks.remove(index);
-			} else {
-				throw new UnrecognisedCommandException("Screen preference not indicated.");
+			if (type != null) {
+				retrieve(type);
 			}
-			
-			TaskieTask deleted = TaskieStorage.deleteTask(realIndex, type);
+			int id = indexSave.get(index - 1);
+			type = searchResult.get(index - 1).getType();
+			TaskieTask deleted = TaskieStorage.deleteTask(id, type);
 			String title = deleted.getTitle();
 			
-			feedback = new String("\"" + title + "\"" + " is deleted");
+			assert title.equals(searchResult.get(index - 1).getTitle());
+			
+			// updating the real id
+			retrieve(type);
 			
 			// Construct undo action
 			if (!isUndoAction) {
 				TaskieAction action = new TaskieAction(TaskieEnum.Actions.ADD, deleted);
 				undoStack.push(action);
 			}
+			
+			String feedback = new String("\"" + title + "\"" + " is deleted");
+			return display(searchResult, feedback);
 		} catch (IndexOutOfBoundsException e) {
-			feedback = new String("Invalid index number");
+			String feedback = "Could not find index " + index;
+			return display(searchResult, feedback);
+		}
+	}
+*/
+	private String[][] delete(String screen, int index) throws UnrecognisedCommandException {
+		try {
+		TaskieEnum.TaskType type;
+		int realIndex;
+		if (screen.equalsIgnoreCase("left")) {
+			type = mainTasks.get(index).getTask().getType();
+			realIndex = mainTasks.get(index).getIndex();
+			mainTasks.remove(index);
+			searchResult.remove(index);
+			indexSave.remove(index);
+		} else if (screen.equalsIgnoreCase("right")) {
+			type = allTasks.get(index).getTask().getType();
+			realIndex = allTasks.get(index).getIndex();
+			allTasks.remove(index);
+		} else {
+			throw new UnrecognisedCommandException("Screen preference not indicated.");
+		}
+		
+		TaskieTask deleted = TaskieStorage.deleteTask(realIndex, type);
+		String title = deleted.getTitle();
+		//retrieve(type);
+		
+		String feedback = new String("\"" + title + "\"" + " is deleted");
+		
+		// Construct undo action
+		if (!isUndoAction) {
+			TaskieAction action = new TaskieAction(TaskieEnum.Actions.ADD, deleted);
+			undoStack.push(action);
+		}
+					
+		return display(searchResult, feedback);
+		} catch (IndexOutOfBoundsException e) {
+			return display(searchResult, "Invalid index number");
 		}
 	}
 	
-	private void markdone(String screen, int index) throws UnrecognisedCommandException {
+	private String[][] markdone(String screen, int index) throws UnrecognisedCommandException {
 		try {
 			TaskieEnum.TaskType type;
 			String title;
@@ -383,7 +413,7 @@ public class Logic {
 				throw new UnrecognisedCommandException("Screen preference not indicated.");
 			}
 			
-			feedback = new String("\"" + title + "\"" + " is marked done");
+			String feedback = new String("\"" + title + "\"" + " is marked done");
 			TaskieStorage.markDone(realIndex, type);
 			
 			// Construct undo action
@@ -391,40 +421,52 @@ public class Logic {
 				TaskieAction action = new TaskieAction(TaskieEnum.Actions.MARKDONE, screen, index + 1);
 				undoStack.push(action);
 			}
+
+			return display(searchResult, feedback);
+			
 		} catch (IndexOutOfBoundsException e) {
-			feedback = new String("Invalid index number");
+			return display(searchResult, "Invalid index number");
 		}
 	}
 	
-	private void search(TaskieAction action) throws UnrecognisedCommandException {
-		searchSave = null;
+	private String[][] search(TaskieAction action) throws UnrecognisedCommandException {
 		Object searchKey = action.getSearch();
-		mainTasks = primarySearch(searchKey);
+		ArrayList<IndexTaskPair> cache = new ArrayList<IndexTaskPair>();
+		cache.addAll(primarySearch(TaskieEnum.TaskType.FLOAT, searchKey));
+		cache.addAll(primarySearch(TaskieEnum.TaskType.DEADLINE, searchKey));
+		//cache.addAll(primarySearch(TaskieEnum.TaskType.EVENT, searchKey));
+		searchResult.clear();
+		indexSave.clear();
+		for (IndexTaskPair pair : cache) {
+			searchResult.add(pair.getTask());
+			indexSave.add(pair.getIndex());
+		}
 		double time = Math.random() * Math.random() / 1000;
-		feedback = new String("Search finished in " + String.format("%.5f", time) + " seconds");
+		String feedback = new String("Search finished in " + String.format("%.5f", time) + " seconds");
+		return display(searchResult, feedback);
 	}
 	
-	private ArrayList<IndexTaskPair> primarySearch(Object searchKey)
+	private ArrayList<IndexTaskPair> primarySearch(TaskieEnum.TaskType type, Object searchKey)
 			throws UnrecognisedCommandException {
 		ArrayList<IndexTaskPair> indexTaskList;
 		if (searchKey instanceof String) {
 			ArrayList<String> searchList = new ArrayList<String>();
 			searchList.add((String)searchKey);
-			indexTaskList = TaskieStorage.searchTask(searchList);
+			indexTaskList = TaskieStorage.searchTask(searchList, type);
 		} else if (searchKey instanceof Date) {
-			indexTaskList = TaskieStorage.searchTask((Date) searchKey);
+			indexTaskList = TaskieStorage.searchTask((Date) searchKey, type);
 		} else if (searchKey instanceof Integer) {
 			indexTaskList = TaskieStorage.searchTask(
-					(TaskieEnum.TaskPriority) searchKey);
+					(TaskieEnum.TaskPriority) searchKey, type);
 		} else if (searchKey instanceof Boolean) {
-			indexTaskList = TaskieStorage.searchTask((Boolean) searchKey);
+			indexTaskList = TaskieStorage.searchTask((Boolean) searchKey, type);
 		} else {
 			throw new UnrecognisedCommandException("Unrecognised search key");
 		}
 		return indexTaskList;
 	}
 
-	private void update(int index, TaskieTask task) throws UnrecognisedCommandException {
+	private String[][] update(int index, TaskieTask task) throws UnrecognisedCommandException {
 		TaskieTask undoTask = new TaskieTask((String)null);
 		if (task.getTitle() != null) {
 			TaskieStorage.updateTaskTitle(index, task.getType(), task.getTitle());
@@ -483,19 +525,23 @@ public class Logic {
 			TaskieAction action = new TaskieAction(TaskieEnum.Actions.UPDATE, index + 1, undoTask);
 			undoStack.push(action);
 		}
-		feedback = new String("Updated successfully");
+		
+		searchResult = retrieveTaskList(task.getType());
+		indexSave = retrieveIndexList(task.getType());
+		String feedback = new String("Updated successfully");
+		return display(searchResult, feedback);
 	}
 	
-	private void deleteAll() throws UnrecognisedCommandException {
-		for (int i = mainTasks.size(); i > 0; i--)
+	private String[][] deleteAll() throws UnrecognisedCommandException {
+		for (int i = searchResult.size(); i > 0; i--)
 			delete("left", i);
-		feedback = new String("All deleted");
+		String feedback = new String("All deleted");
 		undoStack.clear();
 		redoStack.clear();
-		assert mainTasks.isEmpty();
+		return display(new ArrayList<TaskieTask>(), feedback);
 	}
 	
-	private void reset() {
+	private String[][] reset() {
 		undoStack.clear();
 		redoStack.clear();
 		commandSave.clear();
@@ -504,31 +550,34 @@ public class Logic {
 		mainTasks.clear();
 		allTasks.clear();
 		TaskieStorage.deleteAll();
-		feedback = new String("Restored to factory settings");
+		String feedback = new String("Restored to factory settings");
+		return display(new ArrayList<TaskieTask>(), feedback);
 	}
 	
 	
 	/*****
 	 * Below are undo/redo methods.
 	 */
-	private void undo() {
+	private String[][] undo() {
 		isUndoAction = true;
 		if (undoStack.isEmpty()) {
-			feedback = new String("No more action to undo");
+			String feedback = "No more action to undo";
+			return display(searchResult, feedback);
 		}
 		TaskieAction action = undoStack.pop();
 		redoStack.push(commandSave.pop());
-		takeAction(action);
+		return takeAction(action);
 	}
 	
-	private void redo() {
+	private String[][] redo() {
 		isUndoAction = false;
 		if(redoStack.isEmpty()) {
-			feedback = new String("No more action to redo");
+			String feedback = "No more action to redo";
+			return display(new ArrayList<TaskieTask>(), feedback);
 		} else {
 			TaskieAction action = redoStack.pop();
 			commandSave.push(action);
-			takeAction(action);
+			return takeAction(action);
 		} 
 		
 	}
