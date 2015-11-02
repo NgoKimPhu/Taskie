@@ -11,7 +11,7 @@ public class TaskieStorageTest {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
 		}
-		//TaskieStorage.deleteAll();
+		TaskieStorage.deleteAll();
 		TaskieTask float1 = new TaskieTask("finish tutorial");
 		TaskieTask float2 = new TaskieTask("go to dinner with misaki");
 		Calendar deadline = getDate(2015, 11, 1);
@@ -30,7 +30,12 @@ public class TaskieStorageTest {
 		for(IndexTaskPair f: fs){
 			System.out.println(f.getTask().toString());
 		}
-		
+		Calendar startKey = getDate(2015, 10, 5);
+		ArrayList<IndexTaskPair> searchStart = TaskieStorage.searchStart(startKey);
+		System.out.println("start:");
+		for(IndexTaskPair f: searchStart){
+			System.out.println(f.getTask().toString());
+		}
 		//TaskieStorage.deleteTask(2, TaskieEnum.TaskType.FLOAT);
 		//TaskieStorage.deleteTask(2, TaskieEnum.TaskType.EVENT);
 
