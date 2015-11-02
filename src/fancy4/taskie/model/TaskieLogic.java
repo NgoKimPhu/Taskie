@@ -121,66 +121,13 @@ public class TaskieLogic {
 		
 		return new LogicOutput(feedback, main, all);
 	}
-/*	
-	private LogicOutput output(String[][] screen) throws UnrecognisedCommandException {
-		all.clear();
-		main.clear();
-		allTasks.clear();
-		mainTasks.clear();
-		String feedback = screen[0][0];
-		for (String task : screen[1]) {
-			main.add(task);
-		}
-		Calendar cal = Calendar.getInstance();
-		cal.add(cal.DATE, -1);
-		
-		
-		int index = 0, save = 0;
-		for (int i = 0; i < 3; i++) {
-			cal.add(cal.DATE, 1);
-			Date date = cal.getTime();
-			ArrayList<IndexTaskPair> todayTasks = new ArrayList<IndexTaskPair>();
-			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.EVENT, date));
-			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.DEADLINE, date));
-			Collections.sort(todayTasks, comparator);
-			//if (todayTasks.size() != 0) {
-				all.add(df.format(date));
-			//}
-			for (; index < todayTasks.size() + save; index++) {
-				TaskieTask task = todayTasks.get(index).getTask();
-				all.add(index+1 + "  " + task.getStartTime() + "  " + task.getEndTime() + "  " + task.getTitle());
-			}
-			save = index;
-			allTasks.addAll(todayTasks);
-		}
-		//---
-		all.add("Everything else:");
-		ArrayList<IndexTaskPair> todayTasks = new ArrayList<IndexTaskPair>();
-		todayTasks.addAll(primarySearch(TaskieEnum.TaskType.FLOAT, new String()));
-		for (; index < todayTasks.size() + save; index++) {
-			TaskieTask task = todayTasks.get(index).getTask();
-			all.add(index+1 + ".  " + task.getTitle());
-		}
-		allTasks.addAll(todayTasks);
-		//---
-		for (int i = 0; i < searchResult.size(); i++) {
-			mainTasks.add(new IndexTaskPair(indexSave.get(i), searchResult.get(i)));
-		}
-		//Collections.sort(allTasks, comparator);
-		 
-		return new LogicOutput(feedback, main, all);
-	}
-*/
+	
 	private void takeAction(TaskieAction action) {
 		try {
 			switch (action.getType()) {
 			case ADD:
 				add(action.getTask());
 			case DELETE:
-				/*if (action.getTask() != null) {
-					retrieve(action.getTaskType());
-				}
-				return delete(action.getTaskType(), action.getIndex());*/
 				delete(action.getScreen(), action.getIndex() - 1);
 			case DELETEALL:
 				deleteAll();
@@ -222,8 +169,8 @@ public class TaskieLogic {
 		for (IndexTaskPair pair : list) {
 			index++;
 			TaskieTask task = pair.getTask();
-			Date st = task.getStartTime();
-			Date et = task.getEndTime();
+			Calendar st = task.getStartTime();
+			Calendar et = task.getEndTime();
 			boolean isSameDay = false;
 			String sst, set;
 			
@@ -249,65 +196,7 @@ public class TaskieLogic {
 		}
 		return formatted;
 	}
-/*	
-	private ArrayList<IndexTaskPair> powerRetrieve(TaskieEnum.TaskType type) {
-		switch (type) {
-			case DEADLINE:
-			case EVENT:
-				ArrayList<TaskieTask> eventRaw = TaskieStorage.displayEventDeadline();
-				ArrayList<IndexTaskPair> event = new ArrayList<IndexTaskPair>();
-				for (int i = 0; i < eventRaw.size(); i++) {
-					TaskieTask task = eventRaw.get(i);
-					//if (task.getType().equals(TaskieEnum.TaskType.EVENT))
-						event.add(new IndexTaskPair(i, task));
-				}
-				Collections.sort(event, comparator);
-				return event;
-			case FLOAT:
-				ArrayList<TaskieTask> floatRaw = TaskieStorage.displayFloatTask();
-				ArrayList<IndexTaskPair> floatTasks = new ArrayList<IndexTaskPair>();
-				for (int i = 0; i < floatRaw.size(); i++)
-					floatTasks.add(new IndexTaskPair(i, floatRaw.get(i)));
-				Collections.sort(floatTasks, comparator);
-				return floatTasks;	
-				/*
-			case DEADLINE:
-				ArrayList<TaskieTask> deadlineRaw = TaskieStorage.displayEventDeadline();
-				ArrayList<IndexTaskPair> deadline = new ArrayList<IndexTaskPair>();
-				for (int i = 0; i < deadlineRaw.size(); i++) {
-					TaskieTask task = deadlineRaw.get(i);
-					if (task.getType().equals(TaskieEnum.TaskType.DEADLINE))
-						deadline.add(new IndexTaskPair(i, task));
-				}
-				Collections.sort(deadline, comparator);
-				return deadline;
-				
-			default:
-				return new ArrayList<IndexTaskPair>();
-		}
-	}
-	
-	private ArrayList<TaskieTask> retrieveTaskList(TaskieEnum.TaskType type) {
-		ArrayList<IndexTaskPair> raw = powerRetrieve(type);
-		ArrayList<TaskieTask> result = new ArrayList<TaskieTask>();
-		for (IndexTaskPair pair : raw)
-			result.add(pair.getTask());
-		return result;
-	}
-	
-	private ArrayList<Integer> retrieveIndexList(TaskieEnum.TaskType type) {
-		ArrayList<IndexTaskPair> raw = powerRetrieve(type);
-		ArrayList<Integer> result = new ArrayList<Integer>();
-		for (IndexTaskPair pair : raw)
-			result.add(pair.getIndex());
-		return result;
-	}
-	
-	private void retrieve(TaskieEnum.TaskType type) {
-		searchResult = retrieveTaskList(type);
-		indexSave = retrieveIndexList(type);
-	}
-*/
+
 	private void exit() {
 		System.exit(0);
 	}
@@ -323,8 +212,6 @@ public class TaskieLogic {
 		TaskieStorage.addTask(task);
 		
 		if (!isUndoAction) {
-			// TaskieTask undo = new TaskieTask("");
-			// TODO: replace searchResult with allTasksInRightWindow_List
 			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, "left", searchResult.indexOf(task) + 1);
 			undoAction.setTaskType(task.getType());
 			undoStack.push(undoAction);
@@ -351,7 +238,7 @@ public class TaskieLogic {
 				throw new UnrecognisedCommandException("Screen preference not indicated.");
 			}
 			
-			TaskieTask deleted = TaskieStorage.deleteTask(realIndex, type);
+			TaskieTask deleted = TaskieStorage.deleteTask(realIndex);
 			String title = deleted.getTitle();
 			
 			feedback = new String("\"" + title + "\"" + " is deleted");
@@ -384,7 +271,7 @@ public class TaskieLogic {
 			}
 			
 			feedback = new String("\"" + title + "\"" + " is marked done");
-			TaskieStorage.markDone(realIndex, type);
+			TaskieStorage.markDone(realIndex);
 			
 			// Construct undo action
 			if (!isUndoAction) {
@@ -426,8 +313,9 @@ public class TaskieLogic {
 
 	private void update(int index, TaskieTask task) throws UnrecognisedCommandException {
 		TaskieTask undoTask = new TaskieTask((String)null);
+		Calendar startTime, endTime;
 		if (task.getTitle() != null) {
-			TaskieStorage.updateTaskTitle(index, task.getType(), task.getTitle());
+			TaskieStorage.updateTaskTitle(index, task.getTitle());
 			// undoTask: new task with old title
 			undoTask.setTitle(searchResult.get(index).getTitle());
 		} else if (task.getType() == TaskieEnum.TaskType.FLOAT &&
@@ -445,8 +333,8 @@ public class TaskieLogic {
 				 	task.getStartTime() == null && task.getEndTime() == null) {
 			TaskieStorage.updateEventDeadlineToFloat(index);
 			// undoTask: float to event or deadline
-			Date startTime = searchResult.get(index).getStartTime();
-			Date endTime = searchResult.get(index).getEndTime();
+			startTime = searchResult.get(index).getStartTime();
+			endTime = searchResult.get(index).getEndTime();
 			undoTask.setStartTime(startTime);
 			undoTask.setEndTime(endTime);
 			assert undoTask.getType().equals(TaskieEnum.TaskType.FLOAT);
@@ -454,8 +342,8 @@ public class TaskieLogic {
 				   task.getStartTime() == null && task.getEndTime() == null) {
 			TaskieStorage.updateEventToDeadline(index);
 			// undoTask: deadline to event
-			Date startTime = searchResult.get(index).getStartTime();
-			Date endTime = searchResult.get(index).getEndTime();
+			startTime = searchResult.get(index).getStartTime();
+			endTime = searchResult.get(index).getEndTime();
 			undoTask.setToDeadline(endTime);
 			undoTask.setStartTime(startTime);
 			assert undoTask.getType().equals(TaskieEnum.TaskType.DEADLINE);
@@ -464,8 +352,8 @@ public class TaskieLogic {
 				   task.getStartTime() != null) {
 			TaskieStorage.updateDeadlineToEvent(index, task.getStartTime());
 			// undoTask: event to deadline
-			Date startTime = searchResult.get(index).getStartTime();
-			Date endTime = searchResult.get(index).getEndTime();
+			startTime = searchResult.get(index).getStartTime();
+			endTime = searchResult.get(index).getEndTime();
 			//undoTask.setToEvent();
 		} else if (task.getEndTime() != null) {
 			TaskieStorage.updateEventDeadlineEnd(index, task.getEndTime());
