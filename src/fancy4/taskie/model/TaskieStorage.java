@@ -11,6 +11,8 @@ import java.util.logging.*;
 
 import org.json.*;
 
+import fancy4.taskie.model.TaskieEnum.TaskType;
+
 public class TaskieStorage {
 
 	private static File eventDeadlineTask;
@@ -249,20 +251,28 @@ public class TaskieStorage {
 			return searchResult;
 		}
 	}
-	//search event based on start time 
-	public static ArrayList<IndexTaskPair> searchTask(Date start){
-		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
-		if(!eventStartDateMap.containsKey(start)){
-			return searchResult;
-		}else{
-			ArrayList<TaskieTask> tasks = eventStartDateMap.get(start);
-			for(TaskieTask task: tasks){
-				IndexTaskPair pair = new IndexTaskPair(eventDeadlineTaskList.indexOf(task), task);
-				searchResult.add(pair);
-			}
-			return searchResult;
-		}
+	
+	private static boolean isSameDate(Date d1, Date d2) {
+		Calendar c1 = new Calendar.Builder().setInstant(d1).build();
+		Calendar c2 = new Calendar.Builder().setInstant(d2).build();
+		return c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) &&
+				c1.get(Calendar.MONTH) == c2.get(Calendar.MONTH) &&
+				c1.get(Calendar.DATE) == c2.get(Calendar.DATE);
 	}
+	
+	public static ArrayList<IndexTaskPair> searchTask(Date date){
+		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
+		for (TaskieTask task: eventDeadlineTaskList)
+			if ((task.getType() == TaskType.DEADLINE && isSameDate(task.getEndTime(), date)) ||
+					(task.getType() == TaskType.EVENT && 
+					 task.getEndTime().compareTo(date) >= 0 &&
+					(task.getStartTime().before(date) || isSameDate(task.getStartTime(), date)))) {
+			IndexTaskPair pair = new IndexTaskPair(eventDeadlineTaskList.indexOf(task), task);
+			searchResult.add(pair);
+		}
+		return searchResult;
+	}
+	
 	// search event/deadline based on end time
 	public static ArrayList<IndexTaskPair> searchTask(Date end, TaskieEnum.TaskType type){
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();

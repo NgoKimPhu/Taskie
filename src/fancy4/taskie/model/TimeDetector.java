@@ -28,8 +28,8 @@ class TimeDetector {
 	private static final String PATTERN_TIMERANGE_FORMAT = "(?:fr(?:om)?\\s?)?"
 		+ "(?:%1$s)\\s?(?:%2$s)?\\s?(?:-|~|to|till|until)?\\s?(?:%2$s)?\\s?(?:%1$s)";
 	
-	private  final Map<String, Integer> MAP_WEEKDAYS = initWeekdaysMap();
-	private  final Map<String, Integer> MAP_MONTHS = initMonthsMap();
+	private final Map<String, Integer> MAP_WEEKDAYS = initWeekdaysMap();
+	private final Map<String, Integer> MAP_MONTHS = initMonthsMap();
 	
 	private  Map<String, Integer> initWeekdaysMap() {
 		Map<String, Integer> map = new HashMap<String, Integer>();

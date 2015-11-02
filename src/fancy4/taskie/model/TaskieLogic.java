@@ -5,7 +5,6 @@ package fancy4.taskie.model;
  *
  */
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,8 +30,6 @@ public class TaskieLogic {
 	private ArrayList<String> main;
 	private ArrayList<String> all;
 	private boolean isUndoAction;
-
-	private DateFormat df = DateFormat.getDateInstance();
 	
 	private final Logger log = Logger.getLogger( TaskieLogic.class.getName() );
 	
@@ -110,31 +107,31 @@ public class TaskieLogic {
 			main.add(task);
 		}
 		Calendar cal = Calendar.getInstance();
+		cal = new Calendar.Builder().setDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
+				cal.get(Calendar.DAY_OF_MONTH)).build();
 		cal.add(Calendar.DATE, -1);
 		int index = 0, save = 0;
 		for (int i = 0; i < 3; i++) {
 			cal.add(Calendar.DATE, 1);
 			Date date = cal.getTime();
-			ArrayList<IndexTaskPair> todayTasks = new ArrayList<IndexTaskPair>();
-			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.EVENT, date));
-			todayTasks.addAll(primarySearch(TaskieEnum.TaskType.DEADLINE, date));
+			ArrayList<IndexTaskPair> todayTasks = primarySearch(null, date);
+			System.err.println(todayTasks.size());
 			Collections.sort(todayTasks, comparator);
-			//if (todayTasks.size() != 0) {
-				all.add(df.format(date));
-			//}
+			all.add(" -- " + new String[]{"Today","Tomorrow","The day after tomorrow"}[i] + " -- ");
 			for (; index < todayTasks.size() + save; index++) {
-				TaskieTask task = todayTasks.get(index).getTask();
-				all.add(index+1 + "  " + task.getStartTime() + "  " + task.getEndTime() + "  " + task.getTitle());
+				TaskieTask task = todayTasks.get(index - save).getTask();
+				all.add(index+1 + ". " /*+ (task.getStartTime()!=null?task.getStartTime()+ "~":"")
+						+ task.getEndTime() + "  "*/ + task.getTitle());
 			}
 			save = index;
 			allTasks.addAll(todayTasks);
 		}
 		//---
-		all.add("Everything else:");
+		all.add(" -- Everything else --");
 		ArrayList<IndexTaskPair> todayTasks = new ArrayList<IndexTaskPair>();
 		todayTasks.addAll(primarySearch(TaskieEnum.TaskType.FLOAT, new String()));
 		for (; index < todayTasks.size() + save; index++) {
-			TaskieTask task = todayTasks.get(index).getTask();
+			TaskieTask task = todayTasks.get(index - save).getTask();
 			all.add(index+1 + ".  " + task.getTitle());
 		}
 		allTasks.addAll(todayTasks);
@@ -440,7 +437,7 @@ public class TaskieLogic {
 			searchList.add((String)searchKey);
 			indexTaskList = TaskieStorage.searchTask(searchList, type);
 		} else if (searchKey instanceof Date) {
-			indexTaskList = TaskieStorage.searchTask((Date) searchKey, type);
+			indexTaskList = TaskieStorage.searchTask((Date) searchKey);
 		} else if (searchKey instanceof Integer) {
 			indexTaskList = TaskieStorage.searchTask(
 					(TaskieEnum.TaskPriority) searchKey, type);
@@ -491,10 +488,10 @@ public class TaskieLogic {
 		} else if (task.getType() == TaskieEnum.TaskType.DEADLINE &&
 				   task.getStartTime() != null) {
 			TaskieStorage.updateDeadlineToEvent(index, task.getStartTime());
-			// undoTask: event to deadline
+			/*// undoTask: event to deadline
 			Date startTime = searchResult.get(index).getStartTime();
 			Date endTime = searchResult.get(index).getEndTime();
-			//undoTask.setToEvent();
+			*///undoTask.setToEvent();
 		} else if (task.getEndTime() != null) {
 			TaskieStorage.updateEventDeadlineEnd(index, task.getEndTime());
 		} else if (task.getType() == TaskieEnum.TaskType.EVENT &&
