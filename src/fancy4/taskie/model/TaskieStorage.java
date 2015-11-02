@@ -837,6 +837,20 @@ class FreeSlotTable{
 	public void block(Calendar start, Calendar end){
 		
 	}
+	public static void refreshCurrent(){
+		today = Calendar.getInstance();			
+	}
+	private void refreshTodaySlot(){
+		ArrayList<CalendarPair> day = this.table.get(0);
+		if(day.size()==1){
+			CalendarPair blockedSlot = day.get(0);
+			if(today.after(blockedSlot)){
+				blockedSlot.setEnd(today);
+			}
+		}else{
+			
+		}
+	}
 	private static void block(ArrayList<CalendarPair> day, int daysAfter){
 		Calendar start = Calendar.getInstance();
 		start.clear();
