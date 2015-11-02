@@ -2,6 +2,8 @@ package fancy4.taskie.view;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 //import javafx.collections.FXCollections;
 //import javafx.collections.ObservableList;
@@ -28,19 +30,7 @@ import fancy4.taskie.model.UnrecognisedCommandException;
 
 
 public class TaskieOverviewController {
-	/*@FXML
-  private TableView<String> mainTaskTable;
-  @FXML
-  private TableColumn<String, String> taskColumn;
-  @FXML
-  private TableView<String> dTaskTable;
-  @FXML
-  private TableColumn<String, String> dTaskColumn;
-  @FXML
-  private TableView<String> fTaskTable;
-  @FXML
-  private TableColumn<String, String> fTaskColumn;
-	 */
+	ObservableList<String> mainDisplay;
 	@FXML
 	private ListView<String> MainList;
 	@FXML
@@ -60,17 +50,17 @@ public class TaskieOverviewController {
 
 	private MainApp mainApp;
 
-	private String textOutputResponse = "";
 
 	private ArrayList<ArrayList<String>> testList;
-	TreeItem<String> dummyRoot;
-	TreeItem<String> overdueNode;
+	private ArrayList<String> testMain;
+	private TreeItem<String> dummyRoot;
+	private TreeItem<String> overdueNode;
 
-	TreeItem<String> todayNode;
+	private TreeItem<String> todayNode;
 
-	TreeItem<String> tomorrowNode;
+	private TreeItem<String> tomorrowNode;
 
-	TreeItem<String> everythingElseNode;
+	private TreeItem<String> everythingElseNode;
 
 	private PseudoClass titileCell = PseudoClass.getPseudoClass("titileCell");
 	public TaskieOverviewController() {
@@ -80,21 +70,21 @@ public class TaskieOverviewController {
 	@FXML
 	private void initialize() {
 		//TaskieLogic.initialise();
-		/*
-    iniColumn(taskColumn);
-    iniColumn(dTaskColumn);
-    iniColumn(fTaskColumn);
-		 */
+
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
 				textInput.requestFocus();
 			}
 		});
-
+		mainDisplay = FXCollections.observableArrayList();
 		createTree(new ArrayList<String>());
 		setupTestList();
-		populateTree();
+		//populateTree();
+		setupCell();
+		testMain = new ArrayList<String>();
+		testMain.add("aakjhb");
+		populate(testMain, testList);
 	}
 	private void setupCell() {
 		AllTree.setCellFactory(p -> {
@@ -133,34 +123,33 @@ public class TaskieOverviewController {
 		testList.add(overdue);testList.add(today);testList.add(tomorrow);testList.add(everythingElse);
 
 	}
-	private void populateTree() {
-
-		for (String str : testList.get(0)) {
+	public void populate(ArrayList<String> main, ArrayList<ArrayList<String>> list) {
+		overdueNode.getChildren().removeAll(overdueNode.getChildren());
+		todayNode.getChildren().removeAll(todayNode.getChildren());
+		tomorrowNode.getChildren().removeAll(tomorrowNode.getChildren());
+		everythingElseNode.getChildren().removeAll(everythingElseNode.getChildren());
+		for (String str : list.get(0)) {
 			TreeItem<String> overdueLeaf = new TreeItem<String>(str);
 			overdueNode.getChildren().add(overdueLeaf);
 		}
-		for (String str : testList.get(1)) {
+		for (String str : list.get(1)) {
 			TreeItem<String> todayLeaf = new TreeItem<String>(str);
 			todayNode.getChildren().add(todayLeaf);
 		}
-		for (String str : testList.get(2)) {
+		for (String str : list.get(2)) {
 			TreeItem<String> tomorrowLeaf = new TreeItem<String>(str);
 			tomorrowNode.getChildren().add(tomorrowLeaf);
 		}
-		for (String str : testList.get(3)) {
+		for (String str : list.get(3)) {
 			TreeItem<String> everythingElseLeaf = new TreeItem<String>(str);
 			everythingElseNode.getChildren().add(everythingElseLeaf);
 		}
+		mainDisplay.removeAll(mainDisplay);
+		mainDisplay.addAll(main);
+		MainList.setItems(mainDisplay);
 	}
 
-	private void initColumn(TableColumn<String, String> column) {
-		//TaskieLogic.initialise();
-		column.setCellValueFactory(new Callback<CellDataFeatures<String, String>, ObservableValue<String>>() {
-			public ObservableValue<String> call(CellDataFeatures<String, String> p) {
-				return new SimpleStringProperty(p.getValue());
-			}
-		});
-	}
+
 
 	private void createTree(ArrayList<String> allTask) {
 		dummyRoot = new TreeItem<>("root");
@@ -193,11 +182,31 @@ public class TaskieOverviewController {
 		String input;
 		String response;
 		LogicOutput fromLogic;
-		ArrayList<String> mainData, allData;
+		ArrayList<String> mainData;
+		ArrayList<ArrayList<String>> allData; 
 		if (event.getCode() == KeyCode.ENTER) { 
 			input = textInput.getText();  
-
-
+			ArrayList<String> l1 = new ArrayList<String>();
+			l1.add("enter all1");
+			l1.add("enter all2");
+			ArrayList<String> ovd = new ArrayList<String>();
+			ovd.add("enter main1");
+			ovd.add("enter main2");
+			ArrayList<String> td = new ArrayList<String>();
+			td.add("todaasdfasdfy");
+			ArrayList<String> tmr = new ArrayList<String>();
+			tmr.add("tmr");
+			ArrayList<String> allelse = new ArrayList<String>();
+			allelse.add("everything else");
+			ArrayList<ArrayList<String>> all = new ArrayList<ArrayList<String>>();
+			all.add(ovd); all.add(td); all.add(tmr);all.add(allelse);
+			fromLogic = new LogicOutput("test", l1, all);
+			response = fromLogic.getFeedback();
+			mainData = fromLogic.getMain();
+			allData = fromLogic.getAll();
+			
+			populate(testMain, allData);
+			textInput.clear();
 			/*try {
 				fromLogic = TaskieLogic.logic().execute(input);
 				mainData = fromLogic.getMain();
@@ -223,15 +232,7 @@ public class TaskieOverviewController {
 
 			 */
 
-			/*  mainData = fromLogic[1];
-      dData = fromLogic[2];
-      fData = fromLogic[3];
-      response =  fromLogic[0][0] ;
 
-      updateMainTable(mainData);
-      updateDTable(dData);
-      updateFTable(fData);
-			 */
 			//  textOutputResponse += "> " + input + "\n" + response + "\n";
 
 
@@ -241,55 +242,12 @@ public class TaskieOverviewController {
 		}
 
 	}
-	/*
-  public void updateMainTable(String[] data) {
-
-    if (data == null) { 
-
-    } else {
-      mainTaskTable.getItems().removeAll(mainApp.getTaskData());
-      mainTaskTable.getItems().addAll(data);
-    }
-  }
-  public void updateDTable(String[] data) {
-
-    if (data == null) {     
-    } else {
-      dTaskTable.getItems().removeAll(mainApp.getDTaskData());
-      dTaskTable.getItems().addAll(data);
-    }
-  }
-
-  public void updateFTable(String[] data) {
-    if (data == null) { 
-    } else {
-      fTaskTable.getItems().removeAll(mainApp.getFTaskData());
-      fTaskTable.getItems().addAll(data);
-    }
-  }
-	 */
 
 
 	public void setMainApp(MainApp mainApp) {
 		this.mainApp = mainApp;
-
-		// Add observable list data to the table
-		MainList.setItems(mainApp.getMainDisplay());
-		AllList.setItems(mainApp.getAllDisplay());
-		//fTaskTable.setItems(mainApp.getFTaskData());
-
 	}
 
-	public static class Task {
-		private final SimpleStringProperty content;
 
-		private Task(SimpleStringProperty logicOutput) {
-			this.content = logicOutput;
-		}
-
-		private String getContent() {
-			return this.content.get();
-		}
-	}
 }
 
