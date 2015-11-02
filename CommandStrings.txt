@@ -6,8 +6,8 @@ redo
 clear clr
 search find view display
 sort
-markdone
-update
+markdone done finish
+update edit
 displayall viewall
 reset
 exit
