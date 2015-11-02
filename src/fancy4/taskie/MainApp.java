@@ -1,3 +1,7 @@
+/**
+ * @author Lu Yu
+ *
+ */
 package fancy4.taskie;
 
 import java.io.IOException;
@@ -36,25 +40,11 @@ public class MainApp extends Application {
 	public static ArrayList<String> tmrData = new ArrayList<String>();
 	public static ArrayList<String> elseData = new ArrayList<String>();
 
-	/* public static String[] mdata = {};
-    public static String[] ddata = {};
-    public static String[] fdata = {};
-	 */
 	public MainApp() {
-		//data = TaskieLogic.execute("add order a pizza")[0];
-		//TaskieLogic.initialise();
 		TaskieLogic.logic().initialise();
-	
-
 	}
 
 
-	/* public static void refresh(String cmd) {
-
-    	String[] data = TaskieLogic.execute(cmd);
-    	taskData.addAll(data);
-    	System.out.println("refreshed");
-    }*/
 
 	@Override
 	public void start(Stage primaryStage) {

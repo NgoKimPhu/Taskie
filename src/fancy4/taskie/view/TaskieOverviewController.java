@@ -1,3 +1,7 @@
+/**
+ * @author Lu Yu
+ *
+ */
 package fancy4.taskie.view;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
