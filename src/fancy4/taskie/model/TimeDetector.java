@@ -75,7 +75,7 @@ class TimeDetector {
 		
 		startTime = Calendar.getInstance();
 		endTime = Calendar.getInstance();
-		startTime.set(Calendar.HOUR_OF_DAY, 12);
+		startTime.set(Calendar.HOUR_OF_DAY, 0);
 		startTime.set(Calendar.MINUTE, 0);
 		startTime.set(Calendar.SECOND, 0);
 		endTime.set(Calendar.HOUR_OF_DAY, 23);
@@ -198,6 +198,7 @@ class TimeDetector {
 	}
 	
 	private void setTime(Calendar time, int groupOffset) {
+		time.set(Calendar.MINUTE, 0);
 		if (matcher.group(groupOffset) != null) { // (\d{1,2})
 			int hour = Integer.parseInt(matcher.group(groupOffset));
 			if (matcher.group(groupOffset + 2) != null) { // (am|pm)
