@@ -26,7 +26,7 @@ public class MainApp extends Application {
     public static ObservableList<String> mainDisplay = FXCollections.observableArrayList();
     public static ObservableList<String> allDisplay = FXCollections.observableArrayList();
     public static ArrayList<String> mainData = new ArrayList<String>();
-    public static ArrayList<String> allData = new ArrayList<String>();
+    public static ArrayList<ArrayList<String>> allData = new ArrayList<ArrayList<String>>();
     
    /* public static String[] mdata = {};
     public static String[] ddata = {};
@@ -42,17 +42,19 @@ public class MainApp extends Application {
     private void iniAllTable() {
     	
     	LogicOutput iniDisplay;
-		try {
+		/*try {
 			iniDisplay = TaskieLogic.logic().execute("search");
 			mainData = iniDisplay.getMain();
 			mainDisplay.addAll(mainData);
 			
 			allData = iniDisplay.getAll();
-			allDisplay.addAll(allData);
+			//allDisplay.addAll(allData);
 		} catch (UnrecognisedCommandException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
+    	
+    	
 		/*ArrayList<String> l1 = new ArrayList<String>();
 		l1.add("all1");
 		l1.add("all2");

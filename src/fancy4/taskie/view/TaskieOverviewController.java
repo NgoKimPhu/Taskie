@@ -2,6 +2,7 @@ package fancy4.taskie.view;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.css.PseudoClass;
 //import javafx.collections.FXCollections;
 //import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -11,6 +12,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
@@ -70,7 +72,7 @@ public class TaskieOverviewController {
 
 	TreeItem<String> everythingElseNode;
 
-
+	private PseudoClass titileCell = PseudoClass.getPseudoClass("titileCell");
 	public TaskieOverviewController() {
 
 	}
@@ -89,10 +91,32 @@ public class TaskieOverviewController {
 				textInput.requestFocus();
 			}
 		});
+
 		createTree(new ArrayList<String>());
 		setupTestList();
 		populateTree();
 	}
+	private void setupCell() {
+		AllTree.setCellFactory(p -> {
+			return new TreeCell<String>() {
+
+				@Override
+				public void updateItem(String item, boolean empty) {
+					super.updateItem(item, empty);  
+					if (empty) {
+						setText(null);
+						pseudoClassStateChanged(titileCell, false);
+					} else {
+						setText(item);
+						boolean bool = (item.equals("Overdue") || item.equals("Today") || item.equals("Tomorrow")
+								|| item.equals("Everything Else"));
+						pseudoClassStateChanged(titileCell, bool);
+					}
+				}
+			};
+		});
+	}
+
 
 	private void setupTestList() {
 		testList = new ArrayList<ArrayList<String>> ();
@@ -104,7 +128,7 @@ public class TaskieOverviewController {
 		overdue.add("overdue1");overdue.add("overdue2");
 		today.add("today1");today.add("today2");
 		tomorrow.add("tmr1");tomorrow.add("tmr2");
-		
+
 		everythingElse.add("else1");everythingElse.add("else2");
 		testList.add(overdue);testList.add(today);testList.add(tomorrow);testList.add(everythingElse);
 
@@ -154,7 +178,7 @@ public class TaskieOverviewController {
 		tomorrowNode.setExpanded(true);
 		everythingElseNode = new TreeItem<>("Everything Else");
 		everythingElseNode.setExpanded(true);
-		
+
 
 		//root is the parent of itemChild
 		dummyRoot.getChildren().add(overdueNode);
@@ -174,7 +198,7 @@ public class TaskieOverviewController {
 			input = textInput.getText();  
 
 
-			try {
+			/*try {
 				fromLogic = TaskieLogic.logic().execute(input);
 				mainData = fromLogic.getMain();
 				allData = fromLogic.getAll();
@@ -185,7 +209,7 @@ public class TaskieOverviewController {
 			} catch (UnrecognisedCommandException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
 
 			//String[] mainData, dData, fData;
 			/*  
