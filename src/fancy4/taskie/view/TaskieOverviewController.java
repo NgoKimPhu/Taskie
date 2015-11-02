@@ -52,6 +52,7 @@ public class TaskieOverviewController {
 
 
 	private ArrayList<ArrayList<String>> testList;
+	private LogicOutput logicOut;
 	private ArrayList<String> testMain;
 	private TreeItem<String> dummyRoot;
 	private TreeItem<String> overdueNode;
@@ -69,7 +70,6 @@ public class TaskieOverviewController {
 
 	@FXML
 	private void initialize() {
-		//TaskieLogic.initialise();
 
 		Platform.runLater(new Runnable() {
 			@Override
@@ -82,9 +82,15 @@ public class TaskieOverviewController {
 		setupTestList();
 		//populateTree();
 		setupCell();
-		testMain = new ArrayList<String>();
-		testMain.add("aakjhb");
-		populate(testMain, testList);
+
+		try {
+			logicOut = TaskieLogic.logic().execute("search");
+			populate(logicOut.getMain(), logicOut.getAll());
+		} catch (UnrecognisedCommandException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 	private void setupCell() {
 		AllTree.setCellFactory(p -> {
@@ -186,7 +192,7 @@ public class TaskieOverviewController {
 		ArrayList<ArrayList<String>> allData; 
 		if (event.getCode() == KeyCode.ENTER) { 
 			input = textInput.getText();  
-			ArrayList<String> l1 = new ArrayList<String>();
+			/*ArrayList<String> l1 = new ArrayList<String>();
 			l1.add("enter all1");
 			l1.add("enter all2");
 			ArrayList<String> ovd = new ArrayList<String>();
@@ -204,40 +210,17 @@ public class TaskieOverviewController {
 			response = fromLogic.getFeedback();
 			mainData = fromLogic.getMain();
 			allData = fromLogic.getAll();
-			
-			populate(testMain, allData);
-			textInput.clear();
-			/*try {
-				fromLogic = TaskieLogic.logic().execute(input);
-				mainData = fromLogic.getMain();
-				allData = fromLogic.getAll();
-				response = fromLogic.getFeedback();
-				mainApp.updateDisplay(mainData, allData);
+			 */
+			try {
+				logicOut = TaskieLogic.logic().execute(input);
+				populate(logicOut.getMain(), logicOut.getAll());
+				response = logicOut.getFeedback();
 				textOutput.setText(response);
 				textInput.clear();
 			} catch (UnrecognisedCommandException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}*/
-
-			//String[] mainData, dData, fData;
-			/*  
-      ArrayList<String> l1 = new ArrayList<String>();
-      l1.add("enter all1");
-      l1.add("enter all2");
-      ArrayList<String> l2 = new ArrayList<String>();
-      l2.add("enter main1");
-      l2.add("enter main2");
-      fromLogic = new LogicOutput("test", l1, l2);
-
-			 */
-
-
-			//  textOutputResponse += "> " + input + "\n" + response + "\n";
-
-
-
-
+			}
 
 		}
 
