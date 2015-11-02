@@ -27,7 +27,9 @@ public class TaskieStorage {
 	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> eventPriorityMap;
 	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> deadlinePriorityMap;
 	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> floatPriorityMap;
-	private static TaskComparator tc = new TaskComparator();
+	private static EventComparator ec = new EventComparator();
+	private static DeadlineComparator dc = new DeadlineComparator();
+	private static FloatComparator fc = new FloatComparator();
 
 	public static void load(String pathName) throws Exception {
 		File folder;
@@ -96,14 +98,15 @@ public class TaskieStorage {
 		int index = allTasks.indexOf(task);
 		if (TaskieTask.isEvent(task)) {
 			eventTaskList.add(task);
-			Collections.sort(eventTaskList, tc);
+			Collections.sort(eventTaskList, ec);
 			addToEventMap(task);
 		} else if (TaskieTask.isDeadline(task)) {
 			deadlineTaskList.add(task);
-			Collections.sort(deadlineTaskList, tc);
+			Collections.sort(deadlineTaskList, dc);
 			addToDeadlineMap(task);
 		} else {// float
 			floatTaskList.add(task);
+			Collections.sort(floatTaskList, fc);
 			addToFloatMap(task);
 		}
 		rewriteFile();
@@ -168,7 +171,7 @@ public class TaskieStorage {
 	}
 
 	// search event based on start time
-	public static ArrayList<IndexTaskPair> searchTask(Date start) {
+	public static ArrayList<IndexTaskPair> searchStart(Calendar start) {
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 		if (!eventStartDateMap.containsKey(start)) {
 			return searchResult;
@@ -183,7 +186,7 @@ public class TaskieStorage {
 	}
 
 	// search event/deadline based on end time
-	public static ArrayList<IndexTaskPair> searchTask(Date end, TaskieEnum.TaskType type) {
+	public static ArrayList<IndexTaskPair> searchEnd(Calendar end, TaskieEnum.TaskType type) {
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 		if (type.equals(TaskieEnum.TaskType.EVENT)) {
 			if (!eventEndDateMap.containsKey(end)) {
@@ -212,64 +215,55 @@ public class TaskieStorage {
 		}
 	}
 
-	public static ArrayList<IndexTaskPair> searchTask(TaskieEnum.TaskPriority priority, TaskieEnum.TaskType type) {
+	public static ArrayList<IndexTaskPair> searchTask(TaskieEnum.TaskPriority priority) {
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
-		if (type.equals(TaskieEnum.TaskType.EVENT)) {
-			if (!eventPriorityMap.containsKey(priority)) {
-				return searchResult;
-			} else {
-				ArrayList<TaskieTask> tasks = eventPriorityMap.get(priority);
-				for (TaskieTask task : tasks) {
-					IndexTaskPair pair = new IndexTaskPair(eventTaskList.indexOf(task), task);
-					searchResult.add(pair);
-				}
-				return searchResult;
+		if(eventPriorityMap.containsKey(priority)){
+			ArrayList<TaskieTask> events = eventPriorityMap.get(priority);
+			for (TaskieTask task : events) {
+				IndexTaskPair pair = new IndexTaskPair(allTasks.indexOf(task), task);
+				searchResult.add(pair);
 			}
-		} else if (type.equals(TaskieEnum.TaskType.DEADLINE)) {
-			if (!deadlinePriorityMap.containsKey(priority)) {
-				return searchResult;
-			} else {
-				ArrayList<TaskieTask> tasks = deadlinePriorityMap.get(priority);
-				for (TaskieTask task : tasks) {
-					IndexTaskPair pair = new IndexTaskPair(eventTaskList.indexOf(task), task);
-					searchResult.add(pair);
-				}
-				return searchResult;
-			}
-		} else {
-			return searchResult;
 		}
+		if(deadlinePriorityMap.containsKey(priority)){
+			ArrayList<TaskieTask> deadlines = deadlinePriorityMap.get(priority);
+			for (TaskieTask task : deadlines) {
+				IndexTaskPair pair = new IndexTaskPair(allTasks.indexOf(task), task);
+				searchResult.add(pair);
+			}
+		}
+		if(floatPriorityMap.containsKey(priority)){
+			ArrayList<TaskieTask> floats = floatPriorityMap.get(priority);
+			for (TaskieTask task : floats) {
+				IndexTaskPair pair = new IndexTaskPair(allTasks.indexOf(task), task);
+				searchResult.add(pair);
+			}
+		}	
+		return searchResult;
+		
 	}
 
-	public static ArrayList<IndexTaskPair> searchTask(boolean done, TaskieEnum.TaskType type) {
+	public static ArrayList<IndexTaskPair> searchTask(boolean done) {
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
-		if (type.equals(TaskieEnum.TaskType.EVENT)) {
 			for (TaskieTask task : eventTaskList) {
 				if (TaskieTask.isEvent(task) && TaskieTask.isDone(task)) {
-					IndexTaskPair pair = new IndexTaskPair(eventTaskList.indexOf(task), task);
+					IndexTaskPair pair = new IndexTaskPair(allTasks.indexOf(task), task);
 					searchResult.add(pair);
 				}
 			}
-			return searchResult;
-		} else if (type.equals(TaskieEnum.TaskType.DEADLINE)) {
-			for (TaskieTask task : eventTaskList) {
+			for (TaskieTask task : deadlineTaskList) {
 				if (TaskieTask.isDeadline(task) && TaskieTask.isDone(task)) {
-					IndexTaskPair pair = new IndexTaskPair(eventTaskList.indexOf(task), task);
+					IndexTaskPair pair = new IndexTaskPair(allTasks.indexOf(task), task);
 					searchResult.add(pair);
 				}
 			}
-			return searchResult;
-		} else if (type.equals(TaskieEnum.TaskType.FLOAT)) {
+
 			for (TaskieTask task : floatTaskList) {
 				if (TaskieTask.isDone(task)) {
-					IndexTaskPair pair = new IndexTaskPair(eventTaskList.indexOf(task), task);
+					IndexTaskPair pair = new IndexTaskPair(allTasks.indexOf(task), task);
 					searchResult.add(pair);
 				}
 			}
 			return searchResult;
-		} else {
-			return searchResult;
-		}
 	}
 
 	public static ArrayList<TaskieTask> markDone(int index) throws IndexOutOfBoundsException {
@@ -351,7 +345,7 @@ public class TaskieStorage {
 			task.setToDeadline(end);
 			deadlineTaskList.add(task);
 			addToDeadlineMap(task);
-			Collections.sort(deadlineTaskList, tc);
+			Collections.sort(deadlineTaskList, dc);
 			rewriteFile();
 			return allTasks;
 		}
@@ -368,7 +362,7 @@ public class TaskieStorage {
 			task.setToEvent(start, end);
 			eventTaskList.add(task);
 			addToEventMap(task);
-			Collections.sort(eventTaskList, tc);
+			Collections.sort(eventTaskList, ec);
 			rewriteFile();
 			return allTasks;
 		}
@@ -389,7 +383,7 @@ public class TaskieStorage {
 			task.setToFloat();
 			floatTaskList.add(task);
 			addToFloatMap(task);
-			Collections.sort(floatTaskList, tc);
+			Collections.sort(floatTaskList, fc);
 			rewriteFile();
 			return allTasks;
 		}
@@ -404,7 +398,7 @@ public class TaskieStorage {
 			removeFromEventMap(task);
 			task.setToDeadline(task.getEndTime());
 			deadlineTaskList.add(task);
-			Collections.sort(deadlineTaskList, tc);
+			Collections.sort(deadlineTaskList, dc);
 			addToDeadlineMap(task);
 			rewriteFile();
 			return allTasks;
@@ -421,7 +415,7 @@ public class TaskieStorage {
 			removeFromDeadlineMap(task);
 			task.setToEvent(start, task.getEndTime());
 			eventTaskList.add(task);
-			Collections.sort(eventTaskList, tc);
+			Collections.sort(eventTaskList, ec);
 			addToEventMap(task);
 			rewriteFile();
 			return allTasks;
@@ -459,7 +453,7 @@ public class TaskieStorage {
 				removeFromStartDateMap(eventStartDateMap, task);
 				task.setStartTime(start);
 				addToStartDateMap(eventStartDateMap, task);
-				Collections.sort(eventTaskList, tc);
+				Collections.sort(eventTaskList, ec);
 				rewriteFile();
 			}
 			return allTasks;
@@ -479,7 +473,7 @@ public class TaskieStorage {
 				task.setEndTime(end);
 				addToStartDateMap(eventStartDateMap, task);
 				addToEndDateMap(eventEndDateMap, task);
-				Collections.sort(eventTaskList, tc);
+				Collections.sort(eventTaskList, ec);
 				rewriteFile();
 			}
 			return allTasks;
@@ -540,8 +534,8 @@ public class TaskieStorage {
 		}
 		eventEndDateMap.get(end).add(task);
 		Calendar endKey = createDateKey(task.getStartTime());
-		if (!eventStartDateMap.containsKey(endKey)) {
-			eventStartDateMap.put(endKey, new ArrayList<TaskieTask>());
+		if (!eventEndDateMap.containsKey(endKey)) {
+			eventEndDateMap.put(endKey, new ArrayList<TaskieTask>());
 		}
 		eventStartDateMap.get(endKey).add(task);
 		if (!eventPriorityMap.containsKey(priority)) {
@@ -672,11 +666,11 @@ public class TaskieStorage {
 
 	private static void sortList(TaskieEnum.TaskType type) {
 		if (type.equals(TaskieEnum.TaskType.EVENT)) {
-			Collections.sort(eventTaskList, tc);
+			Collections.sort(eventTaskList, ec);
 		} else if (type.equals(TaskieEnum.TaskType.DEADLINE)) {
-			Collections.sort(deadlineTaskList, tc);
+			Collections.sort(deadlineTaskList, dc);
 		} else {
-			Collections.sort(floatTaskList, tc);
+			Collections.sort(floatTaskList, fc);
 		}
 	}
 
