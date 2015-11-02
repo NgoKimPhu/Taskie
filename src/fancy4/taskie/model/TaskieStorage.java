@@ -817,3 +817,62 @@ class FileHandler {
 		}
 	}
 }
+
+// free slot table with seven days start from today
+class FreeSlotTable{
+	private ArrayList<ArrayList<CalendarPair>> table;
+	private static Calendar today;
+	public FreeSlotTable(){
+		this.today = Calendar.getInstance();
+		this.table = new ArrayList<ArrayList<CalendarPair>>();
+		/* seven days
+		   default block 24:00 to 6:00
+		*/
+		for(int i=0; i<7; i++){
+			ArrayList<CalendarPair> day = new ArrayList<CalendarPair>();
+			block(day, i);
+			this.table.add(day);			
+		}
+	}
+	public void block(Calendar start, Calendar end){
+		
+	}
+	private static void block(ArrayList<CalendarPair> day, int daysAfter){
+		Calendar start = Calendar.getInstance();
+		start.clear();
+		//00:00
+		start.set(today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DATE)+daysAfter, 0, 0, 0);
+		Calendar end = Calendar.getInstance();
+		end.clear();
+		// before 6am in the morning
+		end.set(today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DATE)+daysAfter, 5, 59, 59);
+		//today
+		if(daysAfter == 0){
+			if(today.after(end)){
+				end = today;
+			}
+		}
+		CalendarPair am = new CalendarPair(start, end);
+		day.add(am);
+	}
+}
+class CalendarPair{
+	private Calendar start;
+	private Calendar end;
+	public CalendarPair(Calendar start, Calendar end){
+		this.start = start;
+		this.end = end;
+	}
+	public Calendar getStart(){
+		return this.start;
+	}
+	public Calendar getEnd(){
+		return this.end;
+	}
+	public void setStart(Calendar start){
+		this.start = start;
+	}
+	public void setEnd(Calendar end){
+		this.end = end;
+	}
+}
