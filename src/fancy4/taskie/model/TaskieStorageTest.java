@@ -3,7 +3,7 @@ package fancy4.taskie.model;
 import java.util.*;
 public class TaskieStorageTest {
 
-	public static void main(String[] args){
+	public static void main(String[] args) throws Exception{
 		// TODO Auto-generated method stub
 		try {
 			TaskieStorage.load("test/");
@@ -14,12 +14,12 @@ public class TaskieStorageTest {
 		TaskieStorage.deleteAll();
 		TaskieTask float1 = new TaskieTask("finish tutorial");
 		TaskieTask float2 = new TaskieTask("go to dinner with misaki");
-		Calendar deadline = getDate(2015, 11, 1);
+		Calendar deadline = getDate(2015, 10, 5);
 		TaskieTask deadline1 = new TaskieTask("finish assignment", deadline);
 		Calendar start = getDate(2015, 10, 5, 14, 0);
 		Calendar end = getDate(2015, 10, 5, 15, 0);
 		TaskieTask event1 = new TaskieTask("meeting", start, end);
-		TaskieTask event2 = new TaskieTask("meeting", start, end);
+		TaskieTask event2 = new TaskieTask("meeting2", start, end);
 		TaskieStorage.addTask(float1);
 		TaskieStorage.addTask(float2);
 		TaskieStorage.addTask(deadline1);
@@ -32,9 +32,10 @@ public class TaskieStorageTest {
 		for(IndexTaskPair f: fs){
 			System.out.println(f.getTask().toString());
 		}
-		Calendar startKey = getDate(2015, 10, 5);
-		ArrayList<IndexTaskPair> searchStart = TaskieStorage.searchStart(startKey);
-		System.out.println("start:");
+		Calendar startKey = getDate(2015, 10, 5, 0, 0);
+		Calendar endKey = getDate(2015, 10, 5,16,0);
+		ArrayList<IndexTaskPair> searchStart = TaskieStorage.searchTask(startKey, endKey);
+		System.out.println("search date:");
 		for(IndexTaskPair f: searchStart){
 			System.out.println(f.getTask().toString());
 		}
