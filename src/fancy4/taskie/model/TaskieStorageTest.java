@@ -19,12 +19,14 @@ public class TaskieStorageTest {
 		Calendar start = getDate(2015, 10, 5, 14, 0);
 		Calendar end = getDate(2015, 10, 5, 15, 0);
 		TaskieTask event1 = new TaskieTask("meeting", start, end);
+		TaskieTask event2 = new TaskieTask("meeting", start, end);
 		TaskieStorage.addTask(float1);
 		TaskieStorage.addTask(float2);
 		TaskieStorage.addTask(deadline1);
 		TaskieStorage.addTask(event1);
+		TaskieStorage.addTask(event2);
 		ArrayList<String> keyWords = new ArrayList<String>();
-		keyWords.add("");
+		keyWords.add("finish");
 		ArrayList<IndexTaskPair> fs = TaskieStorage.searchTask(keyWords);
 		System.out.println("all:");
 		for(IndexTaskPair f: fs){
