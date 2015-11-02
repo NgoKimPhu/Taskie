@@ -214,98 +214,60 @@ public class TaskieTask {
 }
 
 // This comparator will only be used when we sorting event and float tasks
-class TaskComparator implements Comparator<TaskieTask> {
+class EventComparator implements Comparator<TaskieTask>{
 	public int compare(TaskieTask task1, TaskieTask task2){
-		if(TaskieTask.isEvent(task1) && TaskieTask.isEvent(task2)){
-			if(!task1.getStatus() && task2.getStatus()){
-				return -1;
-			}
-			else if(task1.getStatus() && !task2.getStatus()){
-				return 1;
-			} 
-			else{
-				if(task1.getStartTime().before(task2.getStartTime())){
-					return -1;
-				}
-				else if(task1.getStartTime().after(task2.getStartTime())){
-					return 1;
-				}
-				else{
-					return task1.getTitle().compareTo(task2.getTitle());
-				}
-			}
+		if(!task1.getStatus() && task2.getStatus()){
+			return -1;
 		}
-		else if(TaskieTask.isDeadline(task1) && TaskieTask.isDeadline(task2)){
-			if(!task1.getStatus() && task2.getStatus()){
-				return -1;
-			}
-			else if(task1.getStatus() && !task2.getStatus()){
-				return 1;
-			} 
-			else{
-				if(task1.getEndTime().before(task2.getEndTime())){
-					return -1;
-				}
-				else if(task1.getEndTime().after(task2.getEndTime())){
-					return 1;
-				}
-				else{
-					return task1.getTitle().compareTo(task2.getTitle());
-				}
-			}
-		}
-		else if(TaskieTask.isEvent(task1) && TaskieTask.isDeadline(task2)){
-			if(!task1.getStatus() && task2.getStatus()){
-				return -1;
-			}
-			else if(task1.getStatus() && !task2.getStatus()){
-				return 1;
-			} 
-			else{
-				if(task1.getStartTime().before(task2.getEndTime())){
-					return -1;
-				}
-				else if(task1.getStartTime().after(task2.getEndTime())){
-					return 1;
-				}
-				else{
-					return task1.getTitle().compareTo(task2.getTitle());
-				}
-			}
-		}
-		else if(TaskieTask.isDeadline(task1) && TaskieTask.isFloat(task2)){
-			if(!task1.getStatus() && task2.getStatus()){
-				return -1;
-			}
-			else if(task1.getStatus() && !task2.getStatus()){
-				return 1;
-			} 
-			else{
-				if(task1.getEndTime().before(task2.getStartTime())){
-					return -1;
-				}
-				else if(task1.getEndTime().after(task2.getStartTime())){
-					return 1;
-				}
-				else{
-					return task1.getTitle().compareTo(task2.getTitle());
-				}
-			}
-		}
-		// float
+		else if(task1.getStatus() && !task2.getStatus()){
+			return 1;
+		} 
 		else{
-			if(!task1.getStatus() && task2.getStatus()){
+			if(task1.getStartTime().before(task2.getStartTime())){
 				return -1;
 			}
-			else if(task1.getStatus() && !task2.getStatus()){
+			else if(task1.getStartTime().after(task2.getStartTime())){
 				return 1;
-			} 
+			}
 			else{
 				return task1.getTitle().compareTo(task2.getTitle());
 			}
 		}
 	}
-	
+}
+class DeadlineComparator implements Comparator<TaskieTask>{
+	public int compare(TaskieTask task1, TaskieTask task2){
+		if(!task1.getStatus() && task2.getStatus()){
+			return -1;
+		}
+		else if(task1.getStatus() && !task2.getStatus()){
+			return 1;
+		} 
+		else{
+			if(task1.getEndTime().before(task2.getEndTime())){
+				return -1;
+			}
+			else if(task1.getEndTime().after(task2.getEndTime())){
+				return 1;
+			}
+			else{
+				return task1.getTitle().compareTo(task2.getTitle());
+			}
+		}
+	}
+}
+class FloatComparator implements Comparator<TaskieTask>{
+	public int compare(TaskieTask task1, TaskieTask task2){
+		if(!task1.getStatus() && task2.getStatus()){
+			return -1;
+		}
+		else if(task1.getStatus() && !task2.getStatus()){
+			return 1;
+		} 
+		else{
+			return task1.getTitle().compareTo(task2.getTitle());
+		}
+	}
 }
 
 class IndexTaskPair {
