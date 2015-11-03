@@ -23,8 +23,8 @@ public class TaskieLogic {
 	private Comparator<IndexTaskPair> comparator;
 	private ArrayList<Integer> indexSave;
 	private ArrayList<IndexTaskPair> mainTasks;
+	//private ArrayList<IndexTaskPair> allTasks;
 	private ArrayList<IndexTaskPair> allTasks;
-	private ArrayList<IndexTaskPair> completeList;
 	private Stack<TaskieAction> commandSave;
 	private Stack<TaskieAction> undoStack;
 	private Stack<TaskieAction> redoStack;
@@ -66,7 +66,7 @@ public class TaskieLogic {
 			commandSave = new Stack<TaskieAction>();
 			allTasks = new ArrayList<IndexTaskPair>();
 			mainTasks = new ArrayList<IndexTaskPair>();
-			completeList = new ArrayList<IndexTaskPair>();
+			allTasks = new ArrayList<IndexTaskPair>();
 			comparator = new Comparator<IndexTaskPair>() {
 				@Override
 		        public int compare(IndexTaskPair first, IndexTaskPair second) {
@@ -136,10 +136,10 @@ public class TaskieLogic {
 								 tod = new ArrayList<IndexTaskPair>(),
 								 tmr = new ArrayList<IndexTaskPair>(),
 								 els = new ArrayList<IndexTaskPair>();
-		getCompleteList();
+		getallTasks();
 		
 		Calendar now = Calendar.getInstance();
-		for (IndexTaskPair pair : completeList) {
+		for (IndexTaskPair pair : allTasks) {
 			if (pair.getTask().getEndTime() == null) {
 				els.add(pair);
 			} else {
@@ -233,13 +233,13 @@ public class TaskieLogic {
 	 * 
 	 * 
 	 */
-	private ArrayList<IndexTaskPair> getCompleteList() {
-		completeList.clear();
+	private ArrayList<IndexTaskPair> getallTasks() {
+		allTasks.clear();
 		ArrayList<TaskieTask> complete = TaskieStorage.displayAllTasks();
 		for (int i = 0; i < complete.size(); i++) {
-			completeList.add(new IndexTaskPair(i, complete.get(i)));
+			allTasks.add(new IndexTaskPair(i, complete.get(i)));
 		}
-		return completeList;
+		return allTasks;
 	}
 	
 	private ArrayList<String> format(int index, ArrayList<IndexTaskPair> list) {
@@ -282,9 +282,9 @@ public class TaskieLogic {
 
 	private void retrieveLeft(Calendar day) throws Exception {
 		mainTasks.clear();
-		getCompleteList();
+		getallTasks();
 		if (day == null) {
-			for (IndexTaskPair pair : completeList) {
+			for (IndexTaskPair pair : allTasks) {
 				if (pair.getTask().getType().equals(TaskieEnum.TaskType.FLOAT)) {
 					mainTasks.add(pair);
 				}
@@ -332,20 +332,26 @@ public class TaskieLogic {
 	private void delete(String screen, int index) throws UnrecognisedCommandException {
 		try {
 			System.out.println("Debug: undo index is " + index);
-			TaskieEnum.TaskType type;
 			int realIndex;
 			if (screen.equalsIgnoreCase("left")) {
-				type = mainTasks.get(index).getTask().getType();
 				realIndex = mainTasks.get(index).getIndex();
-				mainTasks.remove(index);
-				//searchResult.remove(index);
-				//indexSave.remove(index);
 			} else if (screen.equalsIgnoreCase("right")) {
-				type = allTasks.get(index).getTask().getType();
 				realIndex = allTasks.get(index).getIndex();
-				allTasks.remove(index);
 			} else {
-				throw new UnrecognisedCommandException("Screen preference not indicated.");
+				throw new UnrecognisedCommandException("Window preference not indicated.");
+			}
+			
+			for (IndexTaskPair pair : mainTasks) {
+				if (pair.getIndex() == realIndex) {
+					mainTasks.remove(pair);
+					break;
+				}
+			}
+			for (IndexTaskPair pair : allTasks) {
+				if (pair.getIndex() == realIndex) {
+					allTasks.remove(pair);
+					break;
+				}
 			}
 			
 			TaskieTask deleted = TaskieStorage.deleteTask(realIndex);
@@ -427,7 +433,7 @@ public class TaskieLogic {
 	private void update(int index, TaskieTask task) throws UnrecognisedCommandException {
 		TaskieTask undoTask = new TaskieTask((String)null);
 		Calendar startTime, endTime;
-		if (task.getTitle() != null) {
+		if (task.getTitle() != null && task.getTitle().trim() != "") {
 			TaskieStorage.updateTaskTitle(index, task.getTitle());
 			// undoTask: new task with old title
 			undoTask.setTitle(mainTasks.get(index).getTask().getTitle());
