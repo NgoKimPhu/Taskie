@@ -104,7 +104,22 @@ public class TaskieLogic {
 	}
 
 	private LogicOutput output() {
+		String headline, number, date;
+		int size = mainTasks.size();
+		if (mainTasks.isEmpty()) {
+			headline = new String("There is no task. Feed me some, or take a nap.");
+		} else {
+			date = new String();
+			if (!mainTasks.get(0).getTask().getType().equals(TaskieEnum.TaskType.FLOAT)) {
+				Date day = mainTasks.get(0).getTask().getEndTime().getTime();
+				SimpleDateFormat sdf = new SimpleDateFormat("dd, MMM, yyyy");
+				date = " on " + sdf.format(day);
+			}
+			number = size == 1 ? new String("is one task") : new String("are " + size + " tasks");
+			headline = new String("There " + number + date + ".");
+		}
 		main = format(0, mainTasks);
+		main.add(0, headline);
 
 		all.clear();
 		getCompleteList();
@@ -204,8 +219,8 @@ public class TaskieLogic {
 		for (IndexTaskPair pair : list) {
 			index++;
 			TaskieTask task = pair.getTask();
-			Calendar st = task.getStartTime();
-			Calendar et = task.getEndTime();
+			Date st = task.getStartTime().getTime();
+			Date et = task.getEndTime().getTime();
 			boolean isSameDay = false;
 			String sst, set;
 			
