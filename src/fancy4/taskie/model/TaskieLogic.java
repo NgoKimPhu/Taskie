@@ -212,7 +212,7 @@ public class TaskieLogic {
 		for (IndexTaskPair pair : list) {
 			formatted.add(++index + ". " + pair.getTask().getTitle());
 		}
-		/*
+		
 		SimpleDateFormat sdf = new SimpleDateFormat("E dd-MM HH:mm");
 		SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
 		SimpleDateFormat sdf3 = new SimpleDateFormat("dd-MM-YYYY");
@@ -243,7 +243,7 @@ public class TaskieLogic {
 			} else {
 				formatted.add(new String(index + ".  " + sst + "  " + set + "  " + task.getTitle()));
 			}
-		}*/
+		}
 		return formatted;
 	}
 
