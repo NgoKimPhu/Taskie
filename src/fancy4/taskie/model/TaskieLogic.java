@@ -21,20 +21,13 @@ public class TaskieLogic {
 	private static TaskieLogic logic;
 	
 	private Comparator<IndexTaskPair> comparator;
-	private ArrayList<Integer> indexSave;
 	private ArrayList<IndexTaskPair> mainTasks;
-	//private ArrayList<IndexTaskPair> allTasks;
 	private ArrayList<IndexTaskPair> allTasks;
 	private Stack<TaskieAction> commandSave;
 	private Stack<TaskieAction> undoStack;
 	private Stack<TaskieAction> redoStack;
-	//private ArrayList<String> main;
-	//private ArrayList<ArrayList<String>> all;
 	private boolean isUndoAction;
-	private TaskieAction searchSave;
 	private String feedback;
-
-	private DateFormat df = DateFormat.getDateInstance();
 	
 	private final Logger log = Logger.getLogger(TaskieLogic.class.getName() );
 	
@@ -60,7 +53,6 @@ public class TaskieLogic {
 		try {
 			TaskieStorage.load("");
 			isUndoAction = false;
-			indexSave = new ArrayList<Integer>();
 			undoStack = new Stack<TaskieAction>();
 			redoStack = new Stack<TaskieAction>();
 			commandSave = new Stack<TaskieAction>();
@@ -136,8 +128,7 @@ public class TaskieLogic {
 								 tod = new ArrayList<IndexTaskPair>(),
 								 tmr = new ArrayList<IndexTaskPair>(),
 								 els = new ArrayList<IndexTaskPair>();
-		getallTasks();
-		
+		getAllTasks();
 		Calendar now = Calendar.getInstance();
 		for (IndexTaskPair pair : allTasks) {
 			if (pair.getTask().getEndTime() == null) {
@@ -175,6 +166,11 @@ public class TaskieLogic {
 			assert 1 == 0;
 		}
 		
+		Collections.sort(ovd, comparator);
+		Collections.sort(tod, comparator);
+		Collections.sort(tmr, comparator);
+		Collections.sort(els, comparator);
+		
 		all.add(format(0, ovd));
 		all.add(format(ovd.size(), tod));
 		all.add(format(ovd.size() + tod.size(), tmr));
@@ -196,7 +192,6 @@ public class TaskieLogic {
 				deleteAll();
 				return;
 			case SEARCH:
-				searchSave = action;
 				search(action);
 				return;
 			case UPDATE:
@@ -221,8 +216,8 @@ public class TaskieLogic {
 				add(action.getTask());
 				return;
 			}
-		} catch (UnrecognisedCommandException e) {
-			System.err.println("Unrecognised Command");
+		} catch (Exception e) {
+			feedback = e.getMessage();
 		}
 	}
 	
@@ -233,7 +228,7 @@ public class TaskieLogic {
 	 * 
 	 * 
 	 */
-	private ArrayList<IndexTaskPair> getallTasks() {
+	private ArrayList<IndexTaskPair> getAllTasks() {
 		allTasks.clear();
 		ArrayList<TaskieTask> complete = TaskieStorage.displayAllTasks();
 		for (int i = 0; i < complete.size(); i++) {
@@ -282,7 +277,7 @@ public class TaskieLogic {
 
 	private void retrieveLeft(Calendar day) throws Exception {
 		mainTasks.clear();
-		getallTasks();
+		getAllTasks();
 		if (day == null) {
 			for (IndexTaskPair pair : allTasks) {
 				if (pair.getTask().getType().equals(TaskieEnum.TaskType.FLOAT)) {
@@ -297,6 +292,15 @@ public class TaskieLogic {
 			mainTasks = TaskieStorage.searchTask(start, end);
 		}
 	}
+	
+	private int getListIndex(IndexTaskPair pair) {
+		for (int i = 0; i < allTasks.size(); i++) {
+			if (pair.getIndex() == allTasks.get(i).getIndex()) {
+				return i;
+			}
+		}
+		return -1;
+	}
 
 	private void exit() {
 		System.exit(0);
@@ -310,7 +314,7 @@ public class TaskieLogic {
 	 * @throws Exception 
 	 * 
 	 */
-	private void add(TaskieTask task) {
+	private void add(TaskieTask task) throws Exception {
 		IndexTaskPair added = TaskieStorage.addTask(task);
 		assert task.getType().equals(added.getTask().getType());
 		try {
@@ -321,7 +325,7 @@ public class TaskieLogic {
 		}
 		
 		if (!isUndoAction) {
-			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, "left", mainTasks.indexOf(added) + 1);
+			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, "right", getListIndex(added) + 1);
 			undoAction.setTaskType(task.getType());
 			undoStack.push(undoAction);
 		}
@@ -331,7 +335,6 @@ public class TaskieLogic {
 	
 	private void delete(String screen, int index) throws UnrecognisedCommandException {
 		try {
-			System.out.println("Debug: undo index is " + index);
 			int realIndex;
 			if (screen.equalsIgnoreCase("left")) {
 				realIndex = mainTasks.get(index).getIndex();
@@ -364,6 +367,7 @@ public class TaskieLogic {
 				TaskieAction action = new TaskieAction(TaskieEnum.Actions.ADD, deleted);
 				undoStack.push(action);
 			}
+			
 		} catch (IndexOutOfBoundsException e) {
 			feedback = new String("Invalid index number");
 		}
@@ -371,15 +375,15 @@ public class TaskieLogic {
 	
 	private void markdone(String screen, int index) throws UnrecognisedCommandException {
 		try {
-			TaskieEnum.TaskType type;
+			//TaskieEnum.TaskType type;
 			String title;
 			int realIndex;
 			if (screen.equalsIgnoreCase("left")) {
-				type = mainTasks.get(index).getTask().getType();
+				//type = mainTasks.get(index).getTask().getType();
 				realIndex = mainTasks.get(index).getIndex();
 				title = mainTasks.get(index).getTask().getTitle();
 			} else if (screen.equalsIgnoreCase("right")) {
-				type = allTasks.get(index).getTask().getType();
+				//type = allTasks.get(index).getTask().getType();
 				realIndex = allTasks.get(index).getIndex();
 				title = allTasks.get(index).getTask().getTitle();
 			} else {
@@ -401,7 +405,6 @@ public class TaskieLogic {
 	
 	private void search(TaskieAction action) {
 		try {
-			searchSave = null;
 			Object searchKey = action.getSearch();
 			mainTasks = primarySearch(searchKey);
 			double time = Math.random() * Math.random() / 1000;
@@ -498,18 +501,15 @@ public class TaskieLogic {
 			delete("left", i);
 		}
 		feedback = new String("All deleted");
-		undoStack.clear();
-		redoStack.clear();
 		assert mainTasks.isEmpty();
 	}
 	
 	private void reset() {
+		allTasks.clear();
+		mainTasks.clear();
 		undoStack.clear();
 		redoStack.clear();
 		commandSave.clear();
-		indexSave.clear();
-		mainTasks.clear();
-		allTasks.clear();
 		TaskieStorage.deleteAll();
 		feedback = new String("Restored to factory settings");
 	}
