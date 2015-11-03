@@ -6,7 +6,7 @@ public class TaskieStorageTest {
 	public static void main(String[] args) throws Exception{
 		// TODO Auto-generated method stub
 		try {
-			TaskieStorage.load("testnew");
+			TaskieStorage.load("");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
