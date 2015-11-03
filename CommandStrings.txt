@@ -1,13 +1,14 @@
 add +
+search find view display
+displayall viewall
+clear clr
 delete del - remove rem rm
 delall deleteall removeall remall rmall
+update edit
+markdone done finish
+sort
 undo
 redo
-clear clr
-search find view display
-sort
-markdone done finish
-update edit
-displayall viewall
+fs freeslot freetime /fs
 reset
 exit
