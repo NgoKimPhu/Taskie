@@ -42,7 +42,7 @@ public class TaskieStorageTest {
 		}
 		//TaskieStorage.deleteTask(2, TaskieEnum.TaskType.FLOAT);
 		//TaskieStorage.deleteTask(2, TaskieEnum.TaskType.EVENT);
-		ArrayList<CalendarPair> freeSlots = TaskieStorage.getFreeSlot();
+		ArrayList<CalendarPair> freeSlots = TaskieStorage.getFreeSlots();
 		System.out.println("Free Slot:");
 		for(CalendarPair slot: freeSlots){
 			System.out.println(slot);
