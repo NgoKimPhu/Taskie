@@ -21,10 +21,10 @@ public class TaskieLogic {
 	private static TaskieLogic logic;
 	
 	private Comparator<IndexTaskPair> comparator;
-	private ArrayList<TaskieTask> searchResult;
 	private ArrayList<Integer> indexSave;
 	private ArrayList<IndexTaskPair> mainTasks;
 	private ArrayList<IndexTaskPair> allTasks;
+	private ArrayList<IndexTaskPair> completeList;
 	private Stack<TaskieAction> commandSave;
 	private Stack<TaskieAction> undoStack;
 	private Stack<TaskieAction> redoStack;
@@ -50,7 +50,7 @@ public class TaskieLogic {
 		initialise();
 	}
 	
-	
+
 	/*****
 	 * Below are backbone functions.
 	 * 
@@ -67,8 +67,8 @@ public class TaskieLogic {
 			commandSave = new Stack<TaskieAction>();
 			all = new ArrayList<ArrayList<String>>();
 			allTasks = new ArrayList<IndexTaskPair>();
-			searchResult = new ArrayList<TaskieTask>();
-			mainTasks = new ArrayList<IndexTaskPair>(); 
+			mainTasks = new ArrayList<IndexTaskPair>();
+			completeList = new ArrayList<IndexTaskPair>();
 			comparator = new Comparator<IndexTaskPair>() {
 				@Override
 		        public int compare(IndexTaskPair first, IndexTaskPair second) {
@@ -84,41 +84,52 @@ public class TaskieLogic {
 	}
 
 	public LogicOutput execute(String str) throws UnrecognisedCommandException {
-		if (str.equals("")) {
-			throw new UnrecognisedCommandException("Empty command.");
-		}
-		isUndoAction = false;
-		TaskieParser parser = TaskieParser.getInstance();
-		TaskieAction action = parser.parse(str);
-		if (action.getType().equals(TaskieEnum.Actions.ADD) ||
-			action.getType().equals(TaskieEnum.Actions.DELETE)) {
-			commandSave.push(action);
-		}
-		if (action.getType() != TaskieEnum.Actions.UNDO &&
-			action.getType() != TaskieEnum.Actions.REDO) {
-			redoStack.clear();
-		}
-		takeAction(action);	
-		return output();
+			if (str.equals("")) {
+				throw new UnrecognisedCommandException("Empty command.");
+			}
+			isUndoAction = false;
+			TaskieParser parser = TaskieParser.getInstance();
+			TaskieAction action = parser.parse(str);
+			if (action.getType().equals(TaskieEnum.Actions.ADD) ||
+				action.getType().equals(TaskieEnum.Actions.DELETE)) {
+				commandSave.push(action);
+			}
+			if (action.getType() != TaskieEnum.Actions.UNDO &&
+				action.getType() != TaskieEnum.Actions.REDO) {
+				redoStack.clear();
+			}
+			
+			takeAction(action);	
+			return output();
 	}
 
 	private LogicOutput output() {
-		if (searchSave != null) {
-			takeAction(searchSave);
-		}
 		main = format(0, mainTasks);
 
 		all.clear();
+		getCompleteList();
+		/*  the "all" format:
+		 *		all is an ArrayList<ArrayList<String>>. all.size() == 4
+		 *		overdue, today, tmr, else
+		 * 		
+		 * */
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DATE, -1);
+		ArrayList<String> ovd = new ArrayList<String>();
+		ArrayList<String> tod = new ArrayList<String>();
+		ArrayList<String> tmr = new ArrayList<String>();
+		ArrayList<String> els = new ArrayList<String>();
 		for (int i = 0; i < 2; i++) {
 			cal.add(Calendar.DATE, 1);
-			Date date = cal.getTime();
-			ArrayList<IndexTaskPair> day = TaskieStorage.searchTask(date);
-			allTasks.addAll(day);
-			all.add(format(all.size(), day));
+			//Calendar date = Calendar;
+		//	ArrayList<IndexTaskPair> day = TaskieStorage.searchStart(cal);
+		//	allTasks.addAll(day);
+		//	all.add(format(all.size(), day));
 		}
-		
+		all.add(ovd);
+		all.add(tod);
+		all.add(tmr);
+		all.add(els);
 		return new LogicOutput(feedback, main, all);
 	}
 	
@@ -127,27 +138,38 @@ public class TaskieLogic {
 			switch (action.getType()) {
 			case ADD:
 				add(action.getTask());
+				return;
 			case DELETE:
 				delete(action.getScreen(), action.getIndex() - 1);
+				return;
 			case DELETEALL:
 				deleteAll();
+				return;
 			case SEARCH:
 				searchSave = action;
 				search(action);
+				return;
 			case UPDATE:
 				update(action.getIndex() - 1, action.getTask());
+				return;
 			case MARKDONE:
 				markdone(action.getScreen(), action.getIndex() - 1);
+				return;
 			case UNDO:
 				undo();
+				return;
 			case REDO:
 				redo();
+				return;
 			case RESET:
 				reset();
+				return;
 			case EXIT:
 				exit();
+				return;
 			default:
 				add(action.getTask());
+				return;
 			}
 		} catch (UnrecognisedCommandException e) {
 			System.err.println("Unrecognised Command");
@@ -161,8 +183,21 @@ public class TaskieLogic {
 	 * 
 	 * 
 	 */
+	private ArrayList<IndexTaskPair> getCompleteList() {
+		completeList.clear();
+		ArrayList<TaskieTask> complete = TaskieStorage.displayAllTasks();
+		for (int i = 0; i < complete.size(); i++) {
+			completeList.add(new IndexTaskPair(i, complete.get(i)));
+		}
+		return completeList;
+	}
+	
 	private ArrayList<String> format(int index, ArrayList<IndexTaskPair> list) {
 		ArrayList<String> formatted = new ArrayList<String>();
+		for (IndexTaskPair pair : list) {
+			formatted.add(++index + ". " + pair.getTask().getTitle());
+		}
+		/*
 		SimpleDateFormat sdf = new SimpleDateFormat("E dd-MM HH:mm");
 		SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
 		SimpleDateFormat sdf3 = new SimpleDateFormat("dd-MM-YYYY");
@@ -193,8 +228,26 @@ public class TaskieLogic {
 			} else {
 				formatted.add(new String(index + ".  " + sst + "  " + set + "  " + task.getTitle()));
 			}
-		}
+		}*/
 		return formatted;
+	}
+
+	private void retrieveLeft(Calendar day) throws Exception {
+		mainTasks.clear();
+		getCompleteList();
+		Calendar start = new Calendar.Builder().setDate(day.get(Calendar.YEAR), 
+				day.get(Calendar.MONTH), day.get(Calendar.DATE)).build();
+		Calendar end = (Calendar) start.clone();
+		end.add(Calendar.DATE, 1);
+		if (day != null) {
+			mainTasks = TaskieStorage.searchTask(start, end);
+		} else {
+			for (IndexTaskPair pair : completeList) {
+				if (pair.getTask().getType().equals(TaskieEnum.TaskType.FLOAT)) {
+					mainTasks.add(pair);
+				}
+			}
+		}
 	}
 
 	private void exit() {
@@ -206,13 +259,21 @@ public class TaskieLogic {
 	/*****
 	 * Below are feature methods.
 	 * Including add, delete, search, update.
+	 * @throws Exception 
 	 * 
 	 */
 	private void add(TaskieTask task) {
-		TaskieStorage.addTask(task);
+		IndexTaskPair added = TaskieStorage.addTask(task);
+		assert task.getType().equals(added.getTask().getType());
+		try {
+			retrieveLeft(added.getTask().getEndTime());
+		} catch (Exception e) {
+			feedback = e.getMessage();
+			return;
+		}
 		
 		if (!isUndoAction) {
-			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, "left", searchResult.indexOf(task) + 1);
+			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, "left", mainTasks.indexOf(added) + 1);
 			undoAction.setTaskType(task.getType());
 			undoStack.push(undoAction);
 		}
@@ -222,6 +283,7 @@ public class TaskieLogic {
 	
 	private void delete(String screen, int index) throws UnrecognisedCommandException {
 		try {
+			System.out.println("Debug: undo index is " + index);
 			TaskieEnum.TaskType type;
 			int realIndex;
 			if (screen.equalsIgnoreCase("left")) {
@@ -283,23 +345,26 @@ public class TaskieLogic {
 		}
 	}
 	
-	private void search(TaskieAction action) throws UnrecognisedCommandException {
-		searchSave = null;
-		Object searchKey = action.getSearch();
-		mainTasks = primarySearch(searchKey);
-		double time = Math.random() * Math.random() / 1000;
-		feedback = new String("Search finished in " + String.format("%.5f", time) + " seconds");
+	private void search(TaskieAction action) {
+		try {
+			searchSave = null;
+			Object searchKey = action.getSearch();
+			mainTasks = primarySearch(searchKey);
+			double time = Math.random() * Math.random() / 1000;
+			feedback = new String("Search finished in " + String.format("%.5f", time) + " seconds");
+		} catch (Exception e) {
+			feedback = e.getMessage();
+		}
 	}
 	
-	private ArrayList<IndexTaskPair> primarySearch(Object searchKey)
-			throws UnrecognisedCommandException {
+	private ArrayList<IndexTaskPair> primarySearch(Object searchKey) throws Exception {
 		ArrayList<IndexTaskPair> indexTaskList;
 		if (searchKey instanceof String) {
 			ArrayList<String> searchList = new ArrayList<String>();
 			searchList.add((String)searchKey);
 			indexTaskList = TaskieStorage.searchTask(searchList);
-		} else if (searchKey instanceof Date) {
-			indexTaskList = TaskieStorage.searchTask((Date) searchKey);
+		} else if (searchKey instanceof Calendar) {
+			indexTaskList = TaskieStorage.searchTask((Calendar) searchKey, (Calendar) searchKey);
 		} else if (searchKey instanceof Integer) {
 			indexTaskList = TaskieStorage.searchTask(
 					(TaskieEnum.TaskPriority) searchKey);
@@ -317,7 +382,7 @@ public class TaskieLogic {
 		if (task.getTitle() != null) {
 			TaskieStorage.updateTaskTitle(index, task.getTitle());
 			// undoTask: new task with old title
-			undoTask.setTitle(searchResult.get(index).getTitle());
+			undoTask.setTitle(mainTasks.get(index).getTask().getTitle());
 		} else if (task.getType() == TaskieEnum.TaskType.FLOAT &&
 				   task.getStartTime() == null && task.getEndTime() != null) {
 			TaskieStorage.updateFloatToDeadline(index, task.getEndTime());
@@ -333,8 +398,8 @@ public class TaskieLogic {
 				 	task.getStartTime() == null && task.getEndTime() == null) {
 			TaskieStorage.updateEventDeadlineToFloat(index);
 			// undoTask: float to event or deadline
-			startTime = searchResult.get(index).getStartTime();
-			endTime = searchResult.get(index).getEndTime();
+			startTime = mainTasks.get(index).getTask().getStartTime();
+			endTime = mainTasks.get(index).getTask().getEndTime();
 			undoTask.setStartTime(startTime);
 			undoTask.setEndTime(endTime);
 			assert undoTask.getType().equals(TaskieEnum.TaskType.FLOAT);
@@ -342,8 +407,8 @@ public class TaskieLogic {
 				   task.getStartTime() == null && task.getEndTime() == null) {
 			TaskieStorage.updateEventToDeadline(index);
 			// undoTask: deadline to event
-			startTime = searchResult.get(index).getStartTime();
-			endTime = searchResult.get(index).getEndTime();
+			startTime = mainTasks.get(index).getTask().getStartTime();
+			endTime = mainTasks.get(index).getTask().getEndTime();
 			undoTask.setToDeadline(endTime);
 			undoTask.setStartTime(startTime);
 			assert undoTask.getType().equals(TaskieEnum.TaskType.DEADLINE);
@@ -352,8 +417,8 @@ public class TaskieLogic {
 				   task.getStartTime() != null) {
 			TaskieStorage.updateDeadlineToEvent(index, task.getStartTime());
 			// undoTask: event to deadline
-			startTime = searchResult.get(index).getStartTime();
-			endTime = searchResult.get(index).getEndTime();
+			startTime = mainTasks.get(index).getTask().getStartTime();
+			endTime = mainTasks.get(index).getTask().getEndTime();
 			//undoTask.setToEvent();
 		} else if (task.getEndTime() != null) {
 			TaskieStorage.updateEventDeadlineEnd(index, task.getEndTime());
@@ -375,8 +440,9 @@ public class TaskieLogic {
 	}
 	
 	private void deleteAll() throws UnrecognisedCommandException {
-		for (int i = mainTasks.size(); i > 0; i--)
+		for (int i = mainTasks.size(); i > 0; i--) {
 			delete("left", i);
+		}
 		feedback = new String("All deleted");
 		undoStack.clear();
 		redoStack.clear();
@@ -387,7 +453,6 @@ public class TaskieLogic {
 		undoStack.clear();
 		redoStack.clear();
 		commandSave.clear();
-		searchResult.clear();
 		indexSave.clear();
 		mainTasks.clear();
 		allTasks.clear();
@@ -398,11 +463,13 @@ public class TaskieLogic {
 	
 	/*****
 	 * Below are undo/redo methods.
+	 * @throws Exception 
 	 */
 	private void undo() {
 		isUndoAction = true;
 		if (undoStack.isEmpty()) {
 			feedback = new String("No more action to undo");
+			return;
 		}
 		TaskieAction action = undoStack.pop();
 		redoStack.push(commandSave.pop());
