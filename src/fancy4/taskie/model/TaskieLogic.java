@@ -60,7 +60,6 @@ public class TaskieLogic {
 		try {
 			TaskieStorage.load("");
 			isUndoAction = false;
-			
 			indexSave = new ArrayList<Integer>();
 			undoStack = new Stack<TaskieAction>();
 			redoStack = new Stack<TaskieAction>();
@@ -97,7 +96,9 @@ public class TaskieLogic {
 				action.getType() != TaskieEnum.Actions.REDO) {
 				redoStack.clear();
 			}
-			takeAction(action);	
+			takeAction(action);
+			Collections.sort(mainTasks, comparator);
+			Collections.sort(allTasks, comparator);
 			return new LogicOutput(feedback, getMain(), getAll());
 	}
 
@@ -156,10 +157,10 @@ public class TaskieLogic {
 		
 		Calendar endOfToday = (Calendar) now.clone();
 		endOfToday.add(Calendar.DATE, 1);
-		endOfToday.clear(Calendar.HOUR);
-		endOfToday.clear(Calendar.MINUTE);
-		endOfToday.clear(Calendar.SECOND);
-		endOfToday.clear(Calendar.MILLISECOND);
+		endOfToday.set(Calendar.HOUR_OF_DAY, 0);
+		endOfToday.set(Calendar.MINUTE, 0);
+		endOfToday.set(Calendar.SECOND, 0);
+		endOfToday.set(Calendar.MILLISECOND, 0);
 		try {
 			tod = TaskieStorage.searchTask(now, endOfToday);
 		} catch (Exception e) {
