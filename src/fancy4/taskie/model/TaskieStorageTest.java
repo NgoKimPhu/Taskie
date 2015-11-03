@@ -23,8 +23,17 @@ public class TaskieStorageTest {
 		TaskieStorage.addTask(float1);
 		TaskieStorage.addTask(float2);
 		TaskieStorage.addTask(deadline1);
-		TaskieStorage.addTask(event1);
-		TaskieStorage.addTask(event2);
+		try{
+			TaskieStorage.addTask(event1);
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+		}
+		try{
+			TaskieStorage.addTask(event2);
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+		}
+		
 		ArrayList<String> keyWords = new ArrayList<String>();
 		keyWords.add("finish");
 		ArrayList<IndexTaskPair> fs = TaskieStorage.searchTask(keyWords);
