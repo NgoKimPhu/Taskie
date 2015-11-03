@@ -359,7 +359,7 @@ public class TaskieLogic {
 			
 			TaskieTask deleted = TaskieStorage.deleteTask(realIndex);
 			String title = deleted.getTitle();
-			
+
 			feedback = new String("\"" + title + "\"" + " is deleted");
 			
 			// Construct undo action
@@ -497,7 +497,7 @@ public class TaskieLogic {
 	}
 	
 	private void deleteAll() throws UnrecognisedCommandException {
-		for (int i = mainTasks.size(); i > 0; i--) {
+		for (int i = mainTasks.size() - 1; i >= 0; i--) {
 			delete("left", i);
 		}
 		feedback = new String("All deleted");
