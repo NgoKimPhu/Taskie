@@ -235,18 +235,18 @@ public class TaskieLogic {
 	private void retrieveLeft(Calendar day) throws Exception {
 		mainTasks.clear();
 		getCompleteList();
-		Calendar start = new Calendar.Builder().setDate(day.get(Calendar.YEAR), 
-				day.get(Calendar.MONTH), day.get(Calendar.DATE)).build();
-		Calendar end = (Calendar) start.clone();
-		end.add(Calendar.DATE, 1);
-		if (day != null) {
-			mainTasks = TaskieStorage.searchTask(start, end);
-		} else {
+		if (day == null) {
 			for (IndexTaskPair pair : completeList) {
 				if (pair.getTask().getType().equals(TaskieEnum.TaskType.FLOAT)) {
 					mainTasks.add(pair);
 				}
 			}
+		} else {
+			Calendar start = new Calendar.Builder().setDate(day.get(Calendar.YEAR), 
+					day.get(Calendar.MONTH), day.get(Calendar.DATE)).build();
+			Calendar end = (Calendar) start.clone();
+			end.add(Calendar.DATE, 1);
+			mainTasks = TaskieStorage.searchTask(start, end);
 		}
 	}
 
