@@ -19,10 +19,18 @@ public final class TaskieParser {
 		}
 		
 		public TaskieTask compileTask(String commandData) {
+			if (commandData.matches(".*[-\\\\\\/]float.*")) {
+				return new TaskieTask(commandData.replaceAll("\\s?-(\\w+)", ""));
+			}
+			
 			TimeDetector timeDetector = new TimeDetector();
+			String title = commandData.matches(".*\".*\".*") ? commandData.substring(
+					commandData.indexOf('\"') + 1, commandData.lastIndexOf('\"')) : "";
+			commandData = commandData.replaceAll("\".*\"", "`@`");
+			
 			timeDetector.detectTime(commandData);
-			// TODO: error-prone
-			String title = timeDetector.removeTime().replaceAll("\\s?-(\\w+)", "");
+			title = timeDetector.removeTime().replace("`@`", title).
+					replaceAll("\\s?-\\w+|\\s(?=\\s)", "").trim();
 			System.err.println("Title: \"" + title + "\"");
 			
 			switch (timeDetector.getTaskType()) {

@@ -146,7 +146,7 @@ class TimeDetector {
 	}
 	
 	private boolean hasMatchFound(String patternString, String dataString) {
-		matcher.usePattern(Pattern.compile(patternString, Pattern.CASE_INSENSITIVE));
+		matcher.usePattern(Pattern.compile("(?i)" + patternString));
 		matcher.reset(dataString);
 		boolean matchFound = matcher.find();
 		if (matchFound) {
