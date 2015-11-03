@@ -136,6 +136,7 @@ public class TaskieLogic {
 								 tmr = new ArrayList<IndexTaskPair>(),
 								 els = new ArrayList<IndexTaskPair>();
 		getCompleteList();
+		
 		Calendar now = Calendar.getInstance();
 		for (IndexTaskPair pair : completeList) {
 			if (pair.getTask().getEndTime() == null) {
@@ -144,11 +145,12 @@ public class TaskieLogic {
 				if (pair.getTask().getEndTime().before(now)) {
 					ovd.add(pair);
 				}
-				now.add(Calendar.DATE, 2);
+				now = new Calendar.Builder().setDate(now.get(Calendar.YEAR), 
+						now.get(Calendar.MONTH), now.get(Calendar.DATE) + 2).build();
 				if (pair.getTask().getEndTime().after(now)) {
 					els.add(pair);
 				}
-				now.clear();
+				now = Calendar.getInstance();
 			}
 		}
 		
@@ -241,9 +243,6 @@ public class TaskieLogic {
 	
 	private ArrayList<String> format(int index, ArrayList<IndexTaskPair> list) {
 		ArrayList<String> formatted = new ArrayList<String>();
-		for (IndexTaskPair pair : list) {
-			formatted.add(++index + ". " + pair.getTask().getTitle());
-		}
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("E dd-MM HH:mm");
 		SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
@@ -251,8 +250,8 @@ public class TaskieLogic {
 		for (IndexTaskPair pair : list) {
 			index++;
 			TaskieTask task = pair.getTask();
-			Date st = task.getStartTime().getTime();
-			Date et = task.getEndTime().getTime();
+			Calendar st = task.getStartTime();
+			Calendar et = task.getEndTime();
 			boolean isSameDay = false;
 			String sst, set;
 			
@@ -261,17 +260,18 @@ public class TaskieLogic {
 			}
 			
 			if (st != null) {
-				sst = sdf.format(st);
+				sst = sdf.format(st.getTime());
 			} else {
 				sst = " -- ";
 			}
 			if (et != null) {
-				set = sdf.format(et);
+				set = sdf.format(et.getTime());
 			} else {
 				set = " -- ";
 			}
+			
 			if (isSameDay) {
-				formatted.add(new String(index + ".  " + sst + " ~ " + sdf2.format(et) + "  " + task.getTitle()));
+				formatted.add(new String(index + ".  " + sst + " ~ " + sdf2.format(et.getTime()) + "  " + task.getTitle()));
 			} else {
 				formatted.add(new String(index + ".  " + sst + "  " + set + "  " + task.getTitle()));
 			}
