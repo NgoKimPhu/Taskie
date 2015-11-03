@@ -392,19 +392,25 @@ public class TaskieStorage {
 	public static ArrayList<CalendarPair> getFreeSlot() {
 		ArrayList<CalendarPair> slots = new ArrayList<CalendarPair>();
 		Calendar current = Calendar.getInstance();
+		Calendar sixDaysLater = Calendar.getInstance();
+		sixDaysLater.add(Calendar.DATE, 6);
+		sixDaysLater.set(Calendar.HOUR_OF_DAY, 23);
+		sixDaysLater.set(Calendar.MINUTE, 59);
+		sixDaysLater.set(Calendar.SECOND, 59);
 		Calendar currentSixAM = (Calendar) current.clone();
-		currentSixAM.set(Calendar.HOUR, 6);
+		currentSixAM.set(Calendar.HOUR_OF_DAY, 6);
 		currentSixAM.set(Calendar.MINUTE, 0);
-		int currentDate = current.get(Calendar.DATE);
+		sixDaysLater.set(Calendar.SECOND, 0);
 		Calendar currentEnd = current.after(currentSixAM)? current: currentSixAM;
 		for (TaskieTask task : eventTaskList) {
-			if (task.getEndTime().get(Calendar.DATE) <= currentDate + 6) {
+			if (!task.getEndTime().after(sixDaysLater)) {
 				if (!task.getStartTime().after(currentEnd)) {
 					if (task.getEndTime().after(currentEnd)) {
 						currentEnd = task.getEndTime();
 						currentSixAM = (Calendar) currentEnd.clone();
-						currentSixAM.set(Calendar.HOUR, 6);
+						currentSixAM.set(Calendar.HOUR_OF_DAY, 6);
 						currentSixAM.set(Calendar.MINUTE, 0);
+						currentSixAM.set(Calendar.SECOND, 0);
 						currentEnd = currentEnd.after(currentSixAM)? currentEnd: currentSixAM;
 					}
 				} else {
@@ -412,10 +418,32 @@ public class TaskieStorage {
 					currentEnd = task.getEndTime();
 					slots.add(slot);
 					currentSixAM = (Calendar) currentEnd.clone();
-					currentSixAM.set(Calendar.HOUR, 6);
+					currentSixAM.set(Calendar.HOUR_OF_DAY, 6);
 					currentSixAM.set(Calendar.MINUTE, 0);
+					currentSixAM.set(Calendar.SECOND, 0);
 					currentEnd = currentEnd.after(currentSixAM)? currentEnd: currentSixAM;		
 				}
+			}
+		}
+		if(!currentEnd.after(sixDaysLater)){
+			Calendar date = (Calendar) currentEnd.clone();
+			if(date.get(Calendar.YEAR)!=(current.get(Calendar.YEAR))
+					||date.get(Calendar.MONTH)!=(current.get(Calendar.MONTH))
+					||date.get(Calendar.DATE)!=(current.get(Calendar.DATE))){
+				date.add(Calendar.DATE, 1);
+			}		
+			while(!date.after(sixDaysLater)){
+				Calendar start = (Calendar) date.clone();
+				Calendar end = (Calendar) date.clone();
+				start.set(Calendar.HOUR_OF_DAY, 6);
+				start.set(Calendar.MINUTE, 0);
+				start.set(Calendar.SECOND, 0);
+				end.set(Calendar.HOUR_OF_DAY, 23);
+				end.set(Calendar.MINUTE, 59);
+				end.set(Calendar.SECOND, 59);
+				CalendarPair slot = new CalendarPair(start, end);
+				slots.add(slot);
+				date.add(Calendar.DATE, 1);	
 			}
 		}
 		return slots;
@@ -698,80 +726,10 @@ class FileHandler {
 	}
 }
 
-// free slot table with seven days start from today
-class FreeSlotTable {
-	private ArrayList<ArrayList<CalendarPair>> table;
-	private static Calendar today;
-
-	public FreeSlotTable() {
-		this.today = Calendar.getInstance();
-		this.table = new ArrayList<ArrayList<CalendarPair>>();
-		/*
-		 * seven days default block 24:00 to 6:00
-		 */
-		for (int i = 0; i < 7; i++) {
-			ArrayList<CalendarPair> day = new ArrayList<CalendarPair>();
-			block(day, i);
-			this.table.add(day);
-		}
-	}
-
-	public void block(Calendar start, Calendar end) {
-
-	}
-
-	public static void refreshCurrent() {
-		today = Calendar.getInstance();
-	}
-
-	private void refreshTodaySlot() {
-		ArrayList<CalendarPair> day = this.table.get(0);
-		if (day.size() == 1) {
-			CalendarPair blockedSlot = day.get(0);
-			if (today.after(blockedSlot)) {
-				blockedSlot.setEnd(today);
-			}
-		} else {
-			int i = 0;
-			while (i < day.size()) {
-				// last blocked slot
-				if (i == day.size() - 1) {
-					if (today.after(day.get(i))) {
-						day.get(i).setEnd(today);
-					}
-				} else {
-					// in between
-					if (day.get(i).getEnd().before(today) && day.get(i + 1).getStart().after(today)) {
-
-					}
-				}
-			}
-		}
-	}
-
-	private static void block(ArrayList<CalendarPair> day, int daysAfter) {
-		Calendar start = Calendar.getInstance();
-		start.clear();
-		// 00:00
-		start.set(today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DATE) + daysAfter, 0, 0, 0);
-		Calendar end = Calendar.getInstance();
-		end.clear();
-		// before 6am in the morning
-		end.set(today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DATE) + daysAfter, 5, 59, 59);
-		// today
-		if (daysAfter == 0) {
-			if (today.after(end)) {
-				end = today;
-			}
-		}
-		CalendarPair am = new CalendarPair(start, end);
-		day.add(am);
-	}
-}
-
 class CalendarPair {
 	private Calendar start;
 	private Calendar end;
+	private static final SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
 	public CalendarPair(Calendar start, Calendar end) {
 		this.start = start;
@@ -792,5 +750,11 @@ class CalendarPair {
 
 	public void setEnd(Calendar end) {
 		this.end = end;
+	}
+	
+	public String toString(){
+		String pair;
+		pair = "("+sdf.format(this.start.getTime())+" ,"+sdf.format(this.end.getTime())+")";
+		return pair;
 	}
 }
