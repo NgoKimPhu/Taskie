@@ -169,7 +169,8 @@ public class TaskieStorage {
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 		for(TaskieTask task: allTasks){
 			if(TaskieTask.isEvent(task)){
-				if((!end.before(task.getStartTime())&&!end.equals(task.getStartTime()))&&!start.after(task.getEndTime())){
+				// inclusive start and exclusive end
+				if((end.after(task.getStartTime()))&&!start.after(task.getEndTime())){
 					searchResult.add(new IndexTaskPair(allTasks.indexOf(task),task));
 				}
 			}
@@ -181,8 +182,6 @@ public class TaskieStorage {
 		}
 		return searchResult;
 	}
-
-
 
 	public static ArrayList<IndexTaskPair> searchTask(TaskieEnum.TaskPriority priority) {
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
