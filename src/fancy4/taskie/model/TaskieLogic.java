@@ -28,8 +28,8 @@ public class TaskieLogic {
 	private Stack<TaskieAction> commandSave;
 	private Stack<TaskieAction> undoStack;
 	private Stack<TaskieAction> redoStack;
-	private ArrayList<String> main;
-	private ArrayList<ArrayList<String>> all;
+	//private ArrayList<String> main;
+	//private ArrayList<ArrayList<String>> all;
 	private boolean isUndoAction;
 	private TaskieAction searchSave;
 	private String feedback;
@@ -60,12 +60,11 @@ public class TaskieLogic {
 		try {
 			TaskieStorage.load("");
 			isUndoAction = false;
-			main = new ArrayList<String>();
+			
 			indexSave = new ArrayList<Integer>();
 			undoStack = new Stack<TaskieAction>();
 			redoStack = new Stack<TaskieAction>();
 			commandSave = new Stack<TaskieAction>();
-			all = new ArrayList<ArrayList<String>>();
 			allTasks = new ArrayList<IndexTaskPair>();
 			mainTasks = new ArrayList<IndexTaskPair>();
 			completeList = new ArrayList<IndexTaskPair>();
@@ -98,12 +97,12 @@ public class TaskieLogic {
 				action.getType() != TaskieEnum.Actions.REDO) {
 				redoStack.clear();
 			}
-			
 			takeAction(action);	
-			return output();
+			return new LogicOutput(feedback, getMain(), getAll());
 	}
 
-	private LogicOutput output() {
+	private ArrayList<String> getMain() {
+		ArrayList<String> main = new ArrayList<String>();
 		String headline, number, date;
 		int size = mainTasks.size();
 		if (mainTasks.isEmpty()) {
@@ -120,32 +119,65 @@ public class TaskieLogic {
 		}
 		main = format(0, mainTasks);
 		main.add(0, headline);
-
-		all.clear();
+		return main;
+	}
+	
+	
+	/*  the "all" format:
+	 *		all is an ArrayList<ArrayList<String>>. all.size() == 4
+	 *		overdue, today, tmr, else
+	 * 		
+	 * 
+	 * */
+	private ArrayList<ArrayList<String>> getAll() {
+		ArrayList<ArrayList<String>> all = new ArrayList<ArrayList<String>>();
+		ArrayList<IndexTaskPair> ovd = new ArrayList<IndexTaskPair>(),
+								 tod = new ArrayList<IndexTaskPair>(),
+								 tmr = new ArrayList<IndexTaskPair>(),
+								 els = new ArrayList<IndexTaskPair>();
 		getCompleteList();
-		/*  the "all" format:
-		 *		all is an ArrayList<ArrayList<String>>. all.size() == 4
-		 *		overdue, today, tmr, else
-		 * 		
-		 * */
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.DATE, -1);
-		ArrayList<String> ovd = new ArrayList<String>();
-		ArrayList<String> tod = new ArrayList<String>();
-		ArrayList<String> tmr = new ArrayList<String>();
-		ArrayList<String> els = new ArrayList<String>();
-		for (int i = 0; i < 2; i++) {
-			cal.add(Calendar.DATE, 1);
-			//Calendar date = Calendar;
-		//	ArrayList<IndexTaskPair> day = TaskieStorage.searchStart(cal);
-		//	allTasks.addAll(day);
-		//	all.add(format(all.size(), day));
+		Calendar now = Calendar.getInstance();
+		for (IndexTaskPair pair : completeList) {
+			if (pair.getTask().getEndTime() == null) {
+				els.add(pair);
+			} else {
+				if (pair.getTask().getEndTime().before(now)) {
+					ovd.add(pair);
+				}
+				now.add(Calendar.DATE, 2);
+				if (pair.getTask().getEndTime().after(now)) {
+					els.add(pair);
+				}
+				now.clear();
+			}
 		}
-		all.add(ovd);
-		all.add(tod);
-		all.add(tmr);
-		all.add(els);
-		return new LogicOutput(feedback, main, all);
+		
+		Calendar endOfToday = (Calendar) now.clone();
+		endOfToday.add(Calendar.DATE, 1);
+		endOfToday.clear(Calendar.HOUR);
+		endOfToday.clear(Calendar.MINUTE);
+		endOfToday.clear(Calendar.SECOND);
+		endOfToday.clear(Calendar.MILLISECOND);
+		try {
+			tod = TaskieStorage.searchTask(now, endOfToday);
+		} catch (Exception e) {
+			assert 1 == 0;
+		}
+		
+		Calendar endOfTmr = (Calendar) endOfToday.clone();
+		endOfTmr.add(Calendar.DATE, 1);
+		try {
+			tmr = TaskieStorage.searchTask(endOfToday, endOfTmr);
+		} catch (Exception e) {
+			assert 1 == 0;
+		}
+		
+		all.add(format(0, ovd));
+		all.add(format(ovd.size(), tod));
+		all.add(format(ovd.size() + tod.size(), tmr));
+		all.add(format(ovd.size() + tod.size() + tmr.size(), els));
+		
+		return all;
 	}
 	
 	private void takeAction(TaskieAction action) {
