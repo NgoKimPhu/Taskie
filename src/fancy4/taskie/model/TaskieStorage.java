@@ -184,7 +184,6 @@ public class TaskieStorage {
 			rewriteFile();
 			return allTasks;
 		}
-
 	}
 	public static ArrayList<TaskieTask> updateTaskTitle(int index, String title) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
@@ -612,6 +611,9 @@ class FileHandler {
 	private static boolean isDeadline(int type) {
 		return type == 1;
 	}
+	private static boolean isFloat(int type) {
+		return type == 2;
+	}
 	private static TaskieEnum.TaskPriority getTaskPriority(int priority) {
 		if (priority == 0) {
 			return TaskieEnum.TaskPriority.VERY_HIGH;
@@ -662,8 +664,10 @@ class FreeSlotTable{
 				//last blocked slot
 				if(i == day.size()-1){
 					if(today.after(day.get(i))){
-						
+						day.get(i).setEnd(today);
 					}
+				}else{
+					
 				}
 			}
 		}
