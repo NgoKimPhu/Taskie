@@ -25,8 +25,10 @@ public class TaskieStorage {
 	public static void load(String pathName) throws Exception {
 		File folder;
 		if (pathName.trim().length() == 0) {
-			pathName = "TaskieData";
-			folder = new File(pathName);
+			folder = new File(pathName + "/TaskieData");
+			if (!folder.exists()) {
+				folder.mkdir();
+			}
 		} else {
 			File userPath = new File(pathName);
 			if (!userPath.exists()) {
