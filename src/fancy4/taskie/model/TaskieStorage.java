@@ -55,20 +55,25 @@ public class TaskieStorage {
 			floatTaskList = new ArrayList<TaskieTask>();
 		}
 	}
-	public static ArrayList<TaskieTask> displayAllTasks(){
+
+	public static ArrayList<TaskieTask> displayAllTasks() {
 		return allTasks;
 	}
+
 	public static ArrayList<TaskieTask> displayEventTasks() {
 		return eventTaskList;
 	}
+
 	public static ArrayList<TaskieTask> displayDeadlineTasks() {
 		return deadlineTaskList;
 	}
+
 	public static ArrayList<TaskieTask> displayFloatTasks() {
 		return floatTaskList;
 	}
+
 	// add task
-	public static IndexTaskPair addTask(TaskieTask task) {
+	public static IndexTaskPair addTask(TaskieTask task) throws Exception {
 		allTasks.add(task);
 		int index = allTasks.indexOf(task);
 		if (TaskieTask.isEvent(task)) {
@@ -84,6 +89,7 @@ public class TaskieStorage {
 		rewriteFile();
 		return new IndexTaskPair(index, task);
 	}
+
 	public static TaskieTask deleteTask(int index) throws IndexOutOfBoundsException {
 		// 0-based index
 		if (index >= allTasks.size()) {
@@ -102,6 +108,7 @@ public class TaskieStorage {
 		}
 
 	}
+
 	// delete all,return value index 0--eventDeadlineTask, 1--floatTask
 	public static ArrayList<TaskieTask> deleteAll() {
 		FileHandler.clearFile(taskList);
@@ -111,6 +118,7 @@ public class TaskieStorage {
 		floatTaskList = new ArrayList<TaskieTask>();
 		return allTasks;
 	}
+
 	// if you want to search all the tasks contains the key words, search twice
 	public static ArrayList<IndexTaskPair> searchTask(ArrayList<String> keyWords) {
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
@@ -129,37 +137,41 @@ public class TaskieStorage {
 		}
 		return searchResult;
 	}
+
 	// search event based on start time
 	public static ArrayList<IndexTaskPair> searchTask(Calendar start, Calendar end) throws Exception {
-		if(start.after(end)){
+		if (start.after(end)) {
 			throw new Exception("end time should equals or after start time");
 		}
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
-		for(TaskieTask task: allTasks){
-			if(TaskieTask.isEvent(task)){
+		for (TaskieTask task : allTasks) {
+			if (TaskieTask.isEvent(task)) {
 				// inclusive start and exclusive end
-				if((end.after(task.getStartTime()))&&!start.after(task.getEndTime())){
-					searchResult.add(new IndexTaskPair(allTasks.indexOf(task),task));
+				if ((end.after(task.getStartTime())) && !start.after(task.getEndTime())) {
+					searchResult.add(new IndexTaskPair(allTasks.indexOf(task), task));
 				}
 			}
-			if(TaskieTask.isDeadline(task)){
-				if((task.getEndTime().before(end)||task.getEndTime().equals(end))&&(task.getEndTime().after(start)||task.getEndTime().equals(start))){
-					searchResult.add(new IndexTaskPair(allTasks.indexOf(task),task));
+			if (TaskieTask.isDeadline(task)) {
+				if ((task.getEndTime().before(end) || task.getEndTime().equals(end))
+						&& (task.getEndTime().after(start) || task.getEndTime().equals(start))) {
+					searchResult.add(new IndexTaskPair(allTasks.indexOf(task), task));
 				}
 			}
 		}
 		return searchResult;
 	}
+
 	public static ArrayList<IndexTaskPair> searchTask(TaskieEnum.TaskPriority priority) {
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
-		for(TaskieTask task: allTasks){
-			if(task.getPriority().equals(priority)){
+		for (TaskieTask task : allTasks) {
+			if (task.getPriority().equals(priority)) {
 				IndexTaskPair pair = new IndexTaskPair(allTasks.indexOf(task), task);
 				searchResult.add(pair);
 			}
 		}
 		return searchResult;
 	}
+
 	public static ArrayList<IndexTaskPair> searchTask(boolean done) {
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 		for (TaskieTask task : allTasks) {
@@ -170,6 +182,7 @@ public class TaskieStorage {
 		}
 		return searchResult;
 	}
+
 	public static ArrayList<TaskieTask> markDone(int index) throws IndexOutOfBoundsException {
 		// 0-based index
 		if (index >= allTasks.size()) {
@@ -187,6 +200,7 @@ public class TaskieStorage {
 			return allTasks;
 		}
 	}
+
 	public static ArrayList<TaskieTask> updateTaskTitle(int index, String title) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
 			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
@@ -198,6 +212,7 @@ public class TaskieStorage {
 			return allTasks;
 		}
 	}
+
 	public static ArrayList<TaskieTask> updateTaskPriority(int index, TaskieEnum.TaskPriority priority)
 			throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
@@ -216,6 +231,7 @@ public class TaskieStorage {
 			return allTasks;
 		}
 	}
+
 	public static ArrayList<TaskieTask> updateTaskDescription(int index, String description)
 			throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
@@ -227,6 +243,7 @@ public class TaskieStorage {
 			return allTasks;
 		}
 	}
+
 	// index 0-eventdeadline 1-float
 	public static ArrayList<TaskieTask> updateFloatToDeadline(int index, Calendar end)
 			throws IndexOutOfBoundsException {
@@ -242,6 +259,7 @@ public class TaskieStorage {
 			return allTasks;
 		}
 	}
+
 	public static ArrayList<TaskieTask> updateFloatToEvent(int index, Calendar start, Calendar end)
 			throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
@@ -340,7 +358,7 @@ public class TaskieStorage {
 			TaskieTask task = allTasks.get(index);
 			if (TaskieTask.isEvent(task)) {
 				task.setStartTime(start);
-				task.setEndTime(end);	
+				task.setEndTime(end);
 				Collections.sort(eventTaskList, ec);
 				rewriteFile();
 			}
@@ -367,21 +385,61 @@ public class TaskieStorage {
 			allTasks.get(index).setDescription(newDescription);
 			rewriteFile();
 		}
-
 	}
 
-	private static Calendar createDateKey(Calendar calendar) {
-		Calendar calendarForKey = Calendar.getInstance();
-		calendarForKey.clear();
-		calendarForKey.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
-		calendarForKey.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
-		calendarForKey.set(Calendar.DATE, calendar.get(Calendar.DATE));
-		return calendarForKey;
+	// get the free slot in seven days start from current time. 00:00-6:00 is
+	// auto blocked
+	public static ArrayList<CalendarPair> getFreeSlot() {
+		ArrayList<CalendarPair> slots = new ArrayList<CalendarPair>();
+		Calendar current = Calendar.getInstance();
+		Calendar currentSixAM = (Calendar) current.clone();
+		currentSixAM.set(Calendar.HOUR, 6);
+		currentSixAM.set(Calendar.MINUTE, 0);
+		int currentDate = current.get(Calendar.DATE);
+		Calendar currentEnd = current.after(currentSixAM)? current: currentSixAM;
+		for (TaskieTask task : eventTaskList) {
+			if (task.getEndTime().get(Calendar.DATE) <= currentDate + 6) {
+				if (!task.getStartTime().after(currentEnd)) {
+					if (task.getEndTime().after(currentEnd)) {
+						currentEnd = task.getEndTime();
+						currentSixAM = (Calendar) currentEnd.clone();
+						currentSixAM.set(Calendar.HOUR, 6);
+						currentSixAM.set(Calendar.MINUTE, 0);
+						currentEnd = currentEnd.after(currentSixAM)? currentEnd: currentSixAM;
+					}
+				} else {
+					CalendarPair slot = new CalendarPair(currentEnd, task.getStartTime());
+					currentEnd = task.getEndTime();
+					slots.add(slot);
+					currentSixAM = (Calendar) currentEnd.clone();
+					currentSixAM.set(Calendar.HOUR, 6);
+					currentSixAM.set(Calendar.MINUTE, 0);
+					currentEnd = currentEnd.after(currentSixAM)? currentEnd: currentSixAM;		
+				}
+			}
+		}
+		return slots;
+	}
+
+	private static boolean isOccupied(TaskieTask task, ArrayList<TaskieTask> events) {
+		boolean check = false;
+		Calendar start = task.getStartTime();
+		Calendar end = task.getEndTime();
+		for (TaskieTask event : eventTaskList) {
+			if (end.before(event.getStartTime()) || !start.before(event.getEndTime())) {
+				continue;
+			} else {
+				check = true;
+				break;
+			}
+		}
+		return check;
 	}
 
 	private static boolean isEmpty(ArrayList<TaskieTask> tasks) {
 		return tasks.size() == 0;
 	}
+
 	private static void sortList(TaskieEnum.TaskType type) {
 		if (type.equals(TaskieEnum.TaskType.EVENT)) {
 			Collections.sort(eventTaskList, ec);
@@ -391,6 +449,7 @@ public class TaskieStorage {
 			Collections.sort(floatTaskList, fc);
 		}
 	}
+
 	private static void rewriteFile() {
 		FileHandler.clearFile(taskList);
 		for (TaskieTask t : eventTaskList) {
@@ -471,6 +530,7 @@ class FileHandler {
 		fileContent.put("all", all);
 		return fileContent;
 	}
+
 	// Write content in to a file.
 	public static void writeFile(File file, TaskieTask task) {
 		// String fileName = file.getName();
@@ -573,6 +633,7 @@ class FileHandler {
 			}
 		}
 	}
+
 	public static void clearFile(File file) {
 		// String fileName = file.getName();
 		assert file.exists() && file != null;
@@ -584,6 +645,7 @@ class FileHandler {
 			logger.log(Level.SEVERE, "Cannot clear file.", e);
 		}
 	}
+
 	private static Calendar getDate(String string) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.clear();
@@ -591,13 +653,14 @@ class FileHandler {
 		String[] dayMonthYear = splitString[0].split("-");
 		String[] hourMinute = splitString[1].split(":");
 		int day = Integer.valueOf(dayMonthYear[0]);
-		int month = Integer.valueOf(dayMonthYear[1])-1;
+		int month = Integer.valueOf(dayMonthYear[1]) - 1;
 		int year = Integer.valueOf(dayMonthYear[2]);
 		int hour = Integer.valueOf(hourMinute[0]);
 		int minute = Integer.valueOf(hourMinute[1]);
 		calendar.set(year, month, day, hour, minute);
 		return calendar;
 	}
+
 	private static TaskieEnum.TaskType getTaskType(int type) {
 		if (isEvent(type)) {
 			return TaskieEnum.TaskType.EVENT;
@@ -607,15 +670,19 @@ class FileHandler {
 			return TaskieEnum.TaskType.FLOAT;
 		}
 	}
+
 	private static boolean isEvent(int type) {
 		return type == 0;
-	} 
+	}
+
 	private static boolean isDeadline(int type) {
 		return type == 1;
 	}
+
 	private static boolean isFloat(int type) {
 		return type == 2;
 	}
+
 	private static TaskieEnum.TaskPriority getTaskPriority(int priority) {
 		if (priority == 0) {
 			return TaskieEnum.TaskPriority.VERY_HIGH;
@@ -632,60 +699,68 @@ class FileHandler {
 }
 
 // free slot table with seven days start from today
-class FreeSlotTable{
+class FreeSlotTable {
 	private ArrayList<ArrayList<CalendarPair>> table;
 	private static Calendar today;
-	public FreeSlotTable(){
+
+	public FreeSlotTable() {
 		this.today = Calendar.getInstance();
 		this.table = new ArrayList<ArrayList<CalendarPair>>();
-		/* seven days
-		   default block 24:00 to 6:00
-		*/
-		for(int i=0; i<7; i++){
+		/*
+		 * seven days default block 24:00 to 6:00
+		 */
+		for (int i = 0; i < 7; i++) {
 			ArrayList<CalendarPair> day = new ArrayList<CalendarPair>();
 			block(day, i);
-			this.table.add(day);			
+			this.table.add(day);
 		}
 	}
-	public void block(Calendar start, Calendar end){
-		
+
+	public void block(Calendar start, Calendar end) {
+
 	}
-	public static void refreshCurrent(){
-		today = Calendar.getInstance();			
+
+	public static void refreshCurrent() {
+		today = Calendar.getInstance();
 	}
-	private void refreshTodaySlot(){
+
+	private void refreshTodaySlot() {
 		ArrayList<CalendarPair> day = this.table.get(0);
-		if(day.size()==1){
+		if (day.size() == 1) {
 			CalendarPair blockedSlot = day.get(0);
-			if(today.after(blockedSlot)){
+			if (today.after(blockedSlot)) {
 				blockedSlot.setEnd(today);
 			}
-		}else{
-			int i=0;
-			while(i<day.size()){
-				//last blocked slot
-				if(i == day.size()-1){
-					if(today.after(day.get(i))){
+		} else {
+			int i = 0;
+			while (i < day.size()) {
+				// last blocked slot
+				if (i == day.size() - 1) {
+					if (today.after(day.get(i))) {
 						day.get(i).setEnd(today);
 					}
-				}else{
-					
+				} else {
+					// in between
+					if (day.get(i).getEnd().before(today) && day.get(i + 1).getStart().after(today)) {
+
+					}
 				}
 			}
 		}
 	}
-	private static void block(ArrayList<CalendarPair> day, int daysAfter){
+
+	private static void block(ArrayList<CalendarPair> day, int daysAfter) {
 		Calendar start = Calendar.getInstance();
 		start.clear();
-		//00:00
-		start.set(today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DATE)+daysAfter, 0, 0, 0);
+		// 00:00
+		start.set(today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DATE) + daysAfter, 0, 0, 0);
 		Calendar end = Calendar.getInstance();
 		end.clear();
 		// before 6am in the morning
-		end.set(today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DATE)+daysAfter, 5, 59, 59);
-		//today
-		if(daysAfter == 0){
-			if(today.after(end)){
+		end.set(today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DATE) + daysAfter, 5, 59, 59);
+		// today
+		if (daysAfter == 0) {
+			if (today.after(end)) {
 				end = today;
 			}
 		}
@@ -693,23 +768,29 @@ class FreeSlotTable{
 		day.add(am);
 	}
 }
-class CalendarPair{
+
+class CalendarPair {
 	private Calendar start;
 	private Calendar end;
-	public CalendarPair(Calendar start, Calendar end){
+
+	public CalendarPair(Calendar start, Calendar end) {
 		this.start = start;
 		this.end = end;
 	}
-	public Calendar getStart(){
+
+	public Calendar getStart() {
 		return this.start;
 	}
-	public Calendar getEnd(){
+
+	public Calendar getEnd() {
 		return this.end;
 	}
-	public void setStart(Calendar start){
+
+	public void setStart(Calendar start) {
 		this.start = start;
 	}
-	public void setEnd(Calendar end){
+
+	public void setEnd(Calendar end) {
 		this.end = end;
 	}
 }
