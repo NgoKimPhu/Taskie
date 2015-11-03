@@ -23,10 +23,12 @@ public class TaskieLogic {
 	private Comparator<IndexTaskPair> comparator;
 	private ArrayList<IndexTaskPair> mainTasks;
 	private ArrayList<IndexTaskPair> allTasks;
+	private ArrayList<CalendarPair> freeSlots;
 	private Stack<TaskieAction> commandSave;
 	private Stack<TaskieAction> undoStack;
 	private Stack<TaskieAction> redoStack;
 	private boolean isUndoAction;
+	private boolean isFreeSlots;
 	private String feedback;
 	
 	private final Logger log = Logger.getLogger(TaskieLogic.class.getName() );
@@ -52,13 +54,12 @@ public class TaskieLogic {
 	public void initialise() {
 		try {
 			TaskieStorage.load("");
-			isUndoAction = false;
 			undoStack = new Stack<TaskieAction>();
 			redoStack = new Stack<TaskieAction>();
 			commandSave = new Stack<TaskieAction>();
+			freeSlots = new ArrayList<CalendarPair>();
 			allTasks = new ArrayList<IndexTaskPair>();
 			mainTasks = new ArrayList<IndexTaskPair>();
-			allTasks = new ArrayList<IndexTaskPair>();
 			comparator = new Comparator<IndexTaskPair>() {
 				@Override
 		        public int compare(IndexTaskPair first, IndexTaskPair second) {
@@ -77,6 +78,7 @@ public class TaskieLogic {
 			if (str.equals("")) {
 				throw new UnrecognisedCommandException("Empty command.");
 			}
+			isFreeSlots = false;
 			isUndoAction = false;
 			TaskieParser parser = TaskieParser.getInstance();
 			TaskieAction action = parser.parse(str);
@@ -97,20 +99,31 @@ public class TaskieLogic {
 	private ArrayList<String> getMain() {
 		ArrayList<String> main = new ArrayList<String>();
 		String headline, number, date;
-		int size = mainTasks.size();
-		if (mainTasks.isEmpty()) {
-			headline = new String("There is no task. Feed me some, or take a nap.");
-		} else {
-			date = new String();
-			if (!mainTasks.get(0).getTask().getType().equals(TaskieEnum.TaskType.FLOAT)) {
-				Date day = mainTasks.get(0).getTask().getEndTime().getTime();
-				SimpleDateFormat sdf = new SimpleDateFormat("dd, MMM, yyyy");
-				date = " on " + sdf.format(day);
+		if (isFreeSlots) {
+			main = format(freeSlots);
+			int size = mainTasks.size();
+			if (size == 0) {
+				headline = "There is no free slots. Take some break.";
+			} else {
+				number = size == 1 ? new String("is one free slot") : new String("are " + size + " free slots");
+				headline = new String("There " + number + ".");
 			}
-			number = size == 1 ? new String("is one task") : new String("are " + size + " tasks");
-			headline = new String("There " + number + date + ".");
+		} else {
+			int size = mainTasks.size();
+			if (mainTasks.isEmpty()) {
+				headline = new String("There is no task. Feed me some, or take a nap.");
+			} else {
+				date = new String();
+				if (!mainTasks.get(0).getTask().getType().equals(TaskieEnum.TaskType.FLOAT)) {
+					Date day = mainTasks.get(0).getTask().getEndTime().getTime();
+					SimpleDateFormat sdf = new SimpleDateFormat("dd, MMM, yyyy");
+					date = " on " + sdf.format(day);
+				}
+				number = size == 1 ? new String("is one task") : new String("are " + size + " tasks");
+				headline = new String("There " + number + date + ".");
+			}
+			main = format(0, mainTasks);
 		}
-		main = format(0, mainTasks);
 		main.add(0, headline);
 		return main;
 	}
@@ -206,6 +219,9 @@ public class TaskieLogic {
 			case REDO:
 				redo();
 				return;
+			case FREESLOT:
+				getFreeSlots();
+				return;
 			case RESET:
 				reset();
 				return;
@@ -274,6 +290,14 @@ public class TaskieLogic {
 		}
 		return formatted;
 	}
+	
+	private ArrayList<String> format(ArrayList<CalendarPair> list) {
+		ArrayList<String> slots = new ArrayList<String>();
+		for (int i = 1; i <= list.size(); i++) {
+			slots.add(i + ". " + list.get(i - 1).toString());
+		}
+		return slots;
+	}
 
 	private void retrieveLeft(Calendar day) throws Exception {
 		mainTasks.clear();
@@ -337,6 +361,10 @@ public class TaskieLogic {
 		try {
 			int realIndex;
 			if (screen.equalsIgnoreCase("left")) {
+				if (isFreeSlots) {
+					feedback = "You cannot delete a slot.";
+					return;
+				}
 				realIndex = mainTasks.get(index).getIndex();
 			} else if (screen.equalsIgnoreCase("right")) {
 				realIndex = allTasks.get(index).getIndex();
@@ -512,6 +540,11 @@ public class TaskieLogic {
 		commandSave.clear();
 		TaskieStorage.deleteAll();
 		feedback = new String("Restored to factory settings");
+	}
+	
+	private void getFreeSlots() {
+		isFreeSlots = true;
+		freeSlots = TaskieStorage.getFreeSlots();
 	}
 	
 	
