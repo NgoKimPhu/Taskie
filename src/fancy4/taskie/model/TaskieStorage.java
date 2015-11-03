@@ -169,7 +169,7 @@ public class TaskieStorage {
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 		for(TaskieTask task: allTasks){
 			if(TaskieTask.isEvent(task)){
-				if(!end.before(task.getStartTime())&&!start.after(task.getEndTime())){
+				if((!end.before(task.getStartTime())&&!end.equals(task.getStartTime()))&&!start.after(task.getEndTime())){
 					searchResult.add(new IndexTaskPair(allTasks.indexOf(task),task));
 				}
 			}
@@ -848,7 +848,15 @@ class FreeSlotTable{
 				blockedSlot.setEnd(today);
 			}
 		}else{
-			
+			int i=0;
+			while(i<day.size()){
+				//last blocked slot
+				if(i == day.size()-1){
+					if(today.after(day.get(i))){
+						
+					}
+				}
+			}
 		}
 	}
 	private static void block(ArrayList<CalendarPair> day, int daysAfter){
