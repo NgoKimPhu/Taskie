@@ -9,27 +9,27 @@ import java.util.*;
 import java.io.*;
 import java.text.*;
 import java.util.logging.*;
+
 import org.json.*;
 
 public class TaskieStorage {
-	private static final SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 	private static File taskList;
 	private static ArrayList<TaskieTask> allTasks;
 	private static ArrayList<TaskieTask> eventTaskList;
 	private static ArrayList<TaskieTask> deadlineTaskList;
 	private static ArrayList<TaskieTask> floatTaskList;
-	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> eventPriorityMap;
-	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> deadlinePriorityMap;
-	private static HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> floatPriorityMap;
 	private static EventComparator ec = new EventComparator();
 	private static DeadlineComparator dc = new DeadlineComparator();
 	private static FloatComparator fc = new FloatComparator();
 
 	public static void load(String pathName) throws Exception {
 		File folder;
+		
 		if (pathName.trim().length() == 0) {
-			pathName = "TaskieData";
-			folder = new File(pathName);
+			folder = new File("TaskieData");
+			if (!folder.exists()) {
+				folder.mkdir();
+			}
 		} else {
 			File userPath = new File(pathName);
 			if (!userPath.exists()) {
@@ -41,27 +41,14 @@ public class TaskieStorage {
 				}
 			}
 		}
+		
 		taskList = new File(folder, "/taskList.json");
-		// System.out.println(folder.toPath());
-		eventPriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
-		deadlinePriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
-		floatPriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
-		// commandStack = new Stack<HashMap<String, Object>>();
 		if (taskList.exists()) {
 			HashMap<String, ArrayList<TaskieTask>> tasks = FileHandler.readFile(taskList);
 			allTasks = tasks.get("all");
 			eventTaskList = tasks.get("event");
 			deadlineTaskList = tasks.get("deadline");
 			floatTaskList = tasks.get("float");
-			for (TaskieTask task : eventTaskList) {
-				addToEventMap(task);
-			}
-			for (TaskieTask task : deadlineTaskList) {
-				addToDeadlineMap(task);
-			}
-			for (TaskieTask task : floatTaskList) {
-				addToFloatMap(task);
-			}
 		} else {
 			taskList.createNewFile();
 			allTasks = new ArrayList<TaskieTask>();
@@ -70,7 +57,8 @@ public class TaskieStorage {
 			floatTaskList = new ArrayList<TaskieTask>();
 		}
 	}
-	public static ArrayList<TaskieTask> displayAllTasks(){
+
+	public static ArrayList<TaskieTask> displayAllTasks() {
 		return allTasks;
 	}
 
@@ -87,21 +75,18 @@ public class TaskieStorage {
 	}
 
 	// add task
-	public static IndexTaskPair addTask(TaskieTask task) {
+	public static IndexTaskPair addTask(TaskieTask task) throws Exception {
 		allTasks.add(task);
 		int index = allTasks.indexOf(task);
 		if (TaskieTask.isEvent(task)) {
 			eventTaskList.add(task);
 			Collections.sort(eventTaskList, ec);
-			addToEventMap(task);
 		} else if (TaskieTask.isDeadline(task)) {
 			deadlineTaskList.add(task);
 			Collections.sort(deadlineTaskList, dc);
-			addToDeadlineMap(task);
 		} else {// float
 			floatTaskList.add(task);
 			Collections.sort(floatTaskList, fc);
-			addToFloatMap(task);
 		}
 		rewriteFile();
 		return new IndexTaskPair(index, task);
@@ -115,13 +100,10 @@ public class TaskieStorage {
 			TaskieTask deletedTask = allTasks.remove(index);
 			if (TaskieTask.isEvent(deletedTask)) {
 				eventTaskList.remove(deletedTask);
-				removeFromEventMap(deletedTask);
 			} else if (TaskieTask.isDeadline(deletedTask)) {
 				deadlineTaskList.remove(deletedTask);
-				removeFromDeadlineMap(deletedTask);
-			} else {// float
+			} else { // float
 				floatTaskList.remove(deletedTask);
-				removeFromFloatMap(deletedTask);
 			}
 			rewriteFile();
 			return deletedTask;
@@ -136,9 +118,6 @@ public class TaskieStorage {
 		eventTaskList = new ArrayList<TaskieTask>();
 		deadlineTaskList = new ArrayList<TaskieTask>();
 		floatTaskList = new ArrayList<TaskieTask>();
-		eventPriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
-		deadlinePriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
-		floatPriorityMap = new HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>>();
 		return allTasks;
 	}
 
@@ -163,52 +142,34 @@ public class TaskieStorage {
 
 	// search event based on start time
 	public static ArrayList<IndexTaskPair> searchTask(Calendar start, Calendar end) throws Exception {
-		if(start.after(end)){
+		if (start.after(end)) {
 			throw new Exception("end time should equals or after start time");
 		}
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
-		for(TaskieTask task: allTasks){
-			if(TaskieTask.isEvent(task)){
-				if(!end.before(task.getStartTime())&&!start.after(task.getEndTime())){
-					searchResult.add(new IndexTaskPair(allTasks.indexOf(task),task));
+		for (TaskieTask task : allTasks) {
+			if (TaskieTask.isEvent(task)) {
+				// inclusive start and exclusive end
+				if (end.after(task.getStartTime()) && !start.after(task.getEndTime())) {
+					searchResult.add(new IndexTaskPair(allTasks.indexOf(task), task));
 				}
-			}
-			if(TaskieTask.isDeadline(task)){
-				if((task.getEndTime().before(end)||task.getEndTime().equals(end))&&(task.getEndTime().after(start)||task.getEndTime().equals(start))){
-					searchResult.add(new IndexTaskPair(allTasks.indexOf(task),task));
+			} else if (TaskieTask.isDeadline(task)) {
+				if (!task.getEndTime().after(end) && !task.getEndTime().before(start)) {
+					searchResult.add(new IndexTaskPair(allTasks.indexOf(task), task));
 				}
 			}
 		}
 		return searchResult;
 	}
 
-
-
 	public static ArrayList<IndexTaskPair> searchTask(TaskieEnum.TaskPriority priority) {
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
-		if (eventPriorityMap.containsKey(priority)) {
-			ArrayList<TaskieTask> events = eventPriorityMap.get(priority);
-			for (TaskieTask task : events) {
-				IndexTaskPair pair = new IndexTaskPair(allTasks.indexOf(task), task);
-				searchResult.add(pair);
-			}
-		}
-		if (deadlinePriorityMap.containsKey(priority)) {
-			ArrayList<TaskieTask> deadlines = deadlinePriorityMap.get(priority);
-			for (TaskieTask task : deadlines) {
-				IndexTaskPair pair = new IndexTaskPair(allTasks.indexOf(task), task);
-				searchResult.add(pair);
-			}
-		}
-		if (floatPriorityMap.containsKey(priority)) {
-			ArrayList<TaskieTask> floats = floatPriorityMap.get(priority);
-			for (TaskieTask task : floats) {
+		for (TaskieTask task : allTasks) {
+			if (task.getPriority().equals(priority)) {
 				IndexTaskPair pair = new IndexTaskPair(allTasks.indexOf(task), task);
 				searchResult.add(pair);
 			}
 		}
 		return searchResult;
-
 	}
 
 	public static ArrayList<IndexTaskPair> searchTask(boolean done) {
@@ -238,7 +199,6 @@ public class TaskieStorage {
 			rewriteFile();
 			return allTasks;
 		}
-
 	}
 
 	public static ArrayList<TaskieTask> updateTaskTitle(int index, String title) throws IndexOutOfBoundsException {
@@ -260,17 +220,11 @@ public class TaskieStorage {
 		} else {
 			TaskieTask task = allTasks.get(index);
 			if (TaskieTask.isEvent(task)) {
-				removeFromPriorityMap(eventPriorityMap, task);
 				task.setPriority(priority);
-				addToPriorityMap(eventPriorityMap, task);
 			} else if (TaskieTask.isDeadline(task)) {
-				removeFromPriorityMap(deadlinePriorityMap, task);
 				task.setPriority(priority);
-				addToPriorityMap(deadlinePriorityMap, task);
 			} else {// float
-				removeFromPriorityMap(floatPriorityMap, task);
 				task.setPriority(priority);
-				addToPriorityMap(floatPriorityMap, task);
 			}
 			sortList(task.getType());
 			rewriteFile();
@@ -298,10 +252,8 @@ public class TaskieStorage {
 		} else {
 			TaskieTask task = allTasks.get(index);
 			floatTaskList.remove(task);
-			removeFromFloatMap(task);
 			task.setToDeadline(end);
 			deadlineTaskList.add(task);
-			addToDeadlineMap(task);
 			Collections.sort(deadlineTaskList, dc);
 			rewriteFile();
 			return allTasks;
@@ -315,10 +267,8 @@ public class TaskieStorage {
 		} else {
 			TaskieTask task = allTasks.get(index);
 			floatTaskList.remove(task);
-			removeFromFloatMap(task);
 			task.setToEvent(start, end);
 			eventTaskList.add(task);
-			addToEventMap(task);
 			Collections.sort(eventTaskList, ec);
 			rewriteFile();
 			return allTasks;
@@ -331,15 +281,12 @@ public class TaskieStorage {
 		} else {
 			TaskieTask task = allTasks.get(index);
 			if (TaskieTask.isEvent(task)) {
-				removeFromEventMap(task);
 				eventTaskList.remove(task);
 			} else {
-				removeFromDeadlineMap(task);
 				deadlineTaskList.remove(task);
 			}
 			task.setToFloat();
 			floatTaskList.add(task);
-			addToFloatMap(task);
 			Collections.sort(floatTaskList, fc);
 			rewriteFile();
 			return allTasks;
@@ -352,11 +299,9 @@ public class TaskieStorage {
 		} else {
 			TaskieTask task = allTasks.get(index);
 			eventTaskList.remove(task);
-			removeFromEventMap(task);
 			task.setToDeadline(task.getEndTime());
 			deadlineTaskList.add(task);
 			Collections.sort(deadlineTaskList, dc);
-			addToDeadlineMap(task);
 			rewriteFile();
 			return allTasks;
 		}
@@ -370,11 +315,9 @@ public class TaskieStorage {
 		} else {
 			TaskieTask task = allTasks.get(index);
 			deadlineTaskList.remove(task);
-			removeFromDeadlineMap(task);
 			task.setToEvent(start, task.getEndTime());
 			eventTaskList.add(task);
 			Collections.sort(eventTaskList, ec);
-			addToEventMap(task);
 			rewriteFile();
 			return allTasks;
 		}
@@ -415,7 +358,7 @@ public class TaskieStorage {
 			TaskieTask task = allTasks.get(index);
 			if (TaskieTask.isEvent(task)) {
 				task.setStartTime(start);
-				task.setEndTime(end);	
+				task.setEndTime(end);
 				Collections.sort(eventTaskList, ec);
 				rewriteFile();
 			}
@@ -442,125 +385,76 @@ public class TaskieStorage {
 			allTasks.get(index).setDescription(newDescription);
 			rewriteFile();
 		}
-
 	}
 
-	private static Calendar createDateKey(Calendar calendar) {
-		Calendar calendarForKey = Calendar.getInstance();
-		calendarForKey.clear();
-		calendarForKey.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
-		calendarForKey.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
-		calendarForKey.set(Calendar.DATE, calendar.get(Calendar.DATE));
-		return calendarForKey;
+	// get the free slot in seven days start from current time. 00:00-06:00 is auto blocked
+	public static ArrayList<CalendarPair> getFreeSlots() {
+		ArrayList<CalendarPair> slots = new ArrayList<CalendarPair>();
+		Calendar currentEndOfDay = Calendar.getInstance();
+		currentEndOfDay.set(Calendar.HOUR_OF_DAY, 0);
+		currentEndOfDay.set(Calendar.MINUTE, 0);
+		currentEndOfDay.set(Calendar.SECOND, 0);
+		
+		Calendar currentSixAM = (Calendar) currentEndOfDay.clone();
+		Calendar sixDaysLater = (Calendar) currentEndOfDay.clone();
+		
+		currentEndOfDay.add(Calendar.DATE, 1);
+		currentEndOfDay.add(Calendar.SECOND, -1);
+		currentSixAM.set(Calendar.HOUR_OF_DAY, 6);
+		sixDaysLater.add(Calendar.DATE, 7);
+		
+		Calendar currentEnd = Calendar.getInstance().after(currentSixAM)
+							? Calendar.getInstance()
+							: currentSixAM;
+		
+		for (TaskieTask task : eventTaskList) {
+			while (currentEndOfDay.before(sixDaysLater) && 
+				   currentEndOfDay.before(task.getStartTime())) {
+				CalendarPair slot = new CalendarPair(currentEnd, currentEndOfDay);
+				slots.add(slot);
+				currentEndOfDay.add(Calendar.DATE, 1);
+				currentSixAM.add(Calendar.DATE, 1);
+				currentEnd = currentSixAM;
+			}
+			if (task.getEndTime().after(currentEnd)) {
+				if (task.getStartTime().after(currentEnd)) {
+					CalendarPair slot = new CalendarPair(currentEnd, task.getStartTime());
+					slots.add(slot);
+					currentEnd = task.getEndTime();
+				} else {
+					currentEnd = task.getEndTime();
+				}
+			}
+		}
+		
+		while (currentEndOfDay.before(sixDaysLater)) {
+			CalendarPair slot = new CalendarPair(currentEnd, currentEndOfDay);
+			slots.add(slot);
+			currentEndOfDay.add(Calendar.DATE, 1);
+			currentSixAM.add(Calendar.DATE, 1);
+			currentEnd = currentSixAM;
+		}
+		
+		return slots;
+	}
+
+	private static boolean isOccupied(TaskieTask task, ArrayList<TaskieTask> events) {
+		boolean check = false;
+		Calendar start = task.getStartTime();
+		Calendar end = task.getEndTime();
+		for (TaskieTask event : eventTaskList) {
+			if (end.before(event.getStartTime()) || !start.before(event.getEndTime())) {
+				continue;
+			} else {
+				check = true;
+				break;
+			}
+		}
+		return check;
 	}
 
 	private static boolean isEmpty(ArrayList<TaskieTask> tasks) {
 		return tasks.size() == 0;
-	}
-
-	private static void addToEventMap(TaskieTask task) {
-		assert TaskieTask.isEvent(task);
-		TaskieEnum.TaskPriority priority = task.getPriority();
-		
-		if (!eventPriorityMap.containsKey(priority)) {
-			eventPriorityMap.put(priority, new ArrayList<TaskieTask>());
-		}
-		eventPriorityMap.get(priority).add(task);
-	}
-
-	private static void addToDeadlineMap(TaskieTask task) {
-		assert TaskieTask.isDeadline(task);
-		TaskieEnum.TaskPriority priority = task.getPriority();
-		if (!deadlinePriorityMap.containsKey(priority)) {
-			deadlinePriorityMap.put(priority, new ArrayList<TaskieTask>());
-		}
-		deadlinePriorityMap.get(priority).add(task);
-	}
-
-	private static void addToFloatMap(TaskieTask task) {
-		assert TaskieTask.isFloat(task);
-		TaskieEnum.TaskPriority priority = task.getPriority();
-		if (!floatPriorityMap.containsKey(priority)) {
-			floatPriorityMap.put(priority, new ArrayList<TaskieTask>());
-		}
-		floatPriorityMap.get(priority).add(task);
-	}
-
-	private static void removeFromEventMap(TaskieTask task) {
-		TaskieEnum.TaskPriority priority = task.getPriority();
-		eventPriorityMap.get(priority).remove(task);
-		if (isEmpty(eventPriorityMap.get(priority))) {
-			eventPriorityMap.remove(priority);
-		}
-	}
-
-	private static void removeFromDeadlineMap(TaskieTask task) {
-		TaskieEnum.TaskPriority priority = task.getPriority();
-		deadlinePriorityMap.get(priority).remove(task);
-		if (isEmpty(deadlinePriorityMap.get(priority))) {
-			deadlinePriorityMap.remove(priority);
-		}
-	}
-
-	private static void removeFromFloatMap(TaskieTask task) {
-		TaskieEnum.TaskPriority priority = task.getPriority();
-		floatPriorityMap.get(priority).remove(task);
-		if (isEmpty(floatPriorityMap.get(priority))) {
-			floatPriorityMap.remove(priority);
-		}
-	}
-
-	private static void addToStartDateMap(HashMap<Integer, ArrayList<TaskieTask>> map, TaskieTask task) {
-		if (TaskieTask.isEvent(task)) {
-			int start = (sdf.format(task.getStartTime().getTime())).hashCode();
-			if (!map.containsKey(start)) {
-				map.put(start, new ArrayList<TaskieTask>());
-			}
-			map.get(start).add(task);
-		}
-	}
-
-	private static void addToEndDateMap(HashMap<Calendar, ArrayList<TaskieTask>> map, TaskieTask task) {
-		Calendar end = task.getEndTime();
-		if (!map.containsKey(end)) {
-			map.put(end, new ArrayList<TaskieTask>());
-		}
-		map.get(end).add(task);
-	}
-
-	private static void addToPriorityMap(HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> map, TaskieTask task) {
-		TaskieEnum.TaskPriority priority = task.getPriority();
-		if (!map.containsKey(priority)) {
-			map.put(priority, new ArrayList<TaskieTask>());
-		}
-		map.get(priority).add(task);
-	}
-
-	private static void removeFromStartDateMap(HashMap<Integer, ArrayList<TaskieTask>> map, TaskieTask task) {
-		if (TaskieTask.isEvent(task)) {
-			int start = sdf.format(task.getStartTime().getTime()).hashCode();
-			map.get(start).remove(task);
-			if (isEmpty(map.get(start))) {
-				map.remove(start);
-			}
-		}
-	}
-
-	private static void removeFromEndDateMap(HashMap<Calendar, ArrayList<TaskieTask>> map, TaskieTask task) {
-		Calendar end = task.getStartTime();
-		map.get(end).remove(task);
-		if (isEmpty(map.get(end))) {
-			map.remove(end);
-		}
-	}
-
-	private static void removeFromPriorityMap(HashMap<TaskieEnum.TaskPriority, ArrayList<TaskieTask>> map,
-			TaskieTask task) {
-		TaskieEnum.TaskPriority priority = task.getPriority();
-		map.get(priority).remove(task);
-		if (isEmpty(map.get(priority))) {
-			map.remove(priority);
-		}
 	}
 
 	private static void sortList(TaskieEnum.TaskType type) {
@@ -588,7 +482,6 @@ public class TaskieStorage {
 			FileHandler.writeFile(taskList, t);
 		}
 	}
-
 }
 
 class FileHandler {
@@ -777,7 +670,7 @@ class FileHandler {
 		String[] dayMonthYear = splitString[0].split("-");
 		String[] hourMinute = splitString[1].split(":");
 		int day = Integer.valueOf(dayMonthYear[0]);
-		int month = Integer.valueOf(dayMonthYear[1])-1;
+		int month = Integer.valueOf(dayMonthYear[1]) - 1;
 		int year = Integer.valueOf(dayMonthYear[2]);
 		int hour = Integer.valueOf(hourMinute[0]);
 		int minute = Integer.valueOf(hourMinute[1]);
@@ -803,6 +696,10 @@ class FileHandler {
 		return type == 1;
 	}
 
+	private static boolean isFloat(int type) {
+		return type == 2;
+	}
+
 	private static TaskieEnum.TaskPriority getTaskPriority(int priority) {
 		if (priority == 0) {
 			return TaskieEnum.TaskPriority.VERY_HIGH;
@@ -818,75 +715,35 @@ class FileHandler {
 	}
 }
 
-// free slot table with seven days start from today
-class FreeSlotTable{
-	private ArrayList<ArrayList<CalendarPair>> table;
-	private static Calendar today;
-	public FreeSlotTable(){
-		this.today = Calendar.getInstance();
-		this.table = new ArrayList<ArrayList<CalendarPair>>();
-		/* seven days
-		   default block 24:00 to 6:00
-		*/
-		for(int i=0; i<7; i++){
-			ArrayList<CalendarPair> day = new ArrayList<CalendarPair>();
-			block(day, i);
-			this.table.add(day);			
-		}
-	}
-	public void block(Calendar start, Calendar end){
-		
-	}
-	public static void refreshCurrent(){
-		today = Calendar.getInstance();			
-	}
-	private void refreshTodaySlot(){
-		ArrayList<CalendarPair> day = this.table.get(0);
-		if(day.size()==1){
-			CalendarPair blockedSlot = day.get(0);
-			if(today.after(blockedSlot)){
-				blockedSlot.setEnd(today);
-			}
-		}else{
-			
-		}
-	}
-	private static void block(ArrayList<CalendarPair> day, int daysAfter){
-		Calendar start = Calendar.getInstance();
-		start.clear();
-		//00:00
-		start.set(today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DATE)+daysAfter, 0, 0, 0);
-		Calendar end = Calendar.getInstance();
-		end.clear();
-		// before 6am in the morning
-		end.set(today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DATE)+daysAfter, 5, 59, 59);
-		//today
-		if(daysAfter == 0){
-			if(today.after(end)){
-				end = today;
-			}
-		}
-		CalendarPair am = new CalendarPair(start, end);
-		day.add(am);
-	}
-}
-class CalendarPair{
+class CalendarPair {
 	private Calendar start;
 	private Calendar end;
-	public CalendarPair(Calendar start, Calendar end){
-		this.start = start;
-		this.end = end;
+	private static final SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+
+	public CalendarPair(Calendar start, Calendar end) {
+		this.start = (Calendar) start.clone();
+		this.end = (Calendar) end.clone();
 	}
-	public Calendar getStart(){
+
+	public Calendar getStart() {
 		return this.start;
 	}
-	public Calendar getEnd(){
+
+	public Calendar getEnd() {
 		return this.end;
 	}
-	public void setStart(Calendar start){
+
+	public void setStart(Calendar start) {
 		this.start = start;
 	}
-	public void setEnd(Calendar end){
+
+	public void setEnd(Calendar end) {
 		this.end = end;
+	}
+	
+	public String toString(){
+		String pair;
+		pair = "("+sdf.format(this.start.getTime()) + " - " + sdf.format(this.end.getTime()) + ")";
+		return pair;
 	}
 }

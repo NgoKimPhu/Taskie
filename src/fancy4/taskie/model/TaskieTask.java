@@ -10,7 +10,7 @@ import java.util.*;
 public class TaskieTask {
 	private TaskieEnum.TaskType type;
 	private String title;
-	//private long id;
+	// private long id;
 	private String description;
 	private Calendar startTime;
 	private Calendar endTime;
@@ -18,10 +18,11 @@ public class TaskieTask {
 	private TaskieEnum.TaskPriority priority;
 	// true==done, false==haven't done;
 	private boolean status;
+
 	// keep counting the no. of tasks create and be used as the task id.
-	//private static long count = 0;	
+	// private static long count = 0;
 	// create float task.
-	public TaskieTask(String title){
+	public TaskieTask(String title) {
 		this.type = TaskieEnum.TaskType.FLOAT;
 		this.title = title;
 		this.description = new String();
@@ -31,8 +32,9 @@ public class TaskieTask {
 		this.priority = TaskieEnum.TaskPriority.VERY_LOW;
 		this.status = false;
 	}
+
 	// create float task with specific priority.
-	public TaskieTask(String title, TaskieEnum.TaskPriority priority){
+	public TaskieTask(String title, TaskieEnum.TaskPriority priority) {
 		this.type = TaskieEnum.TaskType.FLOAT;
 		this.title = title;
 		this.description = new String();
@@ -41,13 +43,14 @@ public class TaskieTask {
 		this.priority = priority;
 		this.status = false;
 	}
+
 	// load existing float task
-	public TaskieTask(String title, TaskieEnum.TaskType type, TaskieEnum.TaskPriority priority, boolean status, String description) throws Exception{
-		//this.count+=1;
-		if(!type.equals(TaskieEnum.TaskType.FLOAT)){
+	public TaskieTask(String title, TaskieEnum.TaskType type, TaskieEnum.TaskPriority priority, boolean status,
+			String description) throws Exception {
+		// this.count+=1;
+		if (!type.equals(TaskieEnum.TaskType.FLOAT)) {
 			throw new Exception("Task type not match.");
-		}
-		else{
+		} else {
 			this.type = TaskieEnum.TaskType.FLOAT;
 			this.title = title;
 			this.description = description;
@@ -57,8 +60,9 @@ public class TaskieTask {
 			this.status = status;
 		}
 	}
+
 	// create deadline task.
-	public TaskieTask(String title, Calendar endTime){
+	public TaskieTask(String title, Calendar endTime) {
 		this.type = TaskieEnum.TaskType.DEADLINE;
 		this.title = title;
 		this.description = new String();
@@ -67,8 +71,9 @@ public class TaskieTask {
 		this.priority = TaskieEnum.TaskPriority.VERY_LOW;
 		this.status = false;
 	}
+
 	// create deadline task with specific priority.
-	public TaskieTask(String title, Calendar endTime, TaskieEnum.TaskPriority priority){
+	public TaskieTask(String title, Calendar endTime, TaskieEnum.TaskPriority priority) {
 		this.type = TaskieEnum.TaskType.DEADLINE;
 		this.title = title;
 		this.description = new String();
@@ -77,8 +82,9 @@ public class TaskieTask {
 		this.priority = priority;
 		this.status = false;
 	}
+
 	// create event.
-	public TaskieTask(String title, Calendar startTime, Calendar endTime){
+	public TaskieTask(String title, Calendar startTime, Calendar endTime) {
 		this.type = TaskieEnum.TaskType.EVENT;
 		this.title = title;
 		this.description = new String();
@@ -87,8 +93,9 @@ public class TaskieTask {
 		this.priority = TaskieEnum.TaskPriority.VERY_LOW;
 		this.status = false;
 	}
+
 	// create event with specific priority.
-	public TaskieTask(String title, Calendar startTime, Calendar endTime, TaskieEnum.TaskPriority priority){
+	public TaskieTask(String title, Calendar startTime, Calendar endTime, TaskieEnum.TaskPriority priority) {
 		this.type = TaskieEnum.TaskType.EVENT;
 		this.title = title;
 		this.description = new String();
@@ -97,12 +104,13 @@ public class TaskieTask {
 		this.priority = priority;
 		this.status = false;
 	}
+
 	// load deadline task
-	public TaskieTask(String title, TaskieEnum.TaskType type, Calendar endTime, TaskieEnum.TaskPriority priority, boolean status, String description) throws Exception{
-		if(type.equals(TaskieEnum.TaskType.FLOAT)){
+	public TaskieTask(String title, TaskieEnum.TaskType type, Calendar endTime, TaskieEnum.TaskPriority priority,
+			boolean status, String description) throws Exception {
+		if (type.equals(TaskieEnum.TaskType.FLOAT)) {
 			throw new Exception("Task type not match.");
-		}
-		else{
+		} else {
 			this.type = type;
 			this.title = title;
 			this.description = description;
@@ -112,12 +120,13 @@ public class TaskieTask {
 			this.status = status;
 		}
 	}
-	//load event
-	public TaskieTask(String title, TaskieEnum.TaskType type, Calendar startTime, Calendar endTime, TaskieEnum.TaskPriority priority, boolean status, String description) throws Exception{
-		if(type.equals(TaskieEnum.TaskType.FLOAT)){
+
+	// load event
+	public TaskieTask(String title, TaskieEnum.TaskType type, Calendar startTime, Calendar endTime,
+			TaskieEnum.TaskPriority priority, boolean status, String description) throws Exception {
+		if (type.equals(TaskieEnum.TaskType.FLOAT)) {
 			throw new Exception("Task type not match.");
-		}
-		else{
+		} else {
 			this.type = type;
 			this.title = title;
 			this.description = description;
@@ -127,144 +136,172 @@ public class TaskieTask {
 			this.status = status;
 		}
 	}
-	public void setTitle(String title){
+
+	public void setTitle(String title) {
 		this.title = title;
 	}
-	public void setPriority(TaskieEnum.TaskPriority priority){
+
+	public void setPriority(TaskieEnum.TaskPriority priority) {
 		this.priority = priority;
 	}
-	public void setToFloat(){
+
+	public void setToFloat() {
 		this.startTime = null;
 		this.endTime = null;
 		this.type = TaskieEnum.TaskType.FLOAT;
 	}
-	public void setToDeadline(Calendar endTime){
+
+	public void setToDeadline(Calendar endTime) {
 		this.startTime = null;
 		this.endTime = endTime;
 		this.type = TaskieEnum.TaskType.DEADLINE;
 	}
-	public void setToEvent(Calendar startTime, Calendar endTime){
+
+	public void setToEvent(Calendar startTime, Calendar endTime) {
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.type = TaskieEnum.TaskType.EVENT;
 	}
-	public boolean setStartTime(Calendar startTime){
+
+	public boolean setStartTime(Calendar startTime) {
 		// only reasonable to change the start time of an event;
-		if(this.type.equals(TaskieEnum.TaskType.EVENT)){
+		if (this.type.equals(TaskieEnum.TaskType.EVENT)) {
 			this.startTime = startTime;
 			return true;
-		}
-		else{
-			// the start time of float task and deadline task is the time 
+		} else {
+			// the start time of float task and deadline task is the time
 			// it is created thus it should not be changed.
 			return false;
 		}
 	}
-	public boolean setEndTime(Calendar endTime){
-		if(this.type.equals(TaskieEnum.TaskType.EVENT) || this.type.equals(TaskieEnum.TaskType.DEADLINE)){
+
+	public boolean setEndTime(Calendar endTime) {
+		if (this.type.equals(TaskieEnum.TaskType.EVENT) || this.type.equals(TaskieEnum.TaskType.DEADLINE)) {
 			this.endTime = endTime;
 			return true;
-		}
-		else{
+		} else {
 			return false;
 		}
 	}
-	public void setStatus(boolean status){
+
+	public void setStatus(boolean status) {
 		this.status = status;
 	}
-	public void setDescription(String description){
+
+	public void setDescription(String description) {
 		this.description = description;
 	}
-	public TaskieEnum.TaskType getType(){
+
+	public TaskieEnum.TaskType getType() {
 		return this.type;
 	}
-	public String getTitle(){
+
+	public String getTitle() {
 		return this.title;
 	}
-	public String getDescription(){
+
+	public String getDescription() {
 		return this.description;
 	}
-	public Calendar getStartTime(){
+
+	public Calendar getStartTime() {
 		return this.startTime;
 	}
-	public Calendar getEndTime(){
+
+	public Calendar getEndTime() {
 		return this.endTime;
 	}
-	public boolean getStatus(){
+
+	public boolean getStatus() {
 		return this.status;
 	}
-	public TaskieEnum.TaskPriority getPriority(){
+
+	public TaskieEnum.TaskPriority getPriority() {
 		return this.priority;
 	}
-	public String toString(){
+
+	public String toString() {
 		return this.title;
 	}
-	public static boolean isEvent(TaskieTask task){
+
+	public static boolean isEvent(TaskieTask task) {
 		return task.getType().equals(TaskieEnum.TaskType.EVENT);
 	}
-	public static boolean isDeadline(TaskieTask task){
+
+	public static boolean isDeadline(TaskieTask task) {
 		return task.getType().equals(TaskieEnum.TaskType.DEADLINE);
 	}
-	public static boolean isFloat(TaskieTask task){
+
+	public static boolean isFloat(TaskieTask task) {
 		return task.getType().equals(TaskieEnum.TaskType.FLOAT);
 	}
-	public static boolean isDone(TaskieTask task){
-		return task.getStatus()==true;
+
+	public static boolean isDone(TaskieTask task) {
+		return task.getStatus() == true;
+	}
+/*	
+	@Override
+	public boolean equals(Object task) {
+		if (task instanceof TaskieTask) {
+			TaskieTask tt = (TaskieTask) task;
+			return this.title.equals(tt.getTitle()) &&
+				   this.type.equals(tt.getType()) &&
+				   this.endTime.equals(tt.getEndTime()) &&
+				   this.startTime.equals(tt.getStartTime()) &&
+				   this.status == tt.getStatus();
+		} else {
+			return false;
+		}
+	}
+	*/
+}
+
+// This comparator will only be used when we sorting event tasks
+class EventComparator implements Comparator<TaskieTask> {
+	public int compare(TaskieTask task1, TaskieTask task2) {
+		if (!task1.getStatus() && task2.getStatus()) {
+			return -1;
+		} else if (task1.getStatus() && !task2.getStatus()) {
+			return 1;
+		} else {
+			if (task1.getStartTime().before(task2.getStartTime())) {
+				return -1;
+			} else if (task1.getStartTime().after(task2.getStartTime())) {
+				return 1;
+			} else {
+				return task1.getTitle().compareTo(task2.getTitle());
+			}
+		}
 	}
 }
 
-// This comparator will only be used when we sorting event and float tasks
-class EventComparator implements Comparator<TaskieTask>{
-	public int compare(TaskieTask task1, TaskieTask task2){
-		if(!task1.getStatus() && task2.getStatus()){
+// This comparator will only be used when we sorting deadline tasks
+class DeadlineComparator implements Comparator<TaskieTask> {
+	public int compare(TaskieTask task1, TaskieTask task2) {
+		if (!task1.getStatus() && task2.getStatus()) {
 			return -1;
-		}
-		else if(task1.getStatus() && !task2.getStatus()){
+		} else if (task1.getStatus() && !task2.getStatus()) {
 			return 1;
-		} 
-		else{
-			if(task1.getStartTime().before(task2.getStartTime())){
+		} else {
+			if (task1.getEndTime().before(task2.getEndTime())) {
 				return -1;
-			}
-			else if(task1.getStartTime().after(task2.getStartTime())){
+			} else if (task1.getEndTime().after(task2.getEndTime())) {
 				return 1;
-			}
-			else{
+			} else {
 				return task1.getTitle().compareTo(task2.getTitle());
 			}
 		}
 	}
 }
-class DeadlineComparator implements Comparator<TaskieTask>{
-	public int compare(TaskieTask task1, TaskieTask task2){
-		if(!task1.getStatus() && task2.getStatus()){
+
+// This comparator will only be used when we sorting floating tasks
+class FloatComparator implements Comparator<TaskieTask> {
+	public int compare(TaskieTask task1, TaskieTask task2) {
+		if (!task1.getStatus() && task2.getStatus()) {
 			return -1;
-		}
-		else if(task1.getStatus() && !task2.getStatus()){
+		} else if (task1.getStatus() && !task2.getStatus()) {
 			return 1;
-		} 
-		else{
-			if(task1.getEndTime().before(task2.getEndTime())){
-				return -1;
-			}
-			else if(task1.getEndTime().after(task2.getEndTime())){
-				return 1;
-			}
-			else{
-				return task1.getTitle().compareTo(task2.getTitle());
-			}
-		}
-	}
-}
-class FloatComparator implements Comparator<TaskieTask>{
-	public int compare(TaskieTask task1, TaskieTask task2){
-		if(!task1.getStatus() && task2.getStatus()){
-			return -1;
-		}
-		else if(task1.getStatus() && !task2.getStatus()){
-			return 1;
-		} 
-		else{
+		} else {
 			return task1.getTitle().compareTo(task2.getTitle());
 		}
 	}
@@ -273,25 +310,35 @@ class FloatComparator implements Comparator<TaskieTask>{
 class IndexTaskPair {
 	private int index;
 	private TaskieTask task;
-	
-	public IndexTaskPair(int index, TaskieTask task){
+
+	public IndexTaskPair(int index, TaskieTask task) {
 		this.index = index;
 		this.task = task;
 	}
-	
-	public int getIndex(){
+
+	public int getIndex() {
 		return this.index;
 	}
-	
-	public TaskieTask getTask(){
+
+	public TaskieTask getTask() {
 		return this.task;
 	}
-	
-	public void setIndex(int index){
+
+	public void setIndex(int index) {
 		this.index = index;
 	}
-	
-	public void setTask(TaskieTask task){
+
+	public void setTask(TaskieTask task) {
 		this.task = task;
 	}
+/*	
+	@Override
+	public boolean equals(Object pair) {
+		if (pair instanceof IndexTaskPair) {
+			return this.index == ((IndexTaskPair)pair).getIndex();
+		} else {
+			return false;
+		}
+	}
+	*/
 }

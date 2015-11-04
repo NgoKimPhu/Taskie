@@ -33,6 +33,14 @@ public class TaskieParserTest {
 		action = parser.parse("+ i want to float");
 		assertEquals("i want to float", action.getTask().getTitle());
 		
+		// force title
+		action = parser.parse("\"the day after tmr\"");
+		assertEquals("the day after tmr", action.getTask().getTitle());
+		action = parser.parse(" the \" day  after  tmr \"   ");
+		assertEquals("the day after tmr", action.getTask().getTitle());
+		action = parser.parse("the day after tmr -float");
+		assertEquals("the day after tmr", action.getTask().getTitle());
+		
 		// force time partition
 		action = parser.parse("buy 5 apples -float");
 		assertEquals("buy 5 apples", action.getTask().getTitle());

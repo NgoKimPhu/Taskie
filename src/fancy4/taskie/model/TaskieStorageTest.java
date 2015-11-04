@@ -6,7 +6,7 @@ public class TaskieStorageTest {
 	public static void main(String[] args) throws Exception{
 		// TODO Auto-generated method stub
 		try {
-			TaskieStorage.load("test/");
+			TaskieStorage.load("");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
@@ -16,8 +16,8 @@ public class TaskieStorageTest {
 		TaskieTask float2 = new TaskieTask("go to dinner with misaki");
 		Calendar deadline = getDate(2015, 10, 5);
 		TaskieTask deadline1 = new TaskieTask("finish assignment", deadline);
-		Calendar start = getDate(2015, 10, 5, 14, 0);
-		Calendar end = getDate(2015, 10, 5, 15, 0);
+		Calendar start = getDate(2015, 11, 5, 14, 0);
+		Calendar end = getDate(2015, 11, 5, 15, 0);
 		TaskieTask event1 = new TaskieTask("meeting", start, end);
 		TaskieTask event2 = new TaskieTask("meeting2", start, end);
 		TaskieStorage.addTask(float1);
@@ -25,6 +25,7 @@ public class TaskieStorageTest {
 		TaskieStorage.addTask(deadline1);
 		TaskieStorage.addTask(event1);
 		TaskieStorage.addTask(event2);
+		
 		ArrayList<String> keyWords = new ArrayList<String>();
 		keyWords.add("finish");
 		ArrayList<IndexTaskPair> fs = TaskieStorage.searchTask(keyWords);
@@ -41,6 +42,11 @@ public class TaskieStorageTest {
 		}
 		//TaskieStorage.deleteTask(2, TaskieEnum.TaskType.FLOAT);
 		//TaskieStorage.deleteTask(2, TaskieEnum.TaskType.EVENT);
+		ArrayList<CalendarPair> freeSlots = TaskieStorage.getFreeSlots();
+		System.out.println("Free Slot:");
+		for(CalendarPair slot: freeSlots){
+			System.out.println(slot);
+		}
 
 	}
 	public static Calendar getDate(int year, int month, int day){

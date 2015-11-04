@@ -6,7 +6,8 @@ package fancy4.taskie.model;
 public class TaskieEnum {
 	
 	public static enum Actions {
-		ADD, DELETE, DELETEALL, UNDO, REDO, CLEAR, SEARCH, SORT, MARKDONE, UPDATE, DISPLAYALL, RESET, EXIT, INVALID
+		ADD, SEARCH, DISPLAYALL, CLEAR, DELETE, DELETEALL, UPDATE, MARKDONE, 
+		SORT, UNDO, REDO, FREESLOT, RESET, EXIT, INVALID
 	}
 	
 	public static enum TaskType {
