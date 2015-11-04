@@ -172,10 +172,10 @@ public class TaskieStorage {
 		return searchResult;
 	}
 
-	public static ArrayList<IndexTaskPair> searchTask(boolean done) {
+	public static ArrayList<IndexTaskPair> searchTask(boolean status) {
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 		for (TaskieTask task : allTasks) {
-			if (TaskieTask.isEvent(task) && TaskieTask.isDone(task)) {
+			if (task.getStatus()==status) {//fix bug
 				IndexTaskPair pair = new IndexTaskPair(allTasks.indexOf(task), task);
 				searchResult.add(pair);
 			}
