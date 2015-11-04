@@ -177,7 +177,8 @@
   -fx-fill: white;
 }
 .time {
-  -fx-fill: white;
+  -fx-font-size: 8pt;
+  -fx-fill: #f9f9f9;
   -fx-font-weight: bold;
   -fx-font-style: italic;
 }
