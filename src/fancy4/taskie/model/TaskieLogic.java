@@ -208,7 +208,7 @@ public class TaskieLogic {
 				search(action);
 				return;
 			case UPDATE:
-				update(action.getIndex() - 1, action.getTask());
+				update(action.getScreen(), action.getIndex() - 1, action.getTask());
 				return;
 			case MARKDONE:
 				markdone(action.getScreen(), action.getIndex() - 1);
@@ -461,64 +461,89 @@ public class TaskieLogic {
 		return indexTaskList;
 	}
 
-	private void update(int index, TaskieTask task) throws UnrecognisedCommandException {
+	private void update(String screen, int index, TaskieTask task) throws UnrecognisedCommandException {
 		TaskieTask undoTask = new TaskieTask((String)null);
 		Calendar startTime, endTime;
-		if (task.getTitle() != null && task.getTitle().trim() != "") {
-			TaskieStorage.updateTaskTitle(index, task.getTitle());
+
+		TaskieTask currTask;
+		int realIndex;
+		if (screen.equalsIgnoreCase("left")) {
+			if (isFreeSlots) {
+				feedback = "You cannot update a slot.";
+				return;
+			}
+			currTask = mainTasks.get(index).getTask();
+			realIndex = mainTasks.get(index).getIndex();
+		} else if (screen.equalsIgnoreCase("right")) {
+			currTask = allTasks.get(index).getTask();
+			realIndex = allTasks.get(index).getIndex();
+		} else {
+			throw new UnrecognisedCommandException("Window preference not indicated.");
+		}
+		
+		if (task.getTitle() != null && task.getTitle().trim().length() != 0) {
+			ArrayList<TaskieTask> taskList = TaskieStorage.updateTaskTitle(realIndex, task.getTitle());
 			// undoTask: new task with old title
-			undoTask.setTitle(mainTasks.get(index).getTask().getTitle());
-		} else if (task.getType() == TaskieEnum.TaskType.FLOAT &&
-				   task.getStartTime() == null && task.getEndTime() != null) {
-			TaskieStorage.updateFloatToDeadline(index, task.getEndTime());
+			undoTask.setTitle(currTask.getTitle());
+		}
+		
+		if (currTask.getType() == TaskieEnum.TaskType.FLOAT &&
+				task.getType() == TaskieEnum.TaskType.DEADLINE) {
+			TaskieStorage.updateFloatToDeadline(realIndex, task.getEndTime());
 			// undoTask: Deadline/Event task with null starttime and null endtime
-			undoTask.setToDeadline(null); // A little bit messy :-(
+			undoTask.setToFloat(); // A little bit messy :-(
 		} else if (task.getType() == TaskieEnum.TaskType.FLOAT &&
-				   task.getStartTime() != null && task.getEndTime() != null) {
-			TaskieStorage.updateFloatToEvent(index, task.getStartTime(), task.getEndTime());
+					task.getType() == TaskieEnum.TaskType.EVENT) {
+			TaskieStorage.updateFloatToEvent(realIndex, task.getStartTime(), task.getEndTime());
 			// undoTask: same as above
-			undoTask.setToEvent(null, null);
-		} else if ((task.getType() == TaskieEnum.TaskType.EVENT ||
-				 	task.getType() == TaskieEnum.TaskType.DEADLINE) && 
-				 	task.getStartTime() == null && task.getEndTime() == null) {
-			TaskieStorage.updateEventDeadlineToFloat(index);
+			undoTask.setToFloat();
+		} else if ((currTask.getType() == TaskieEnum.TaskType.EVENT ||
+					currTask.getType() == TaskieEnum.TaskType.DEADLINE) && 
+				 	task.getType() == TaskieEnum.TaskType.FLOAT) {
+			TaskieStorage.updateEventDeadlineToFloat(realIndex);
 			// undoTask: float to event or deadline
-			startTime = mainTasks.get(index).getTask().getStartTime();
-			endTime = mainTasks.get(index).getTask().getEndTime();
-			undoTask.setStartTime(startTime);
-			undoTask.setEndTime(endTime);
+			startTime = currTask.getStartTime();
+			endTime = currTask.getEndTime();
+			if (currTask.getType() == TaskieEnum.TaskType.EVENT) {
+				undoTask.setToEvent(startTime, endTime);
+			} else {
+				undoTask.setToDeadline(endTime);
+			}
 			assert undoTask.getType().equals(TaskieEnum.TaskType.FLOAT);
-		} else if (task.getType() == TaskieEnum.TaskType.EVENT &&
-				   task.getStartTime() == null && task.getEndTime() == null) {
-			TaskieStorage.updateEventToDeadline(index);
+		} else if (currTask.getType() == TaskieEnum.TaskType.EVENT &&
+					task.getType() == TaskieEnum.TaskType.DEADLINE) {
+			TaskieStorage.updateEventToDeadline(realIndex);
 			// undoTask: deadline to event
-			startTime = mainTasks.get(index).getTask().getStartTime();
-			endTime = mainTasks.get(index).getTask().getEndTime();
-			undoTask.setToDeadline(endTime);
-			undoTask.setStartTime(startTime);
+			startTime = currTask.getStartTime();
+			endTime = currTask.getEndTime();
+			undoTask.setToEvent(startTime, endTime);
 			assert undoTask.getType().equals(TaskieEnum.TaskType.DEADLINE);
 			assert undoTask.getStartTime() != null;
-		} else if (task.getType() == TaskieEnum.TaskType.DEADLINE &&
-				   task.getStartTime() != null) {
-			TaskieStorage.updateDeadlineToEvent(index, task.getStartTime());
+		} else if (currTask.getType() == TaskieEnum.TaskType.DEADLINE &&
+					task.getType() == TaskieEnum.TaskType.EVENT) {
+			TaskieStorage.updateDeadlineToEvent(realIndex, task.getStartTime());
 			// undoTask: event to deadline
-			startTime = mainTasks.get(index).getTask().getStartTime();
-			endTime = mainTasks.get(index).getTask().getEndTime();
-			//undoTask.setToEvent();
+			endTime = currTask.getEndTime();
+			undoTask.setToDeadline(endTime);
+		} else if (currTask.getType() == TaskieEnum.TaskType.EVENT &&
+					task.getType() == TaskieEnum.TaskType.EVENT) {
+			TaskieStorage.updateEventStartEnd(realIndex, task.getStartTime(), task.getEndTime());
+			startTime = currTask.getStartTime();
+			endTime = currTask.getEndTime();
+			undoTask.setToEvent(startTime, endTime);
 		} else if (task.getEndTime() != null) {
-			TaskieStorage.updateEventDeadlineEnd(index, task.getEndTime());
+			TaskieStorage.updateEventDeadlineEnd(realIndex, task.getEndTime());
+			endTime = currTask.getEndTime();
+			undoTask.setToDeadline(endTime);
 		} else if (task.getType() == TaskieEnum.TaskType.EVENT &&
 				   task.getStartTime() != null && task.getEndTime() == null) {
-			TaskieStorage.updateEventStart(index, task.getStartTime());
-		} else if (task.getType() == TaskieEnum.TaskType.EVENT &&
-				   task.getStartTime() != null && task.getEndTime() != null) {
-			TaskieStorage.updateEventStartEnd(index, task.getStartTime(), task.getEndTime());
+			TaskieStorage.updateEventStart(realIndex, task.getStartTime());
 		} else {
 			throw new UnrecognisedCommandException("Unrecognised update criterion");
 		}
 		// return update(action.getIndex() - 1, action.getTask());
 		if (!isUndoAction) {
-			TaskieAction action = new TaskieAction(TaskieEnum.Actions.UPDATE, index + 1, undoTask);
+			TaskieAction action = new TaskieAction(TaskieEnum.Actions.UPDATE, screen, index, undoTask);
 			undoStack.push(action);
 		}
 		feedback = new String("Updated successfully");
