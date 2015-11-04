@@ -274,18 +274,18 @@ public class TaskieLogic {
 			if (st != null) {
 				sst = sdf.format(st.getTime());
 			} else {
-				sst = " -- ";
+				sst = "";
 			}
 			if (et != null) {
 				set = sdf.format(et.getTime());
 			} else {
-				set = " -- ";
+				set = "";
 			}
 			
 			if (isSameDay) {
-				formatted.add(new String(index + ".  " + sst + " ~ " + sdf2.format(et.getTime()) + "  " + task.getTitle()));
+				formatted.add(new String(index + ".  " + task.getTitle() + sst + " ~ " + sdf2.format(et.getTime())));
 			} else {
-				formatted.add(new String(index + ".  " + sst + "  " + set + "  " + task.getTitle()));
+				formatted.add(new String(index + ".  " + task.getTitle() + sst + "  " + set));
 			}
 		}
 		return formatted;
