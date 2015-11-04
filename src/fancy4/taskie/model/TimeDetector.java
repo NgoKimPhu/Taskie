@@ -9,6 +9,10 @@ import java.util.regex.Pattern;
 
 import fancy4.taskie.model.TaskieEnum.TaskType;
 
+/**
+ * @@author A0126586W
+ *  @author Ngo Kim Phu
+ */
 class TimeDetector {
 	private static final String PATTERN_TYPE = "(?:(?:-)?\\b(?:float|event|deadline|at|by|due))?\\s?";
 	private static final String PATTERN_DAY = "\\b(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)|"
