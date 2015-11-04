@@ -11,4 +11,4 @@ undo
 redo
 fs freeslot freetime /fs feee
 reset
-exit
+exit q
