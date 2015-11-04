@@ -18,17 +18,16 @@ class TaskListCell extends ListCell<String> {
 				System.out.println(time);
 				String text = s.substring(0, s.indexOf("-time"));
 				setGraphic(createTextFlow(text, TIME_PLACEHOLDER, time));
-				if (getGraphic() != null) {
-					setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
 				} else {
-					setContentDisplay(ContentDisplay.LEFT);
+					setText(s);
 				}
 			} else {
 	
 			}
 		}
-	}
-
+	
+	
 
 
 	private Node createTextFlow(String... msg) {
