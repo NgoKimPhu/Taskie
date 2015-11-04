@@ -13,7 +13,6 @@ import javafx.css.PseudoClass;
 //import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 //import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -31,7 +30,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Stack;
 
-
 import fancy4.taskie.MainApp;
 import fancy4.taskie.model.LogicOutput;
 import fancy4.taskie.model.TaskieLogic;
@@ -42,7 +40,8 @@ public class TaskieOverviewController {
 	ObservableList<String> mainDisplay;
 	@FXML
 	private ListView<String> MainList;
-
+	@FXML
+	private ListView<String> AllList;
 	@FXML
 	private Label textOutput;
 	@FXML
@@ -93,20 +92,13 @@ public class TaskieOverviewController {
 		redo_command = new Stack<String>();
 		mainDisplay = FXCollections.observableArrayList();
 		createTree(new ArrayList<String>());
-
+		setupTestList();
 		//populateTree();
 		setupCell();
-		setupListCell();
-		String[] fruits  = { "1.finish hw-time 2pm", "prepare for presentation-time 4 nov 3pm", "read book -time 12am 10 dec"};
-		//MainList.setItems(FXCollections.observableArrayList(fruits));
-		
-	
-		
+
 		try {
 			logicOut = TaskieLogic.logic().execute("search");
 			populate(logicOut.getMain(), logicOut.getAll());
-			
-			
 		} catch (UnrecognisedCommandException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -116,6 +108,7 @@ public class TaskieOverviewController {
 	private void setupCell() {
 		AllTree.setCellFactory(p -> {
 			return new TreeCell<String>() {
+
 				@Override
 				public void updateItem(String item, boolean empty) {
 					super.updateItem(item, empty);  
@@ -132,17 +125,23 @@ public class TaskieOverviewController {
 			};
 		});
 	}
-	
-	private void setupListCell() {
-		MainList.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
-			@Override public ListCell<String> call(ListView<String> listView) {
-				return new TaskListCell();
-			}
-		});
+
+
+	private void setupTestList() {
+		testList = new ArrayList<ArrayList<String>> ();
+		ArrayList<String> overdue = new ArrayList<String>();
+		ArrayList<String> today = new ArrayList<String>();
+		ArrayList<String> tomorrow = new ArrayList<String>();
+
+		ArrayList<String> everythingElse = new ArrayList<String>();
+		overdue.add("overdue1");overdue.add("overdue2");
+		today.add("today1");today.add("today2");
+		tomorrow.add("tmr1");tomorrow.add("tmr2");
+
+		everythingElse.add("else1");everythingElse.add("else2");
+		testList.add(overdue);testList.add(today);testList.add(tomorrow);testList.add(everythingElse);
+
 	}
-
-
-
 	public void populate(ArrayList<String> main, ArrayList<ArrayList<String>> list) {
 		overdueNode.getChildren().removeAll(overdueNode.getChildren());
 		todayNode.getChildren().removeAll(todayNode.getChildren());
@@ -166,9 +165,7 @@ public class TaskieOverviewController {
 		}
 		mainDisplay.removeAll(mainDisplay);
 		mainDisplay.addAll(main);
-		//MainList.getItems().clear();
 		MainList.setItems(mainDisplay);
-
 	}
 
 
@@ -177,7 +174,12 @@ public class TaskieOverviewController {
 		dummyRoot = new TreeItem<>("root");
 		overdueNode = new TreeItem<>("Overdue");
 		overdueNode.setExpanded(true);
-
+		/*for (String str : testList.get(0)) {
+			TreeItem<String> overdueLeaf = new TreeItem<String>(str);
+			overdueNode.getChildren().add(overdueLeaf);
+		}*/
+		//root.setExpanded(true);
+		//create child
 		todayNode = new TreeItem<>("Today");
 		todayNode.setExpanded(true);
 		tomorrowNode = new TreeItem<>("Tomorrow");
@@ -208,16 +210,31 @@ public class TaskieOverviewController {
 			if (input.equals("help")) {
 				mainApp.showHelp();
 			}
-
+			/*ArrayList<String> l1 = new ArrayList<String>();
+			l1.add("enter all1");
+			l1.add("enter all2");
+			ArrayList<String> ovd = new ArrayList<String>();
+			ovd.add("enter main1");
+			ovd.add("enter main2");
+			ArrayList<String> td = new ArrayList<String>();
+			td.add("todaasdfasdfy");
+			ArrayList<String> tmr = new ArrayList<String>();
+			tmr.add("tmr");
+			ArrayList<String> allelse = new ArrayList<String>();
+			allelse.add("everything else");
+			ArrayList<ArrayList<String>> all = new ArrayList<ArrayList<String>>();
+			all.add(ovd); all.add(td); all.add(tmr);all.add(allelse);
+			fromLogic = new LogicOutput("test", l1, all);
+			response = fromLogic.getFeedback();
+			mainData = fromLogic.getMain();
+			allData = fromLogic.getAll();
+			 */
 			try {
 				logicOut = TaskieLogic.logic().execute(input);
 				populate(logicOut.getMain(), logicOut.getAll());
 				response = logicOut.getFeedback();
 				textOutput.setText(response);
 				textInput.clear();
-				for (String s: logicOut.getMain()) {
-					System.out.println(s);
-				}
 			} catch (UnrecognisedCommandException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
