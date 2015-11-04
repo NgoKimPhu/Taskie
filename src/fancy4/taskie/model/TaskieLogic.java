@@ -297,9 +297,9 @@ public class TaskieLogic {
 			}
 			
 			if (isSameDay) {
-				formatted.add(new String(index + ".  " + task.getTitle() + " -time " + sst + " ~ " + " -time " + sdf2.format(et.getTime())));
+				formatted.add(new String(index + ".  " + task.getTitle() + " -time " + sst + " ~ " + sdf2.format(et.getTime())));
 			} else {
-				formatted.add(new String(index + ".  " + task.getTitle() + " -time " + sst + "  " + " -time " + set));
+				formatted.add(new String(index + ".  " + task.getTitle() + " -time " + sst + "  " + set));
 			}
 		}
 		return formatted;
