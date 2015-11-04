@@ -2,6 +2,7 @@ package fancy4.taskie.model;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -105,7 +106,13 @@ public final class TaskieParser {
 	    }
 
 		try {
-			Scanner commandStringScanner = new Scanner(new FileReader("CommandStrings.txt"));
+			InputStream commandStringFile = TaskieParser.class.getResourceAsStream("CommandStrings.txt");
+			Scanner commandStringScanner;
+			if (commandStringFile == null) {
+				commandStringScanner = new Scanner(new FileReader("CommandStrings.txt"));
+			} else {
+				commandStringScanner = new Scanner(commandStringFile);
+			}
 			int i = 0;
 			while (commandStringScanner.hasNext()) {
 				Collections.addAll(STRING_COMMANDS[i++], commandStringScanner.nextLine().split("\\s+"));
