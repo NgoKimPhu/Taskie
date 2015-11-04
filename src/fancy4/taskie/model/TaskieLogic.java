@@ -27,6 +27,7 @@ public class TaskieLogic {
 	private Stack<TaskieAction> commandSave;
 	private Stack<TaskieAction> undoStack;
 	private Stack<TaskieAction> redoStack;
+	private Calendar retrieveSave;
 	private boolean isUndoAction;
 	private boolean isFreeSlots;
 	private boolean isMarkDone;
@@ -321,11 +322,13 @@ public class TaskieLogic {
 		
 		if (day == null) {
 			for (IndexTaskPair pair : allTasks) {
+				retrieveSave = null;
 				if (pair.getTask().getType().equals(TaskieEnum.TaskType.FLOAT)) {
 					mainTasks.add(pair);
 				}
 			}
 		} else {
+			retrieveSave = (Calendar) day.clone();
 			Calendar start = new Calendar.Builder().setDate(day.get(Calendar.YEAR), 
 					day.get(Calendar.MONTH), day.get(Calendar.DATE)).build();
 			Calendar end = (Calendar) start.clone();
@@ -392,7 +395,12 @@ public class TaskieLogic {
 				throw new UnrecognisedCommandException("Window preference not indicated.");
 			}
 
-			retrieve(retrieveSave);
+			try {
+				retrieve(retrieveSave);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			/*
 			for (int i = 0; i < mainTasks.size(); i++) {
