@@ -24,7 +24,7 @@ class TaskListCell extends ListCell<String> {
 					setContentDisplay(ContentDisplay.LEFT);
 				}
 			} else {
-				setGraphic(createTextFlow(s));
+	
 			}
 		}
 	}
@@ -63,3 +63,4 @@ class TaskListCell extends ListCell<String> {
 		return spacer;
 	}
 }
+

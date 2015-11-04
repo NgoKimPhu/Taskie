@@ -166,7 +166,7 @@ public class TaskieOverviewController {
 		}
 		mainDisplay.removeAll(mainDisplay);
 		mainDisplay.addAll(main);
-		//MainList.getItems().clear();
+		setupListCell();
 		MainList.setItems(mainDisplay);
 
 	}
