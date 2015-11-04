@@ -16,20 +16,22 @@ import fancy4.taskie.model.TaskieEnum.TaskType;
 class TimeDetector {
 	private static final String PATTERN_TYPE = "(?:(?:-)?\\b(?:float|event|deadline|at|by|due))?\\s?";
 	private static final String PATTERN_DAY = "\\b(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)|"
-		+ "(?:(?:next\\s)?((?:Mon|Fri|Sun)(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|"
+		+ "(?:on )?(?:(?:(?:next\\s)?((?:Mon|Fri|Sun)(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|"
 		+ "Thu(?:rsday)?|Sat(?:urday)?)\\b)|"
-		+ "(?:(\\d{1,2})\\s?[\\\\\\/-]\\s?(\\d{1,2}))|"
+		+ "(?:(\\d{1,2})\\s?[\\\\\\/]\\s?(\\d{1,2}))|"
 		+ "(?=\\S*\\s?\\S*\\d{1,2})(\\d{1,2})?\\s?(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|"
 		+ "May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|(?:Nov|Dec)(?:ember)?)"
-		+ "\\b\\s?(\\d{1,2})?";
+		+ "\\b\\s?(\\d{1,2})?)";
 	private static final String PATTERN_TIME = "(?:\\b(?:(?<=fr(?:om)?|-|~|to|till|until)|at|by|due))?"
 		+ "\\s?(?<=fr(?:om)?|-|~|to|till|until|\\b)(?:(?:(\\d{1,2})\\s?"
-		+ "(?=[.:h ]\\s?\\d{1,2}\\s?m?|am|pm|tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)"
-		+ "(?:[.:h ]\\s?(\\d{1,2})\\s?m?)?\\s?(am|pm)?\\s?"
+		+ "(?=[.:h]\\s?\\d{1,2}\\s?m?|am|pm|tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)"
+		+ "(?:[.:h]\\s?(\\d{1,2})\\s?m?)?\\s?(am|pm)?\\s?"
 		+ "(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)?)\\b|(now|(?:to|tmr |tomorrow )night)\\b)|"
-		+ "(?:\\b(?:(?<=fr(?:om)?|-|~|to|till|until)|at|by|due))\\s?(\\d{1,2})\\b";
+		+ "(?:(?:(?<=fr(?:om)?|-|~|to|till|until)|at|by|due))\\s?(\\d{1,2})\\b"
+		+ "(?!\\s?(?:[\\\\\\/]|(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|"
+		+ "Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|(?:Nov|Dec)(?:ember)?)\\b(?!\\s?\\d{1,2})))";
 	private static final String PATTERN_TIMERANGE_FORMAT = "(?:fr(?:om)?\\s?)?"
-		+ "(?:%1$s)\\s?(?:%2$s)?\\s?(?:-|~|to|till|until)?\\s?(?:%2$s)?\\s?(?:%1$s)";
+		+ "(?:%1$s)\\s?(?:%2$s)?\\s?(?:-|~|to|till|until)\\s?(?:%2$s)?\\s?(?:%1$s)";
 	
 	private  final Map<String, Integer> MAP_WEEKDAYS = initWeekdaysMap();
 	private  final Map<String, Integer> MAP_MONTHS = initMonthsMap();
@@ -169,34 +171,38 @@ class TimeDetector {
 			if (!matcher.group(groupOffset).contains("today")) {
 				time.add(Calendar.DATE, 1);
 			}
-		} else if (matcher.group(groupOffset + 1) != null) { // weekday
-			time.set(Calendar.DAY_OF_WEEK, 
-					MAP_WEEKDAYS.get(matcher.group(groupOffset + 1).substring(0, 3).toLowerCase()));
-			if (time.before(Calendar.getInstance())) {
-				time.add(Calendar.DATE, 7);
-			}
-		} else if (matcher.group(groupOffset + 2) != null) { // ((\d{1,2})\s?[\\/.-]?(\d{1,2}))
-			int dateInt1 = Integer.parseInt(matcher.group(groupOffset + 2));
-			int dateInt2 = Integer.parseInt(matcher.group(groupOffset + 3));
-			if (dateInt2 > 12) {
-				time.set(Calendar.DATE, dateInt2);
-				time.set(Calendar.MONTH, dateInt1 - 1);
-			} else {
-				time.set(Calendar.DATE, dateInt1);
-				time.set(Calendar.MONTH, dateInt2 - 1);
-			}
-		} else { // (\d{1,2}) (month) (\d{1,2})
-			time.set(Calendar.MONTH, 
-					MAP_MONTHS.get(matcher.group(groupOffset + 5).substring(0, 3).toLowerCase()));
-			int date;
-			if (matcher.group(groupOffset + 4) != null) {
-				date = Integer.parseInt(matcher.group(groupOffset + 4));
-			} else {
-				date = Integer.parseInt(matcher.group(groupOffset + 6));
-			}
-			time.set(Calendar.DATE, date);
-			if (time.before(Calendar.getInstance())) {
-				time.add(Calendar.YEAR, 1);
+		} else {
+			Calendar instance = Calendar.getInstance();
+			if (matcher.group(groupOffset + 1) != null) { // weekday
+				time.set(Calendar.DAY_OF_WEEK, 
+						MAP_WEEKDAYS.get(matcher.group(groupOffset + 1).substring(0, 3).toLowerCase()));
+				if (time.before(instance)) {
+					time.add(Calendar.DATE, 7);
+				}
+			} else if (matcher.group(groupOffset + 2) != null) { // ((\d{1,2})\s?[\\/.-]?(\d{1,2}))
+				int dateInt1 = Integer.parseInt(matcher.group(groupOffset + 2));
+				int dateInt2 = Integer.parseInt(matcher.group(groupOffset + 3));
+				if (dateInt2 > 12) {
+					time.set(Calendar.DATE, dateInt2);
+					time.set(Calendar.MONTH, dateInt1 - 1);
+				} else {
+					time.set(Calendar.DATE, dateInt1);
+					time.set(Calendar.MONTH, dateInt2 - 1);
+				}
+			} else { // (\d{1,2}) (month) (\d{1,2})
+				time.set(Calendar.MONTH, 
+						MAP_MONTHS.get(matcher.group(groupOffset + 5).substring(0, 3).toLowerCase()));
+				int date;
+				if (matcher.group(groupOffset + 6) != null) {
+					date = Integer.parseInt(matcher.group(groupOffset + 6));
+				} else {
+					date = Integer.parseInt(matcher.group(groupOffset + 4));
+				}
+				time.set(Calendar.DATE, date);
+				instance.set(Calendar.DATE, 1); // first day of this month
+				if (time.before(instance)) {
+					time.add(Calendar.YEAR, 1);
+				}
 			}
 		}
 	}

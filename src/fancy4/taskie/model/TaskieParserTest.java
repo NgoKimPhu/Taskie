@@ -94,7 +94,7 @@ public class TaskieParserTest {
 		assertEquals("meeting", action.getTask().getTitle());
 		action = parser.parse("meeting from 8 to 10 tmr night");
 		assertEquals("meeting", action.getTask().getTitle());
-		action = parser.parse("meeting from 1pm tmr till sunday");
+		action = parser.parse("meeting from 1pm tmr till 2pm sunday");
 		assertEquals("meeting", action.getTask().getTitle());
 		
 		// date and time in the middle
