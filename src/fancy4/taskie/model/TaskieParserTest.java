@@ -52,6 +52,14 @@ public class TaskieParserTest {
 		// time and date deadline partition
 		action = parser.parse("buy pizza 7pm today");
 		assertEquals("buy pizza", action.getTask().getTitle());
+		action = parser.parse("fix me 26/11 1pm");
+		assertEquals("fix me", action.getTask().getTitle());
+		
+		// time range connector
+		action = parser.parse("connect fr 4 ~ 5");
+		assertEquals("connect", action.getTask().getTitle());
+		action = parser.parse("connect tmr fr 4 - 5");
+		assertEquals("connect", action.getTask().getTitle());
 		
 		// date range partition
 		action = parser.parse("add test from today till mon");
@@ -78,6 +86,12 @@ public class TaskieParserTest {
 		// date and time range partition
 		action = parser.parse("conference event 7 today till 9pm tmr");
 		assertEquals("conference", action.getTask().getTitle());
+		action = parser.parse("meeting tmr night from 8 to 10");
+		assertEquals("meeting", action.getTask().getTitle());
+		action = parser.parse("meeting from 8 to 10 tmr night");
+		assertEquals("meeting", action.getTask().getTitle());
+		action = parser.parse("meeting from 1pm tmr till sunday");
+		assertEquals("meeting", action.getTask().getTitle());
 		
 		// date and time in the middle
 		action = parser.parse("dance 7.15pm till 9.30 tmr night at th");

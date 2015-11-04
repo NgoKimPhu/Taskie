@@ -101,11 +101,11 @@ public class TaskieLogic {
 		String headline, number, date;
 		if (isFreeSlots) {
 			main = format(freeSlots);
-			int size = mainTasks.size();
+			int size = main.size();
 			if (size == 0) {
 				headline = "There is no free slots. Take some break.";
 			} else {
-				number = size == 1 ? new String("is one free slot") : new String("are " + size + " free slots");
+				number = size == 1 ? "is one free slot" : "are " + size + " free slots";
 				headline = new String("There " + number + ".");
 			}
 		} else {
@@ -267,7 +267,7 @@ public class TaskieLogic {
 			boolean isSameDay = false;
 			String sst, set;
 			
-			if (st != null && et != null && sdf3.format(st).equals(sdf3.format(et))) {
+			if (st != null && et != null && sdf3.format(st.getTime()).equals(sdf3.format(et.getTime()))) {
 				isSameDay = true;
 			}
 			
