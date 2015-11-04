@@ -197,7 +197,7 @@ public class TaskieOverviewController {
 		//root.setExpanded(true);
 	}
 	public void inputEnter(KeyEvent event) {
-		event.consume();
+		
 		String input;
 		String response;
 		LogicOutput fromLogic;
