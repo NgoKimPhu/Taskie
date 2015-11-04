@@ -5,14 +5,16 @@ package fancy4.taskie.model;
  *
  */
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.logging.Logger;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Stack;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.Stack;
+import java.util.logging.Logger;
 
 public class TaskieLogic {
 
@@ -25,7 +27,6 @@ public class TaskieLogic {
 	private Stack<TaskieAction> commandSave;
 	private Stack<TaskieAction> undoStack;
 	private Stack<TaskieAction> redoStack;
-	private Calendar retrieveSave;
 	private boolean isUndoAction;
 	private boolean isFreeSlots;
 	private boolean isMarkDone;
@@ -54,7 +55,6 @@ public class TaskieLogic {
 	public void initialise() {
 		try {
 			TaskieStorage.load("");
-			//retrieveSave = Calendar.getInstance();
 			undoStack = new Stack<TaskieAction>();
 			redoStack = new Stack<TaskieAction>();
 			commandSave = new Stack<TaskieAction>();
@@ -297,9 +297,11 @@ public class TaskieLogic {
 			}
 			
 			if (isSameDay) {
-				formatted.add(new String(index + ".  " + task.getTitle() + " -time " + sst + " ~ " + sdf2.format(et.getTime())));
+
+				formatted.add(new String(index + ".  " + task.getTitle() + sst + " ~ " + sdf2.format(et.getTime())));
 			} else {
-				formatted.add(new String(index + ".  " + task.getTitle() + " -time " + sst + "  " + set));
+				formatted.add(new String(index + ".  " + task.getTitle() + sst + "  " + set));
+
 			}
 		}
 		return formatted;
@@ -318,14 +320,12 @@ public class TaskieLogic {
 		retrieveAllTasks();
 		
 		if (day == null) {
-			retrieveSave = null;
 			for (IndexTaskPair pair : allTasks) {
 				if (pair.getTask().getType().equals(TaskieEnum.TaskType.FLOAT)) {
 					mainTasks.add(pair);
 				}
 			}
 		} else {
-			retrieveSave = (Calendar) day.clone();
 			Calendar start = new Calendar.Builder().setDate(day.get(Calendar.YEAR), 
 					day.get(Calendar.MONTH), day.get(Calendar.DATE)).build();
 			Calendar end = (Calendar) start.clone();
@@ -392,26 +392,27 @@ public class TaskieLogic {
 				throw new UnrecognisedCommandException("Window preference not indicated.");
 			}
 
-			TaskieTask deleted = TaskieStorage.deleteTask(realIndex);
-			String title = deleted.getTitle();
-			
 			retrieve(retrieveSave);
 			
 			/*
 			for (int i = 0; i < mainTasks.size(); i++) {
 				if (mainTasks.get(i).getIndex() == realIndex) {
 					mainTasks.remove(i);
+
 					break;
 				}
 			}
-			for (int i = 0; i < allTasks.size(); i++) {
-				if (allTasks.get(i).getIndex() == realIndex) {
-					allTasks.remove(i);
+			for (IndexTaskPair pair : allTasks) {
+				if (pair.getIndex() == realIndex) {
+					allTasks.remove(pair);
 					break;
 				}
 			}
 			*/
 			
+			TaskieTask deleted = TaskieStorage.deleteTask(realIndex);
+			String title = deleted.getTitle();
+
 			feedback = new String("\"" + title + "\"" + " is deleted");
 			
 			// Construct undo action
@@ -422,8 +423,6 @@ public class TaskieLogic {
 			
 		} catch (IndexOutOfBoundsException e) {
 			feedback = new String("Invalid index number");
-		} catch (Exception e) {
-			feedback = e.getMessage();
 		}
 	}
 	
