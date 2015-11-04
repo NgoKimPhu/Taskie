@@ -12,12 +12,15 @@ import fancy4.taskie.view.TaskieOverviewController;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class MainApp extends Application {
@@ -71,6 +74,7 @@ public class MainApp extends Application {
 			Scene scene = new Scene(rootLayout);
 			scene.getStylesheets().add("JMetroLightTheme.css");
 			primaryStage.setScene(scene);
+
 			primaryStage.show();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -96,7 +100,25 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 	}
+	public void showHelp() throws IOException {
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(MainApp.class.getResource("view/HelpScene.fxml"));
+		StackPane help = (StackPane) loader.load();
+		Stage helpStage = new Stage();
+		helpStage.setTitle("help");
+		
+		Scene helpScene = new Scene(help);
+		helpScene.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+	        public void handle(KeyEvent ke) {
+	            if (ke.getCode() == KeyCode.ESCAPE) {
+	                System.out.println("Key Pressed: " + ke.getCode());
+	                helpStage.close();
+	            }
+	        }
+	    });
 
+		helpStage.show();
+	}
 	/**
 	 * Returns the main stage.
 	 * @return

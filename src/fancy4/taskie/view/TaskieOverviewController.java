@@ -25,6 +25,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.util.Callback;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Stack;
@@ -196,7 +197,7 @@ public class TaskieOverviewController {
 		AllTree.setShowRoot(false);
 		//root.setExpanded(true);
 	}
-	public void inputEnter(KeyEvent event) {
+	public void inputEnter(KeyEvent event) throws IOException {
 		
 		String input;
 		String response;
@@ -206,6 +207,9 @@ public class TaskieOverviewController {
 		if (event.getCode() == KeyCode.ENTER) { 
 			input = textInput.getText();  
 			undo_command.push(input);
+			if (input.equals("help")) {
+				mainApp.showHelp();
+			}
 			/*ArrayList<String> l1 = new ArrayList<String>();
 			l1.add("enter all1");
 			l1.add("enter all2");
