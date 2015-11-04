@@ -28,6 +28,7 @@ public class TaskieLogic {
 	private Calendar retrieveSave;
 	private boolean isUndoAction;
 	private boolean isFreeSlots;
+	private boolean isMarkDone;
 	private String feedback;
 	
 	private final Logger log = Logger.getLogger(TaskieLogic.class.getName() );
@@ -81,6 +82,7 @@ public class TaskieLogic {
 			if (str.equals("")) {
 				throw new UnrecognisedCommandException("Empty command.");
 			}
+			isMarkDone = false;
 			isFreeSlots = false;
 			isUndoAction = false;
 			TaskieParser parser = TaskieParser.getInstance();
@@ -112,7 +114,11 @@ public class TaskieLogic {
 		} else {
 			int size = mainTasks.size();
 			if (mainTasks.isEmpty()) {
-				headline = new String("There is no task. Feed me some, or take a nap.");
+				if (isMarkDone) {
+					headline = new String("There is no completed task.");
+				} else {
+					headline = new String("There is no task. Feed me some, or take a nap.");
+				}
 			} else {
 				date = new String();
 				if (!mainTasks.get(0).getTask().getType().equals(TaskieEnum.TaskType.FLOAT)) {
@@ -120,8 +126,13 @@ public class TaskieLogic {
 					SimpleDateFormat sdf = new SimpleDateFormat("dd, MMM, yyyy");
 					date = " on " + sdf.format(day);
 				}
-				number = size == 1 ? new String("is one task") : new String("are " + size + " tasks");
-				headline = new String("There " + number + date + ".");
+				if (isMarkDone) {
+					number = size == 1 ? new String("is one completed task") : new String("are " + size + " completed tasks");
+					headline = new String("There " + number + ".");
+				} else {
+					number = size == 1 ? new String("is one task") : new String("are " + size + " tasks");
+					headline = new String("There " + number + date + ".");
+				}
 			}
 			main = format(0, mainTasks);
 		}
@@ -249,7 +260,9 @@ public class TaskieLogic {
 		allTasks.clear();
 		ArrayList<TaskieTask> complete = TaskieStorage.displayAllTasks();
 		for (int i = 0; i < complete.size(); i++) {
-			allTasks.add(new IndexTaskPair(i, complete.get(i)));
+			if (!complete.get(i).getStatus()) {
+				allTasks.add(new IndexTaskPair(i, complete.get(i)));
+			}
 		}
 		Collections.sort(allTasks);
 	}
@@ -319,6 +332,12 @@ public class TaskieLogic {
 			end.add(Calendar.DATE, 1);
 			mainTasks = TaskieStorage.searchTask(start, end);
 		}
+		Collections.sort(mainTasks);
+	}
+	
+	private void retrieve(boolean status) throws Exception {
+		retrieveAllTasks();
+		mainTasks = primarySearch(true);
 		Collections.sort(mainTasks);
 	}
 	
@@ -408,25 +427,25 @@ public class TaskieLogic {
 		}
 	}
 	
-	private void markdone(String screen, int index) throws UnrecognisedCommandException {
+	private void markdone(String screen, int index) throws Exception {
 		try {
-			//TaskieEnum.TaskType type;
 			String title;
 			int realIndex;
 			if (screen.equalsIgnoreCase("left")) {
-				//type = mainTasks.get(index).getTask().getType();
 				realIndex = mainTasks.get(index).getIndex();
 				title = mainTasks.get(index).getTask().getTitle();
 			} else if (screen.equalsIgnoreCase("right")) {
-				//type = allTasks.get(index).getTask().getType();
 				realIndex = allTasks.get(index).getIndex();
 				title = allTasks.get(index).getTask().getTitle();
 			} else {
 				throw new UnrecognisedCommandException("Screen preference not indicated.");
 			}
 			
+			isMarkDone = true;
+			
 			feedback = new String("\"" + title + "\"" + " is marked done");
 			TaskieStorage.markDone(realIndex);
+			retrieve(true);
 			
 			// Construct undo action
 			if (!isUndoAction) {
