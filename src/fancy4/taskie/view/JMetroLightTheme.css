@@ -168,13 +168,15 @@
     -fx-control-inner-background: #1d1d1d;
     -fx-background-color: #1d1d1d;
 }
-.tree-cell:titileCell {
+.titleCell {
 	-fx-font-size: 14pt;
-    -fx-text-fill: #33CCFF;
+    -fx-fill: #33CCFF;
     
 }
 .plain {
+  -fx-font-size: 11pt;
   -fx-fill: white;
+  -fx-font-family: "Segoe UI Light";
 }
 .time {
   -fx-font-size: 8pt;
