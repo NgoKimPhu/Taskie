@@ -410,11 +410,16 @@ public class TaskieStorage {
 		for (TaskieTask task : eventTaskList) {
 			while (currentEndOfDay.before(sixDaysLater) && 
 				   currentEndOfDay.before(task.getStartTime())) {
-				CalendarPair slot = new CalendarPair(currentEnd, currentEndOfDay);
-				slots.add(slot);
+				if (currentEnd.before(currentEndOfDay)) {
+					CalendarPair slot = new CalendarPair(currentEnd, currentEndOfDay);
+					slots.add(slot);
+				}
 				currentEndOfDay.add(Calendar.DATE, 1);
 				currentSixAM.add(Calendar.DATE, 1);
-				currentEnd = currentSixAM;
+				currentEnd = currentEnd.after(currentSixAM) ? currentEnd : currentSixAM;
+			}
+			if (currentEndOfDay.after(sixDaysLater)) {
+				break;
 			}
 			if (task.getEndTime().after(currentEnd)) {
 				if (task.getStartTime().after(currentEnd)) {
@@ -428,11 +433,13 @@ public class TaskieStorage {
 		}
 		
 		while (currentEndOfDay.before(sixDaysLater)) {
-			CalendarPair slot = new CalendarPair(currentEnd, currentEndOfDay);
-			slots.add(slot);
+			if (currentEnd.before(currentEndOfDay)) {
+				CalendarPair slot = new CalendarPair(currentEnd, currentEndOfDay);
+				slots.add(slot);
+			}
 			currentEndOfDay.add(Calendar.DATE, 1);
 			currentSixAM.add(Calendar.DATE, 1);
-			currentEnd = currentSixAM;
+			currentEnd = currentEnd.after(currentSixAM) ? currentEnd : currentSixAM;
 		}
 		
 		return slots;
