@@ -60,6 +60,7 @@ public class TaskieLogic {
 			freeSlots = new ArrayList<CalendarPair>();
 			allTasks = new ArrayList<IndexTaskPair>();
 			mainTasks = new ArrayList<IndexTaskPair>();
+			/*
 			comparator = new Comparator<IndexTaskPair>() {
 				@Override
 		        public int compare(IndexTaskPair first, IndexTaskPair second) {
@@ -68,6 +69,8 @@ public class TaskieLogic {
 					return first.getTask().getEndTime().compareTo(second.getTask().getEndTime());
 		        }
 			};
+			*/
+			retrieve(retrieveSave);
 			log.fine("Initialisation Completed.");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -91,8 +94,6 @@ public class TaskieLogic {
 				redoStack.clear();
 			}
 			takeAction(action);
-			Collections.sort(mainTasks, comparator);
-			Collections.sort(allTasks, comparator);
 			return new LogicOutput(feedback, getMain(), getAll());
 	}
 
@@ -141,7 +142,7 @@ public class TaskieLogic {
 								 tod = new ArrayList<IndexTaskPair>(),
 								 tmr = new ArrayList<IndexTaskPair>(),
 								 els = new ArrayList<IndexTaskPair>();
-		getAllTasks();
+		retrieveAllTasks();
 		Calendar now = Calendar.getInstance();
 		for (IndexTaskPair pair : allTasks) {
 			if (pair.getTask().getEndTime() == null) {
@@ -179,10 +180,10 @@ public class TaskieLogic {
 			assert 1 == 0;
 		}
 		
-		Collections.sort(ovd, comparator);
-		Collections.sort(tod, comparator);
-		Collections.sort(tmr, comparator);
-		Collections.sort(els, comparator);
+		Collections.sort(ovd);
+		Collections.sort(tod);
+		Collections.sort(tmr);
+		Collections.sort(els);
 		
 		all.add(format(0, ovd));
 		all.add(format(ovd.size(), tod));
@@ -244,13 +245,13 @@ public class TaskieLogic {
 	 * 
 	 * 
 	 */
-	private ArrayList<IndexTaskPair> getAllTasks() {
+	private void retrieveAllTasks() {
 		allTasks.clear();
 		ArrayList<TaskieTask> complete = TaskieStorage.displayAllTasks();
 		for (int i = 0; i < complete.size(); i++) {
 			allTasks.add(new IndexTaskPair(i, complete.get(i)));
 		}
-		return allTasks;
+		Collections.sort(allTasks);
 	}
 	
 	private ArrayList<String> format(int index, ArrayList<IndexTaskPair> list) {
@@ -283,9 +284,9 @@ public class TaskieLogic {
 			}
 			
 			if (isSameDay) {
-				formatted.add(new String(index + ".  " + task.getTitle() + "-time " + sst + " ~ " + "-time " + sdf2.format(et.getTime())));
+				formatted.add(new String(index + ".  " + task.getTitle() + " -time " + sst + " ~ " + " -time " + sdf2.format(et.getTime())));
 			} else {
-				formatted.add(new String(index + ".  " + task.getTitle() + "-time " + sst + "  " + "-time " + set));
+				formatted.add(new String(index + ".  " + task.getTitle() + " -time " + sst + "  " + " -time " + set));
 			}
 		}
 		return formatted;
@@ -299,9 +300,10 @@ public class TaskieLogic {
 		return slots;
 	}
 
-	private void retrieveLeft(Calendar day) throws Exception {
+	private void retrieve(Calendar day) throws Exception {
 		mainTasks.clear();
-		getAllTasks();
+		retrieveAllTasks();
+		
 		if (day == null) {
 			retrieveSave = null;
 			for (IndexTaskPair pair : allTasks) {
@@ -317,6 +319,7 @@ public class TaskieLogic {
 			end.add(Calendar.DATE, 1);
 			mainTasks = TaskieStorage.searchTask(start, end);
 		}
+		Collections.sort(mainTasks);
 	}
 	
 	private int getListIndex(IndexTaskPair pair) {
@@ -343,12 +346,8 @@ public class TaskieLogic {
 	private void add(TaskieTask task) throws Exception {
 		IndexTaskPair added = TaskieStorage.addTask(task);
 		assert task.getType().equals(added.getTask().getType());
-		try {
-			retrieveLeft(added.getTask().getEndTime());
-		} catch (Exception e) {
-			feedback = e.getMessage();
-			return;
-		}
+		
+		retrieve(added.getTask().getEndTime());
 		
 		if (!isUndoAction) {
 			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, "right", getListIndex(added) + 1);
@@ -377,8 +376,9 @@ public class TaskieLogic {
 			TaskieTask deleted = TaskieStorage.deleteTask(realIndex);
 			String title = deleted.getTitle();
 			
-			retrieveLeft(retrieveSave);
+			retrieve(retrieveSave);
 			
+			/*
 			for (int i = 0; i < mainTasks.size(); i++) {
 				if (mainTasks.get(i).getIndex() == realIndex) {
 					mainTasks.remove(i);
@@ -391,6 +391,7 @@ public class TaskieLogic {
 					break;
 				}
 			}
+			*/
 			
 			feedback = new String("\"" + title + "\"" + " is deleted");
 			

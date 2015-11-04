@@ -307,7 +307,7 @@ class FloatComparator implements Comparator<TaskieTask> {
 	}
 }
 
-class IndexTaskPair {
+class IndexTaskPair implements Comparable<IndexTaskPair> {
 	private int index;
 	private TaskieTask task;
 
@@ -331,6 +331,7 @@ class IndexTaskPair {
 	public void setTask(TaskieTask task) {
 		this.task = task;
 	}
+	
 /*	
 	@Override
 	public boolean equals(Object pair) {
@@ -341,4 +342,22 @@ class IndexTaskPair {
 		}
 	}
 	*/
+
+	@Override
+	public int compareTo(IndexTaskPair p) {
+		if (p instanceof IndexTaskPair) {
+			IndexTaskPair pair = (IndexTaskPair) p;
+			if (this.getTask().getEndTime() == null && pair.getTask().getEndTime() == null) {
+				return this.getTask().getTitle().compareTo(pair.getTask().getTitle());
+			} else if (this.getTask().getEndTime() == null) {
+				return 1;
+			} else if (pair.getTask().getEndTime() == null) {
+				return -1;
+			} else {
+				return this.getTask().getEndTime().compareTo(pair.getTask().getEndTime());
+			}
+		} else {
+			return -1;
+		}
+	}
 }
