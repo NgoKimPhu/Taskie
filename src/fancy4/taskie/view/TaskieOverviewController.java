@@ -94,13 +94,10 @@ public class TaskieOverviewController {
 		mainDisplay = FXCollections.observableArrayList();
 		createTree(new ArrayList<String>());
 
-		//populateTree();
+
 		setupCell();
-		setupListCell();
-		String[] fruits  = { "1.finish hw-time 2pm", "prepare for presentation-time 4 nov 3pm", "read book -time 12am 10 dec"};
-		//MainList.setItems(FXCollections.observableArrayList(fruits));
-		
 	
+		
 		
 		try {
 			logicOut = TaskieLogic.logic().execute("search");
@@ -140,6 +137,13 @@ public class TaskieOverviewController {
 			}
 		});
 	}
+	private void setupTreeCell() {
+		AllTree.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
+			@Override public TreeCell<String> call(TreeView<String> treeView) {
+				return new TaskTreeCell();
+			}
+		});
+	}
 
 
 
@@ -164,6 +168,7 @@ public class TaskieOverviewController {
 			TreeItem<String> everythingElseLeaf = new TreeItem<String>(str);
 			everythingElseNode.getChildren().add(everythingElseLeaf);
 		}
+		setupTreeCell();
 		mainDisplay.removeAll(mainDisplay);
 		mainDisplay.addAll(main);
 		setupListCell();
@@ -175,14 +180,14 @@ public class TaskieOverviewController {
 
 	private void createTree(ArrayList<String> allTask) {
 		dummyRoot = new TreeItem<>("root");
-		overdueNode = new TreeItem<>("Overdue");
+		overdueNode = new TreeItem<>("-title Overdue");
 		overdueNode.setExpanded(true);
 
-		todayNode = new TreeItem<>("Today");
+		todayNode = new TreeItem<>("-title Today");
 		todayNode.setExpanded(true);
-		tomorrowNode = new TreeItem<>("Tomorrow");
+		tomorrowNode = new TreeItem<>("-title Tomorrow");
 		tomorrowNode.setExpanded(true);
-		everythingElseNode = new TreeItem<>("Everything Else");
+		everythingElseNode = new TreeItem<>("-title Everything Else");
 		everythingElseNode.setExpanded(true);
 
 
