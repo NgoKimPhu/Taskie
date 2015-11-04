@@ -26,6 +26,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.util.Callback;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Stack;
 
 import fancy4.taskie.MainApp;
 import fancy4.taskie.model.LogicOutput;
@@ -68,6 +70,10 @@ public class TaskieOverviewController {
 	private TreeItem<String> everythingElseNode;
 
 	private PseudoClass titileCell = PseudoClass.getPseudoClass("titileCell");
+
+	private Stack<String> undo_command;
+	private Stack<String> redo_command;
+	private boolean upPressed = false;
 	public TaskieOverviewController() {
 
 	}
@@ -81,6 +87,8 @@ public class TaskieOverviewController {
 				textInput.requestFocus();
 			}
 		});
+		undo_command = new Stack<String>();
+		redo_command = new Stack<String>();
 		mainDisplay = FXCollections.observableArrayList();
 		createTree(new ArrayList<String>());
 		setupTestList();
@@ -94,7 +102,7 @@ public class TaskieOverviewController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+	
 	}
 	private void setupCell() {
 		AllTree.setCellFactory(p -> {
@@ -189,6 +197,7 @@ public class TaskieOverviewController {
 		//root.setExpanded(true);
 	}
 	public void inputEnter(KeyEvent event) {
+		event.consume();
 		String input;
 		String response;
 		LogicOutput fromLogic;
@@ -196,6 +205,7 @@ public class TaskieOverviewController {
 		ArrayList<ArrayList<String>> allData; 
 		if (event.getCode() == KeyCode.ENTER) { 
 			input = textInput.getText();  
+			undo_command.push(input);
 			/*ArrayList<String> l1 = new ArrayList<String>();
 			l1.add("enter all1");
 			l1.add("enter all2");
@@ -227,6 +237,42 @@ public class TaskieOverviewController {
 			}
 
 		}
+	
+		if (event.getCode() == KeyCode.UP) {
+			
+			if (!undo_command.isEmpty()) {
+				textInput.clear();
+				String poped = undo_command.pop();
+				redo_command.push(poped);
+				textInput.setText(poped);
+				upPressed = true;
+			}
+		}
+		if (event.getCode() == KeyCode.DOWN) {
+		
+			if (upPressed == true) {
+				if (!redo_command.isEmpty()) {
+					if (!undo_command.isEmpty()) {
+						textInput.clear();
+						String poped = redo_command.pop();
+						undo_command.push(poped);
+						textInput.setText(poped);
+					} else {
+						textInput.clear();
+						String poped = redo_command.pop();
+						undo_command.push(poped);
+					
+						textInput.clear();
+						poped = redo_command.pop();
+						undo_command.push(poped);
+						textInput.setText(poped);
+					}
+				}
+			} else {
+				textInput.clear();
+			}
+		}
+
 
 	}
 
