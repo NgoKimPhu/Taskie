@@ -173,3 +173,11 @@
     -fx-text-fill: #33CCFF;
     
 }
+.plain {
+  -fx-fill: white;
+}
+.time {
+  -fx-fill: white;
+  -fx-font-weight: bold;
+  -fx-font-style: italic;
+}
