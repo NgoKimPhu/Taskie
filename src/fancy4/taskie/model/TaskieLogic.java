@@ -487,7 +487,7 @@ public class TaskieLogic {
 		return indexTaskList;
 	}
 
-	private void update(String screen, int index, TaskieTask task) throws UnrecognisedCommandException {
+	private void update(String screen, int index, TaskieTask task) throws Exception {
 		TaskieTask undoTask = new TaskieTask((String)null);
 		Calendar startTime, endTime;
 
@@ -567,6 +567,9 @@ public class TaskieLogic {
 		} else {
 			throw new UnrecognisedCommandException("Unrecognised update criterion");
 		}
+		
+		retrieveSave = task.getEndTime();
+		retrieve(retrieveSave);
 		// return update(action.getIndex() - 1, action.getTask());
 		if (!isUndoAction) {
 			TaskieAction action = new TaskieAction(TaskieEnum.Actions.UPDATE, screen, index, undoTask);
