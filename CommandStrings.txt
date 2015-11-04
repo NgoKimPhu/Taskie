@@ -9,6 +9,6 @@ markdone done finish
 sort
 undo
 redo
-fs freeslot freetime /fs
+fs freeslot freetime /fs feee
 reset
 exit

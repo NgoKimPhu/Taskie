@@ -177,14 +177,22 @@ public final class TaskieParser {
 	}
 
 	private TaskieAction parseDelete(String commandData) {
+		if (commandData.matches("a|all")) {
+			return new TaskieAction(TaskieEnum.Actions.DELETEALL, null);
+		}
 		TaskSelectorDetector tSD = new TaskSelectorDetector(commandData);
 		
 		return new TaskieAction(TaskieEnum.Actions.DELETE, tSD.getScreen(), tSD.getIndex());
 	}
 
 	private TaskieAction parseSearch(String commandData) {
-		TaskCompiler tC = new TaskCompiler();
+		if (commandData.matches("(marked )?done|finished")) {
+			return new TaskieAction(TaskieEnum.Actions.SEARCH, null, true);
+		} else if (commandData.matches("(marked )?(not |un)(done|finished)|pending")) {
+			return new TaskieAction(TaskieEnum.Actions.SEARCH, null, false);
+		}
 		
+		TaskCompiler tC = new TaskCompiler();
 		return new TaskieAction(TaskieEnum.Actions.SEARCH, tC.compileTask(commandData), commandData);
 	}
 
