@@ -342,8 +342,12 @@ public class TaskieLogic {
 	}
 	
 	private int getListIndex(IndexTaskPair pair) {
+		return getListIndex(pair.getIndex());
+	}
+	
+	private int getListIndex(int realIndex) {
 		for (int i = 0; i < allTasks.size(); i++) {
-			if (pair.getIndex() == allTasks.get(i).getIndex()) {
+			if (realIndex == allTasks.get(i).getIndex()) {
 				return i;
 			}
 		}
@@ -508,12 +512,10 @@ public class TaskieLogic {
 		}
 		
 		if (task.getTitle() != null && task.getTitle().trim().length() != 0) {
-			ArrayList<TaskieTask> taskList = TaskieStorage.updateTaskTitle(realIndex, task.getTitle());
+			TaskieStorage.updateTaskTitle(realIndex, task.getTitle());
 			// undoTask: new task with old title
 			undoTask.setTitle(currTask.getTitle());
-		}
-		
-		if (currTask.getType() == TaskieEnum.TaskType.FLOAT &&
+		} else if (currTask.getType() == TaskieEnum.TaskType.FLOAT &&
 				task.getType() == TaskieEnum.TaskType.DEADLINE) {
 			TaskieStorage.updateFloatToDeadline(realIndex, task.getEndTime());
 			// undoTask: Deadline/Event task with null starttime and null endtime
@@ -567,12 +569,12 @@ public class TaskieLogic {
 		} else {
 			throw new UnrecognisedCommandException("Unrecognised update criterion");
 		}
-		
-		retrieveSave = task.getEndTime();
+
+		retrieveSave = (Calendar) currTask.getEndTime().clone();
 		retrieve(retrieveSave);
 		// return update(action.getIndex() - 1, action.getTask());
 		if (!isUndoAction) {
-			TaskieAction action = new TaskieAction(TaskieEnum.Actions.UPDATE, screen, index, undoTask);
+			TaskieAction action = new TaskieAction(TaskieEnum.Actions.UPDATE, "right", getListIndex(realIndex), undoTask);
 			undoStack.push(action);
 		}
 		feedback = new String("Updated successfully");
