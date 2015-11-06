@@ -71,7 +71,7 @@ public class TaskieOverviewController {
 
 	private TreeItem<String> everythingElseNode;
 
-	private PseudoClass titileCell = PseudoClass.getPseudoClass("titileCell");
+	
 
 	private Stack<String> undo_command;
 	private Stack<String> redo_command;
@@ -109,25 +109,6 @@ public class TaskieOverviewController {
 			e.printStackTrace();
 		}
 	
-	}
-	private void setupCell() {
-		AllTree.setCellFactory(p -> {
-			return new TreeCell<String>() {
-				@Override
-				public void updateItem(String item, boolean empty) {
-					super.updateItem(item, empty);  
-					if (empty) {
-						setText(null);
-						pseudoClassStateChanged(titileCell, false);
-					} else {
-						setText(item);
-						boolean bool = (item.equals("Overdue") || item.equals("Today") || item.equals("Tomorrow")
-								|| item.equals("Everything Else"));
-						pseudoClassStateChanged(titileCell, bool);
-					}
-				}
-			};
-		});
 	}
 	
 	private void setupListCell() {
@@ -173,7 +154,7 @@ public class TaskieOverviewController {
 		
 		mainDisplay.removeAll(mainDisplay);
 		mainDisplay.addAll(main);
-		
+		setupListCell();
 		MainList.setItems(mainDisplay);
 
 	}
