@@ -23,7 +23,7 @@ class TaskListCell extends ListCell<String> {
 					setText(s);
 				}
 			} else {
-	
+				setGraphic(null);
 			}
 		}
 	

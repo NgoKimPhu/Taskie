@@ -95,9 +95,9 @@ public class TaskieOverviewController {
 		createTree(new ArrayList<String>());
 
 
-		setupCell();
+		setupListCell();
 	
-		
+		setupTreeCell();
 		
 		try {
 			logicOut = TaskieLogic.logic().execute("search");
@@ -148,6 +148,8 @@ public class TaskieOverviewController {
 
 
 	public void populate(ArrayList<String> main, ArrayList<ArrayList<String>> list) {
+		
+		
 		overdueNode.getChildren().removeAll(overdueNode.getChildren());
 		todayNode.getChildren().removeAll(todayNode.getChildren());
 		tomorrowNode.getChildren().removeAll(tomorrowNode.getChildren());
@@ -168,10 +170,10 @@ public class TaskieOverviewController {
 			TreeItem<String> everythingElseLeaf = new TreeItem<String>(str);
 			everythingElseNode.getChildren().add(everythingElseLeaf);
 		}
-		setupTreeCell();
+		
 		mainDisplay.removeAll(mainDisplay);
 		mainDisplay.addAll(main);
-		setupListCell();
+		
 		MainList.setItems(mainDisplay);
 
 	}

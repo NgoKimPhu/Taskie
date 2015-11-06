@@ -10,17 +10,19 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 
 class TaskTreeCell extends TreeCell<String> {
-	public static final String TIME_PLACEHOLDER = "%f";
+	public static final String PLACEHOLDER = "%f";
+	
 	private PseudoClass titileCell = PseudoClass.getPseudoClass("titileCell");
 	@Override protected void updateItem(String s, boolean empty) {
 		super.updateItem(s, empty);
+		setDisclosureNode(null);
 		if (!isEmpty()) {
 
 			if (s.contains("-time")) {
 				String time = s.substring(s.indexOf("-time")+5);
 				System.out.println(time);
 				String text = s.substring(0, s.indexOf("-time"));
-				setGraphic(createTextFlow(text, TIME_PLACEHOLDER, time));
+				setGraphic(createTextFlow(text, PLACEHOLDER, time));
 
 			} else if (s.contains("-title")) {
 				String text = s.substring(7);
@@ -30,7 +32,7 @@ class TaskTreeCell extends TreeCell<String> {
 				setGraphic(createTextFlow(s));
 			}
 		} else {
-
+			setGraphic(null);
 		}
 	}
 
@@ -57,7 +59,7 @@ class TaskTreeCell extends TreeCell<String> {
 		boolean isTime = false;
 
 		for (String s: msg) {
-			if (TIME_PLACEHOLDER.equals(s)) {
+			if (PLACEHOLDER.equals(s)) {
 				isTime = true;
 				continue;
 			}
@@ -83,5 +85,6 @@ class TaskTreeCell extends TreeCell<String> {
 
 		return spacer;
 	}
+	
 }
 
