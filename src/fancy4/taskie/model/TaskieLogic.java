@@ -153,7 +153,6 @@ public class TaskieLogic {
 								 tod = new ArrayList<IndexTaskPair>(),
 								 tmr = new ArrayList<IndexTaskPair>(),
 								 els = new ArrayList<IndexTaskPair>();
-		retrieveAllTasks();
 		Calendar now = Calendar.getInstance();
 		for (IndexTaskPair pair : allTasks) {
 			if (pair.getTask().getEndTime() == null) {
@@ -240,6 +239,12 @@ public class TaskieLogic {
 			case EXIT:
 				exit();
 				return;
+			case HELP:
+				if (action.getSearch() instanceof String) {
+					help((String)action.getSearch());
+				} else {
+					feedback = "Unrecognised help command.";
+				}
 			default:
 				add(action.getTask());
 				return;
@@ -247,24 +252,6 @@ public class TaskieLogic {
 		} catch (Exception e) {
 			feedback = e.getMessage();
 		}
-	}
-	
-	
-	
-	/*****
-	 * Below are auxiliary methods.
-	 * 
-	 * 
-	 */
-	private void retrieveAllTasks() {
-		allTasks.clear();
-		ArrayList<TaskieTask> complete = TaskieStorage.displayAllTasks();
-		for (int i = 0; i < complete.size(); i++) {
-			if (!complete.get(i).getStatus()) {
-				allTasks.add(new IndexTaskPair(i, complete.get(i)));
-			}
-		}
-		Collections.sort(allTasks);
 	}
 	
 	private ArrayList<String> format(int index, ArrayList<IndexTaskPair> list) {
@@ -313,6 +300,22 @@ public class TaskieLogic {
 		return slots;
 	}
 
+	/*****
+	 * Below are auxiliary methods.
+	 * 
+	 * 
+	 */
+	private void retrieveAllTasks() {
+		allTasks.clear();
+		ArrayList<TaskieTask> complete = TaskieStorage.displayAllTasks();
+		for (int i = 0; i < complete.size(); i++) {
+			if (!complete.get(i).getStatus()) {
+				allTasks.add(new IndexTaskPair(i, complete.get(i)));
+			}
+		}
+		Collections.sort(allTasks);
+	}
+
 	private void retrieve(Calendar day) throws Exception {
 		mainTasks.clear();
 		retrieveAllTasks();
@@ -342,8 +345,12 @@ public class TaskieLogic {
 	}
 	
 	private int getListIndex(IndexTaskPair pair) {
+		return getListIndex(pair.getIndex());
+	}
+	
+	private int getListIndex(int realIndex) {
 		for (int i = 0; i < allTasks.size(); i++) {
-			if (pair.getIndex() == allTasks.get(i).getIndex()) {
+			if (realIndex == allTasks.get(i).getIndex()) {
 				return i;
 			}
 		}
@@ -387,6 +394,9 @@ public class TaskieLogic {
 				}
 				realIndex = mainTasks.get(index).getIndex();
 			} else if (screen.equalsIgnoreCase("right")) {
+				if (allTasks.isEmpty()) {
+					System.out.println("Empty allTasks");
+				}
 				realIndex = allTasks.get(index).getIndex();
 			} else {
 				throw new UnrecognisedCommandException("Window preference not indicated.");
@@ -396,21 +406,6 @@ public class TaskieLogic {
 			String title = deleted.getTitle();
 			
 			retrieve(retrieveSave);
-			
-			/*
-			for (int i = 0; i < mainTasks.size(); i++) {
-				if (mainTasks.get(i).getIndex() == realIndex) {
-					mainTasks.remove(i);
-					break;
-				}
-			}
-			for (int i = 0; i < allTasks.size(); i++) {
-				if (allTasks.get(i).getIndex() == realIndex) {
-					allTasks.remove(i);
-					break;
-				}
-			}
-			*/
 			
 			feedback = new String("\"" + title + "\"" + " is deleted");
 			
@@ -508,12 +503,10 @@ public class TaskieLogic {
 		}
 		
 		if (task.getTitle() != null && task.getTitle().trim().length() != 0) {
-			ArrayList<TaskieTask> taskList = TaskieStorage.updateTaskTitle(realIndex, task.getTitle());
+			TaskieStorage.updateTaskTitle(realIndex, task.getTitle());
 			// undoTask: new task with old title
 			undoTask.setTitle(currTask.getTitle());
-		}
-		
-		if (currTask.getType() == TaskieEnum.TaskType.FLOAT &&
+		} else if (currTask.getType() == TaskieEnum.TaskType.FLOAT &&
 				task.getType() == TaskieEnum.TaskType.DEADLINE) {
 			TaskieStorage.updateFloatToDeadline(realIndex, task.getEndTime());
 			// undoTask: Deadline/Event task with null starttime and null endtime
@@ -567,12 +560,12 @@ public class TaskieLogic {
 		} else {
 			throw new UnrecognisedCommandException("Unrecognised update criterion");
 		}
-		
-		retrieveSave = task.getEndTime();
+
+		retrieveSave = (Calendar) currTask.getEndTime().clone();
 		retrieve(retrieveSave);
 		// return update(action.getIndex() - 1, action.getTask());
 		if (!isUndoAction) {
-			TaskieAction action = new TaskieAction(TaskieEnum.Actions.UPDATE, screen, index, undoTask);
+			TaskieAction action = new TaskieAction(TaskieEnum.Actions.UPDATE, "right", getListIndex(realIndex), undoTask);
 			undoStack.push(action);
 		}
 		feedback = new String("Updated successfully");
@@ -599,6 +592,10 @@ public class TaskieLogic {
 	private void getFreeSlots() {
 		isFreeSlots = true;
 		freeSlots = TaskieStorage.getFreeSlots();
+	}
+	
+	private void help(String o) {
+		
 	}
 	
 	
