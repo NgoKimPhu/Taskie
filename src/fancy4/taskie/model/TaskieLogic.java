@@ -17,20 +17,14 @@ import java.util.Date;
 public class TaskieLogic {
 
 	private static TaskieLogic logic;
-	
-	private Comparator<IndexTaskPair> comparator;
-	private ArrayList<IndexTaskPair> mainTasks;
-	private ArrayList<IndexTaskPair> allTasks;
+
+	private boolean isFreeSlots, isMarkdone, isSearch, isUndoAction;
+	private Stack<TaskieAction> commandSave, undoStack, redoStack;
+	private ArrayList<IndexTaskPair> mainTasks, allTasks;
 	private ArrayList<CalendarPair> freeSlots;
-	private Stack<TaskieAction> commandSave;
-	private Stack<TaskieAction> undoStack;
-	private Stack<TaskieAction> redoStack;
 	private Calendar retrieveSave;
-	private boolean isUndoAction;
-	private boolean isFreeSlots;
-	private boolean isMarkDone;
 	private String feedback;
-	
+
 	private final Logger log = Logger.getLogger(TaskieLogic.class.getName() );
 	
 	public static TaskieLogic logic() {
@@ -61,16 +55,6 @@ public class TaskieLogic {
 			freeSlots = new ArrayList<CalendarPair>();
 			allTasks = new ArrayList<IndexTaskPair>();
 			mainTasks = new ArrayList<IndexTaskPair>();
-			/*
-			comparator = new Comparator<IndexTaskPair>() {
-				@Override
-		        public int compare(IndexTaskPair first, IndexTaskPair second) {
-					if (first.getTask().getEndTime() == null || second.getTask().getEndTime() == null)
-						return first.getTask().getTitle().compareTo(second.getTask().getTitle());
-					return first.getTask().getEndTime().compareTo(second.getTask().getEndTime());
-		        }
-			};
-			*/
 			retrieve(retrieveSave);
 			log.fine("Initialisation Completed.");
 		} catch (Exception e) {
@@ -82,7 +66,8 @@ public class TaskieLogic {
 			if (str.equals("")) {
 				throw new UnrecognisedCommandException("Empty command.");
 			}
-			isMarkDone = false;
+			isSearch = false;
+			isMarkdone = false;
 			isFreeSlots = false;
 			isUndoAction = false;
 			TaskieParser parser = TaskieParser.getInstance();
@@ -114,8 +99,10 @@ public class TaskieLogic {
 		} else {
 			int size = mainTasks.size();
 			if (mainTasks.isEmpty()) {
-				if (isMarkDone) {
+				if (isMarkdone) {
 					headline = new String("There is no completed task.");
+				} else if (isSearch) {
+					headline = new String("Your search did not match any tasks.");
 				} else {
 					headline = new String("There is no task. Feed me some, or take a nap.");
 				}
@@ -126,7 +113,7 @@ public class TaskieLogic {
 					SimpleDateFormat sdf = new SimpleDateFormat("dd, MMM, yyyy");
 					date = " on " + sdf.format(day);
 				}
-				if (isMarkDone) {
+				if (isMarkdone) {
 					number = size == 1 ? new String("is one completed task") : new String("are " + size + " completed tasks");
 					headline = new String("There " + number + ".");
 				} else {
@@ -436,7 +423,7 @@ public class TaskieLogic {
 				throw new UnrecognisedCommandException("Screen preference not indicated.");
 			}
 			
-			isMarkDone = true;
+			isMarkdone = true;
 			
 			feedback = new String("\"" + title + "\"" + " is marked done");
 			TaskieStorage.markDone(realIndex);
@@ -454,6 +441,7 @@ public class TaskieLogic {
 	
 	private void search(TaskieAction action) {
 		try {
+			isSearch = true;
 			Object searchKey = action.getSearch();
 			mainTasks = primarySearch(searchKey);
 			double time = Math.random() * Math.random() / 1000;
@@ -469,12 +457,14 @@ public class TaskieLogic {
 			ArrayList<String> searchList = new ArrayList<String>();
 			searchList.add((String)searchKey);
 			indexTaskList = TaskieStorage.searchTask(searchList);
+			isSearch = searchKey.equals("") ? false : true;
 		} else if (searchKey instanceof Calendar) {
 			indexTaskList = TaskieStorage.searchTask((Calendar) searchKey, (Calendar) searchKey);
 		} else if (searchKey instanceof Integer) {
 			indexTaskList = TaskieStorage.searchTask(
 					(TaskieEnum.TaskPriority) searchKey);
 		} else if (searchKey instanceof Boolean) {
+			isMarkdone = true;
 			indexTaskList = TaskieStorage.searchTask((Boolean) searchKey);
 		} else {
 			throw new UnrecognisedCommandException("Unrecognised search key");
