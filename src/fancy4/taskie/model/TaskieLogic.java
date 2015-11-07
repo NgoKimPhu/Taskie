@@ -253,7 +253,7 @@ public class TaskieLogic {
 			Calendar st = task.getStartTime();
 			Calendar et = task.getEndTime();
 			boolean isSameDay = false;
-			String sst, set;
+			String sst, set, taskDetail, status;
 			
 			if (st != null && et != null && sdf3.format(st.getTime()).equals(sdf3.format(et.getTime()))) {
 				isSameDay = true;
@@ -270,11 +270,14 @@ public class TaskieLogic {
 				set = "";
 			}
 			
+			status = pair.getTask().getStatus() ? "Completed" : "";
+			
 			if (isSameDay) {
-				formatted.add(new String(index + ".  " + task.getTitle() + " -time " + sst + " ~ " + sdf2.format(et.getTime())));
+				taskDetail = new String(index + ".  " + task.getTitle() + "-time " + sst + " ~ " + sdf2.format(et.getTime()) + "  " + (status = pair.getTask().getStatus() ? "Completed" : ""));
 			} else {
-				formatted.add(new String(index + ".  " + task.getTitle() + " -time " + sst + "  " + set));
+				taskDetail = new String(index + ".  " + task.getTitle() + "-time " + sst + "  " + set);
 			}
+			formatted.add(new String(taskDetail + "    " + status));
 		}
 		return formatted;
 	}
@@ -332,12 +335,21 @@ public class TaskieLogic {
 	}
 	
 	private int getListIndex(IndexTaskPair pair) {
-		return getListIndex(pair.getIndex());
+		return getRightIndex(pair.getIndex());
 	}
 	
-	private int getListIndex(int realIndex) {
+	private int getRightIndex(int realIndex) {
 		for (int i = 0; i < allTasks.size(); i++) {
 			if (realIndex == allTasks.get(i).getIndex()) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	private int getLeftIndex(int realIndex) {
+		for (int i = 0; i < mainTasks.size(); i++) {
+			if (realIndex == mainTasks.get(i).getIndex()) {
 				return i;
 			}
 		}
@@ -431,7 +443,7 @@ public class TaskieLogic {
 			
 			// Construct undo action
 			if (!isUndoAction) {
-				TaskieAction action = new TaskieAction(TaskieEnum.Actions.MARKDONE, screen, index + 1);
+				TaskieAction action = new TaskieAction(TaskieEnum.Actions.MARKDONE, "left", getLeftIndex(realIndex));
 				undoStack.push(action);
 			}
 		} catch (IndexOutOfBoundsException e) {
@@ -555,7 +567,7 @@ public class TaskieLogic {
 		retrieve(retrieveSave);
 		// return update(action.getIndex() - 1, action.getTask());
 		if (!isUndoAction) {
-			TaskieAction action = new TaskieAction(TaskieEnum.Actions.UPDATE, "right", getListIndex(realIndex), undoTask);
+			TaskieAction action = new TaskieAction(TaskieEnum.Actions.UPDATE, "right", getRightIndex(realIndex), undoTask);
 			undoStack.push(action);
 		}
 		feedback = new String("Updated successfully");
