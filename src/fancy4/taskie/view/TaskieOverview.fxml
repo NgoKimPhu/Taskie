@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- @@author A0130221H -->
+
+<?import java.net.*?>
 <?import javafx.scene.effect.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
@@ -8,18 +9,18 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="477.0" prefWidth="800.0" stylesheets="@JMetroLightTheme.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fancy4.taskie.view.TaskieOverviewController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="477.0" prefWidth="800.0" stylesheets="@Theme.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fancy4.taskie.view.TaskieOverviewController">
    <children>
-      <SplitPane dividerPositions="0.9083094555873925" layoutX="254.0" layoutY="66.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="477.0" prefWidth="800.0" styleClass="background" stylesheets="@JMetroLightTheme.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <SplitPane dividerPositions="0.9083094555873925" layoutX="254.0" layoutY="66.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="477.0" prefWidth="800.0" styleClass="background" stylesheets="@Theme.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
-          <AnchorPane maxHeight="400.0" maxWidth="800.0" minHeight="400.0" minWidth="800.0" prefHeight="400.0" prefWidth="800.0" stylesheets="@JMetroLightTheme.css">
+          <AnchorPane maxHeight="400.0" maxWidth="800.0" minHeight="400.0" minWidth="800.0" prefHeight="400.0" prefWidth="800.0" stylesheets="@Theme.css">
                <children>
-                  <SplitPane dividerPositions="0.4899328859060403" maxHeight="400.0" maxWidth="800.0" minHeight="400.0" minWidth="800.0" prefHeight="400.0" prefWidth="800.0" styleClass="background" stylesheets="@JMetroLightTheme.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <SplitPane dividerPositions="0.4899328859060403" maxHeight="400.0" maxWidth="800.0" minHeight="400.0" minWidth="800.0" prefHeight="400.0" prefWidth="800.0" styleClass="background" stylesheets="@Theme.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>
-                      <AnchorPane maxHeight="630.0" maxWidth="400.0" minHeight="386.0" minWidth="383.0" prefHeight="386.0" prefWidth="383.0" stylesheets="@JMetroLightTheme.css">
+                      <AnchorPane maxHeight="630.0" maxWidth="400.0" minHeight="386.0" minWidth="383.0" prefHeight="386.0" prefWidth="383.0" stylesheets="@Theme.css">
                            <children>
                               <ListView fx:id="MainList" layoutX="7.0" layoutY="53.0" prefHeight="346.0" prefWidth="383.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="7.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="53.0" />
-                              <Label fx:id="mainLabel" layoutX="14.0" prefHeight="40.0" prefWidth="63.0" styleClass="label-big" stylesheets="@JMetroLightTheme.css" text="Main" AnchorPane.bottomAnchor="359.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="313.0" AnchorPane.topAnchor="0.0">
+                              <Label fx:id="mainLabel" layoutX="14.0" prefHeight="40.0" prefWidth="63.0" styleClass="label-big" stylesheets="@Theme.css" text="Main" AnchorPane.bottomAnchor="359.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="313.0" AnchorPane.topAnchor="0.0">
                                  <font>
                                     <Font size="33.0" />
                                  </font>
@@ -27,24 +28,24 @@
                               <Label fx:id="mainListFeedback" layoutX="15.0" layoutY="35.0" prefHeight="17.0" prefWidth="374.0" text="Label" />
                            </children>
                         </AnchorPane>
-                      <AnchorPane maxHeight="630.0" maxWidth="400.0" minHeight="403.0" minWidth="400.0" prefHeight="403.0" prefWidth="400.0" stylesheets="@JMetroLightTheme.css">
+                      <AnchorPane maxHeight="630.0" maxWidth="400.0" minHeight="403.0" minWidth="400.0" prefHeight="403.0" prefWidth="400.0" stylesheets="@Theme.css">
                            <children>
                               <TreeView fx:id="AllTree" layoutX="-12.0" layoutY="33.0" prefHeight="370.0" prefWidth="406.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-12.0" AnchorPane.rightAnchor="6.0" AnchorPane.topAnchor="33.0">
                                  <effect>
                                     <Blend />
                                  </effect>
                               </TreeView>
-                              <Label fx:id="allLabel" layoutX="10.0" prefHeight="40.0" prefWidth="32.0" styleClass="label-big" stylesheets="@JMetroLightTheme.css" text="All" />
+                              <Label fx:id="allLabel" layoutX="10.0" prefHeight="40.0" prefWidth="32.0" styleClass="label-big" stylesheets="@Theme.css" text="All" />
                            </children>
                         </AnchorPane>
                     </items>
                   </SplitPane>
                </children>
             </AnchorPane>
-          <AnchorPane maxHeight="60.0" maxWidth="800.0" minHeight="60.0" minWidth="800.0" prefHeight="60.0" prefWidth="800.0">
+          <AnchorPane maxHeight="60.0" maxWidth="800.0" minHeight="60.0" minWidth="800.0" prefHeight="60.0" prefWidth="800.0" stylesheets="@Theme.css">
                <children>
-                  <TextField fx:id="textInput" layoutX="208.0" layoutY="120.0" maxHeight="35.0" maxWidth="800.0" minHeight="35.0" minWidth="800.0" onKeyPressed="#inputEnter" prefHeight="35.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
-                  <Label fx:id="textOutput" alignment="CENTER" layoutX="400.0" layoutY="6.0" maxHeight="40.0" maxWidth="800.0" minHeight="40.0" minWidth="800.0" prefHeight="40.0" prefWidth="800.0" styleClass="label-bright" stylesheets="@JMetroLightTheme.css" text="Welcome to Taskie!" textAlignment="CENTER" textFill="#00c8ff" wrapText="true" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <TextField fx:id="textInput" layoutX="208.0" layoutY="120.0" maxHeight="35.0" maxWidth="800.0" minHeight="35.0" minWidth="800.0" onKeyPressed="#handleKeyPress" prefHeight="35.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
+                  <Label fx:id="textOutput" alignment="CENTER" layoutX="400.0" layoutY="6.0" maxHeight="40.0" maxWidth="800.0" minHeight="40.0" minWidth="800.0" prefHeight="40.0" prefWidth="800.0" styleClass="label-bright" stylesheets="@Theme.css" text="Welcome to Taskie!" textAlignment="CENTER" textFill="#00c8ff" wrapText="true" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <font>
                         <Font name="Calibri Italic" size="15.0" />
                      </font></Label>
