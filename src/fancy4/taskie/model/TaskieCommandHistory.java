@@ -39,4 +39,8 @@ public class TaskieCommandHistory {
 	public void setPointer(int i) {
 		pointer = i;
 	}
+
+	public boolean isEmpty() {
+		return history.isEmpty();
+	}
 }
