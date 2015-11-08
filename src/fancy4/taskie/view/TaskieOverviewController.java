@@ -27,15 +27,9 @@ import java.io.IOException;
 
 //@@author A0130221H
 public class TaskieOverviewController {
-
-
-
-
-
 	// ================================================================
 	// FXML Fields
 	// ================================================================
-
 	@FXML
 	private ListView<String> mainListView;
 
@@ -77,14 +71,14 @@ public class TaskieOverviewController {
 	private static final String SEARCH_CMD = "search";
 	private static final String DEFAULT_INPUT_COMMAND = "Please input a command here";
 	private static final String TREE_ROOT = "root";
-	private static final String TREE_OVERDUE = "-title Overdue";
-	private static final String TREE_TODAY = "-title Today";
-	private static final String TREE_TOMORROW = "-title Tomorrow";
-	private static final String TREE_EVERYTHING_ELSE = "-title Everything Else";
+	private static final String TITLE_FLAG = "-title ";
+	private static final String TREE_OVERDUE = "Overdue";
+	private static final String TREE_TODAY = "Today";
+	private static final String TREE_TOMORROW = "Tomorrow";
+	private static final String TREE_EVERYTHING_ELSE = "Everything Else";
 
 
 	public TaskieOverviewController() {
-
 	}
 
 	@FXML
@@ -124,24 +118,37 @@ public class TaskieOverviewController {
 	 */
 	private void createTree(ArrayList<String> allTask) {
 		dummyRoot = new TreeItem<>(TREE_ROOT);
-		overdueNode = new TreeItem<>(TREE_OVERDUE);
-		overdueNode.setExpanded(true);
+		
+		overdueNode = setupNode(overdueNode, TITLE_FLAG + TREE_OVERDUE);
+		todayNode = setupNode(todayNode, TITLE_FLAG + TREE_TODAY);
+		tomorrowNode = setupNode(tomorrowNode, TITLE_FLAG + TREE_TOMORROW);
+		everythingElseNode = setupNode(everythingElseNode, TITLE_FLAG + TREE_EVERYTHING_ELSE);
+		
 
-		todayNode = new TreeItem<>(TREE_TODAY);
-		todayNode.setExpanded(true);
-		tomorrowNode = new TreeItem<>(TREE_TOMORROW);
-		tomorrowNode.setExpanded(true);
-		everythingElseNode = new TreeItem<>(TREE_EVERYTHING_ELSE);
-		everythingElseNode.setExpanded(true);
-
-		dummyRoot.getChildren().add(overdueNode);
-		dummyRoot.getChildren().add(todayNode);
-		dummyRoot.getChildren().add(tomorrowNode);
-		dummyRoot.getChildren().add(everythingElseNode);
 		allTreeView.setRoot(dummyRoot);
 		allTreeView.setShowRoot(false);
 	}
+/*
+	private void setupNode() {
 
+		overdueNode = new TreeItem<>(TITLE_FLAG + TREE_OVERDUE);
+		overdueNode.setExpanded(true);
+
+		todayNode = new TreeItem<>(TITLE_FLAG + TREE_TODAY);
+		todayNode.setExpanded(true);
+		tomorrowNode = new TreeItem<>(TITLE_FLAG + TREE_TOMORROW);
+		tomorrowNode.setExpanded(true);
+		everythingElseNode = new TreeItem<>(TITLE_FLAG + TREE_EVERYTHING_ELSE);
+		everythingElseNode.setExpanded(true);
+
+	}
+	*/
+	private TreeItem<String> setupNode(TreeItem<String> node, String content) {
+		node = new TreeItem<>(content);
+		node.setExpanded(true);
+		dummyRoot.getChildren().add(node);
+		return node;
+	}
 	/*
 	 * Initialize the ListView by populating it with custom ListCell class
 	 */
