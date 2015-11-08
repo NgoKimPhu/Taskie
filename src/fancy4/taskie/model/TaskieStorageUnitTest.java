@@ -1,3 +1,4 @@
+//@@author A0119390E
 package fancy4.taskie.model;
 
 import static org.junit.Assert.*;
@@ -47,7 +48,7 @@ public class TaskieStorageUnitTest {
 	}
 	@Test
 	// test add a event task partition
-	public void testAddEvent() {
+	public void testAddEvent() throws Exception {
 		try {
 			TaskieStorage.load("unit/");
 			TaskieStorage.deleteAll();
@@ -57,8 +58,8 @@ public class TaskieStorageUnitTest {
 		Calendar start = Calendar.getInstance();
 		Calendar end = Calendar.getInstance();
 		start.set(Calendar.DATE, start.get(Calendar.DATE)-1);
-		TaskieTask deadline = new TaskieTask("study", start, end);
-		TaskieStorage.addTask(deadline);
+		TaskieTask event = new TaskieTask("study", start, end);
+		TaskieStorage.addTask(event);
 		assertEquals(TaskieStorage.displayEventTasks().size(), 1);
 		assertEquals(TaskieStorage.displayAllTasks().size(), 1);
 	}
