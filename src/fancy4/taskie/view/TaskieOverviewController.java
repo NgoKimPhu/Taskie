@@ -1,23 +1,13 @@
-/**
- * @author Lu Yu
- *
- */
+//@@author A0130221H
+
 package fancy4.taskie.view;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.css.PseudoClass;
-//import javafx.collections.FXCollections;
-//import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-//import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
@@ -25,10 +15,8 @@ import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.util.Callback;
-
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Stack;
 
 
@@ -42,13 +30,14 @@ public class TaskieOverviewController {
 	ObservableList<String> mainDisplay;
 	@FXML
 	private ListView<String> MainList;
-
 	@FXML
-	private Label textOutput;
+	private Label mainLabel;
 	@FXML
 	private Label allLabel;
 	@FXML
-	private Label mainLabel;
+	private Label textOutput;
+	@FXML
+	private Label mainListFeedback;
 	@FXML
 	private TreeView<String> AllTree;
 	@FXML
@@ -151,9 +140,13 @@ public class TaskieOverviewController {
 			TreeItem<String> everythingElseLeaf = new TreeItem<String>(str);
 			everythingElseNode.getChildren().add(everythingElseLeaf);
 		}
+		String mainFeedback = main.get(0);
+		ArrayList<String> mainRemovedFirst = main;
 		
+		mainRemovedFirst.remove(0);
 		mainDisplay.removeAll(mainDisplay);
-		mainDisplay.addAll(main);
+		mainDisplay.addAll(mainRemovedFirst);
+		mainListFeedback.setText(mainFeedback);
 		setupListCell();
 		MainList.setItems(mainDisplay);
 

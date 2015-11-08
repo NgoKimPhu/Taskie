@@ -1,3 +1,4 @@
+/* @@author Lu Yu A0130221H */
 .background {
     -fx-background-color: #1d1d1d;
 }
@@ -169,7 +170,7 @@
     -fx-background-color: #1d1d1d;
 }
 .titleCell {
-	-fx-font-size: 14pt;
+	-fx-font-size: 12pt;
     -fx-fill: #33CCFF;
     
 }
