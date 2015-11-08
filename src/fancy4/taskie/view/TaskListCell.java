@@ -33,9 +33,9 @@ class TaskListCell extends ListCell<String> {
 			}
 		}
 	
-	
-
-
+	/**
+	 * Create a FlowPane to display the content and time with different css styles.
+	 */
 	private Node createTextFlow(String... msg) {
 		FlowPane flow = new FlowPane();
 		boolean isTime = false;
