@@ -1,14 +1,12 @@
 add +
 search find view display
-displayall viewall
-clear clr
 delete del - remove rem rm
 delall deleteall removeall remall rmall
 update edit
 markdone done finish
-sort
 undo
 redo
+set setpath path dir cd
 fs freeslot freetime /fs feee
 reset
 exit q
