@@ -35,18 +35,18 @@ public class TaskieLogic {
 
 	/* Constructor */
 	protected TaskieLogic() {
-		allTasks = new ArrayList<IndexTaskPair>();
-		mainTasks = new ArrayList<IndexTaskPair>();
 		undoStack = new Stack<TaskieAction>();
 		redoStack = new Stack<TaskieAction>();
-		freeSlots = new ArrayList<CalendarPair>();
 		commandSave = new Stack<TaskieAction>();
+		allTasks = new ArrayList<IndexTaskPair>();
+		freeSlots = new ArrayList<CalendarPair>();
+		mainTasks = new ArrayList<IndexTaskPair>();
 	}
 	
 	
 
 	/*****
-	 * Below are backbone functions.
+	 * Below are "backbone" functions:
 	 * initialise, execute, getMain, getAll, takeAction
 	 * 
 	 */
@@ -70,6 +70,7 @@ public class TaskieLogic {
 			isUndoAction = false;
 			TaskieParser parser = TaskieParser.getInstance();
 			TaskieAction action = parser.parse(str);
+			// Save the undo- and redo-able actions
 			if (action.getType().equals(TaskieEnum.Actions.ADD) ||
 				action.getType().equals(TaskieEnum.Actions.DELETE) ||
 				action.getType().equals(TaskieEnum.Actions.UPDATE) ||
@@ -81,9 +82,11 @@ public class TaskieLogic {
 				redoStack.clear();
 			}
 			takeAction(action);
+			// Assemble the output: feedback, left screen output, right screen output
 			return new LogicOutput(feedback, getMain(), getAll());
 	}
 
+	/*	The output to left window	*/
 	private ArrayList<String> getMain() {
 		ArrayList<String> main = new ArrayList<String>();
 		String headline, number, date, floating;
@@ -126,7 +129,7 @@ public class TaskieLogic {
 					number = size == 1 ? new String("one task") : new String(size + " tasks");
 					headline = new String("You have " + number + " in total.");
 				} else {
-					number = size == 1 ? new String(" one" + floating + " task") : new String(size + floating + " tasks");
+					number = size == 1 ? new String(" one" + floating + " task") : new String(" " + size + floating + " tasks");
 					headline = new String("You have" + number + date + ".");
 				}
 			}
@@ -137,13 +140,14 @@ public class TaskieLogic {
 	}
 	
 	
-	/*  the "all" format:
+	/*	The output to right window
+	 *    the "all" format:
 	 *		all is an ArrayList<ArrayList<String>>. all.size() == 4
 	 *		The four elements are:
-	 *		a. overdue tasks, 
-	 *		b. today's tasks, 
-	 *		c. tomorrow's tasks and 
-	 *		d. everything else which includes floating tasks and other tasks with deadlines more than two days away.
+	 *		a. overdue tasks, ovd;
+	 *		b. today's tasks, tod;
+	 *		c. tomorrow's tasks, tmr; and
+	 *		d. everything else, els, which includes floating tasks and other tasks with deadlines more than two days away.
 	 * 
 	 * */
 	private ArrayList<ArrayList<String>> getAll() {
@@ -153,18 +157,18 @@ public class TaskieLogic {
 								 tmr = new ArrayList<IndexTaskPair>(),
 								 els = new ArrayList<IndexTaskPair>();
 		
+		// Get the current time
 		Calendar now = Calendar.getInstance();
 		
-		Calendar endOfToday = (Calendar) now.clone();
-		endOfToday.add(Calendar.DATE, 1);
-		endOfToday.set(Calendar.HOUR_OF_DAY, 0);
-		endOfToday.set(Calendar.MINUTE, 0);
-		endOfToday.set(Calendar.SECOND, 0);
-		endOfToday.set(Calendar.MILLISECOND, 0);
+		// Get the time of the end of today
+		Calendar endOfToday = new Calendar.Builder().setDate(now.get(Calendar.YEAR), 
+				now.get(Calendar.MONTH), now.get(Calendar.DATE) + 1).build();
 		
+		// Get the time of the end of tomorrow
 		Calendar endOfTmr = (Calendar) endOfToday.clone();
 		endOfTmr.add(Calendar.DATE, 1);
 		
+		// Add the pairs in allTasks to their respective list
 		for (IndexTaskPair pair : allTasks) {
 			Calendar time = pair.getTask().getEndTime();
 			if (time == null) {
@@ -176,13 +180,10 @@ public class TaskieLogic {
 					tod.add(pair);
 				} else if (time.before(endOfTmr) && time.after(endOfToday)) {
 					tmr.add(pair);
+				} else if (pair.getTask().getEndTime().after(endOfTmr)) {
+					els.add(pair);
 				} else {
-					now = new Calendar.Builder().setDate(now.get(Calendar.YEAR), 
-							now.get(Calendar.MONTH), now.get(Calendar.DATE) + 2).build();
-					if (pair.getTask().getEndTime().after(now)) {
-						els.add(pair);
-					} 
-					now = Calendar.getInstance();
+					assert 1 == 0;
 				}
 			}
 		}
@@ -633,11 +634,18 @@ public class TaskieLogic {
 		
 	}
 	
-	private void setPath(String path) throws Exception {
-		TaskieStorage.load(path);
+	private void setPath(String path) {
+		try {
+			TaskieStorage.load(path);
+			feedback = "File path is set to " + path;
+		} catch (Exception e) {
+			feedback = e.getMessage();
+		}
 	}
 
 	/*****************/
 	/*******END*******/
+	/*******0 F*******/
+	/******L0GIC******/
 	/*****************/
 }
