@@ -217,7 +217,7 @@ public final class TaskieParser {
 				return parseUpdate(commandData);
 			
 			default:
-				return new TaskieAction(actionType, null);
+				return new TaskieAction(actionType, null, commandData);
 		}
 		
 	}
