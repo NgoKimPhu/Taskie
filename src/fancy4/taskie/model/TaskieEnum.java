@@ -6,17 +6,17 @@ package fancy4.taskie.model;
 public class TaskieEnum {
 	
 	public static enum Actions {
-		ADD, SEARCH, DISPLAYALL, CLEAR, DELETE, DELETEALL, UPDATE, MARKDONE, 
-		SORT, UNDO, REDO, FREESLOT, RESET, EXIT, HELP, INVALID
+		ADD, SEARCH, DELETE, DELETEALL, UPDATE, MARKDONE, 
+		UNDO, REDO, FREESLOT, RESET, EXIT, INVALID;
 	}
 	
 	public static enum TaskType {
-		EVENT, DEADLINE, FLOAT
+		EVENT, DEADLINE, FLOAT;
 	}
 	
 	public static enum TaskPriority{
-		//from 0 to 4
-		VERY_HIGH, HIGH, MEDIUM, LOW, VERY_LOW;
+		//from 0--low, 1--high
+		LOW, HIGH;
 	}
 	
 	// Right window rules
