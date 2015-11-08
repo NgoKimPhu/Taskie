@@ -55,7 +55,6 @@ public class TaskieOverviewController {
 	// other Fields
 	// ================================================================
 	private ObservableList<String> obeservableMainList;
-	private MainApp mainApp;
 	private LogicOutput logicOut;
 	private TreeItem<String> dummyRoot;
 	private TreeItem<String> overdueNode;
@@ -63,12 +62,19 @@ public class TaskieOverviewController {
 	private TreeItem<String> tomorrowNode;
 	private TreeItem<String> everythingElseNode;
 	private TaskieCommandHistory cmdHistory;
+	private boolean upPressed;
 
 	// ================================================================
 	// Constants
 	// ================================================================
+	private static final int MAX_INT = Integer.MAX_VALUE;
+	private static final int FEEDBACK_LOGICOUT_INDEX = 0;
+	private static final int OVERDUE_LOGICOUT_INDEX = 0;
+	private static final int TODAY_LOGICOUT_INDEX = 1;
+	private static final int TOMORROW_LOGICOUT_INDEX = 2;
+	private static final int EVERYTHING_ELSE_LOGICOUT_INDEX = 3;
 	private static final String INVALID_COMMAND_MESSAGE = "Invalid command!";
-	private static final String SEARCH_CMD = "search";
+	private static final String VIEW_COMMAND = "view";
 	private static final String DEFAULT_INPUT_COMMAND = "Please input a command here";
 	private static final String TREE_ROOT = "root";
 	private static final String TITLE_FLAG = "-title ";
@@ -95,6 +101,7 @@ public class TaskieOverviewController {
 
 		// Construct the TaskieCommandHistory to keep track of commands typed in by user
 		cmdHistory = new TaskieCommandHistory();
+		upPressed = false;
 
 		obeservableMainList = FXCollections.observableArrayList();
 		createTree(new ArrayList<String>());
@@ -103,7 +110,7 @@ public class TaskieOverviewController {
 		setupTreeCell();
 
 		try {
-			logicOut = TaskieLogic.logic().execute(SEARCH_CMD);
+			logicOut = TaskieLogic.logic().execute(VIEW_COMMAND);
 			populate(logicOut.getMain(), logicOut.getAll());
 		} catch (UnrecognisedCommandException e) {
 			// catch the exception thrown by logic
@@ -112,44 +119,31 @@ public class TaskieOverviewController {
 		}	
 	}
 
-	/*
+	/**
 	 * Initialize the TreeView by adding in children nodes to a dummy root.
-	 * Dummy root is not shown.
+	 * Dummy root is hidden.
 	 */
 	private void createTree(ArrayList<String> allTask) {
 		dummyRoot = new TreeItem<>(TREE_ROOT);
-		
+
 		overdueNode = setupNode(overdueNode, TITLE_FLAG + TREE_OVERDUE);
 		todayNode = setupNode(todayNode, TITLE_FLAG + TREE_TODAY);
 		tomorrowNode = setupNode(tomorrowNode, TITLE_FLAG + TREE_TOMORROW);
 		everythingElseNode = setupNode(everythingElseNode, TITLE_FLAG + TREE_EVERYTHING_ELSE);
-		
+
 
 		allTreeView.setRoot(dummyRoot);
 		allTreeView.setShowRoot(false);
 	}
-/*
-	private void setupNode() {
 
-		overdueNode = new TreeItem<>(TITLE_FLAG + TREE_OVERDUE);
-		overdueNode.setExpanded(true);
-
-		todayNode = new TreeItem<>(TITLE_FLAG + TREE_TODAY);
-		todayNode.setExpanded(true);
-		tomorrowNode = new TreeItem<>(TITLE_FLAG + TREE_TOMORROW);
-		tomorrowNode.setExpanded(true);
-		everythingElseNode = new TreeItem<>(TITLE_FLAG + TREE_EVERYTHING_ELSE);
-		everythingElseNode.setExpanded(true);
-
-	}
-	*/
 	private TreeItem<String> setupNode(TreeItem<String> node, String content) {
 		node = new TreeItem<>(content);
 		node.setExpanded(true);
 		dummyRoot.getChildren().add(node);
 		return node;
 	}
-	/*
+	
+	/**
 	 * Initialize the ListView by populating it with custom ListCell class
 	 */
 	private void setupListCell() {
@@ -161,7 +155,7 @@ public class TaskieOverviewController {
 		});
 	}
 
-	/*
+	/**
 	 * Initialize the TreeView by populating it with custom TreeCell class
 	 */
 	private void setupTreeCell() {
@@ -173,51 +167,61 @@ public class TaskieOverviewController {
 		});
 	}
 
-	/*
+	/**
 	 * Populate the ListView and TreeView (left and right window respectively)
 	 * with content returned by TaskieLogic.
 	 * 
 	 * @param mainList	 ArrayList to be displayed on left window wrapped in LogicOutput class returned by Logic 
 	 * @param allList 	 2D ArrayList to be displayed on right window wrapped in LogicOutput class returned by Logic 
 	 */
-	public void populate(ArrayList<String> mainList, ArrayList<ArrayList<String>> allList) {
-		overdueNode.getChildren().removeAll(overdueNode.getChildren());
-		todayNode.getChildren().removeAll(todayNode.getChildren());
-		tomorrowNode.getChildren().removeAll(tomorrowNode.getChildren());
-		everythingElseNode.getChildren().removeAll(everythingElseNode.getChildren());
-		for (String str : allList.get(0)) {
-			TreeItem<String> overdueLeaf = new TreeItem<String>(str);
-			overdueNode.getChildren().add(overdueLeaf);
-		}
-		for (String str : allList.get(1)) {
-			TreeItem<String> todayLeaf = new TreeItem<String>(str);
-			todayNode.getChildren().add(todayLeaf);
-		}
-		for (String str : allList.get(2)) {
-			TreeItem<String> tomorrowLeaf = new TreeItem<String>(str);
-			tomorrowNode.getChildren().add(tomorrowLeaf);
-		}
-		for (String str : allList.get(3)) {
-			TreeItem<String> everythingElseLeaf = new TreeItem<String>(str);
-			everythingElseNode.getChildren().add(everythingElseLeaf);
-		}
-		String mainFeedback = mainList.get(0);
+	private void populate(ArrayList<String> mainList, ArrayList<ArrayList<String>> allList) {
+		clearNode();
+		populateNode(overdueNode, allList.get(OVERDUE_LOGICOUT_INDEX));
+		populateNode(todayNode, allList.get(TODAY_LOGICOUT_INDEX));
+		populateNode(tomorrowNode, allList.get(TOMORROW_LOGICOUT_INDEX));
+		populateNode(everythingElseNode, allList.get(EVERYTHING_ELSE_LOGICOUT_INDEX));
+
+		String mainFeedback = mainList.get(FEEDBACK_LOGICOUT_INDEX);
 		ArrayList<String> mainRemovedFirst = mainList;
 
 		// Extract the first element of mainList and display it on the mainListFeedbackLabel
 		// Display the rest of the list on mainListView
-		mainRemovedFirst.remove(0);
+		mainRemovedFirst.remove(FEEDBACK_LOGICOUT_INDEX);
 		obeservableMainList.removeAll(obeservableMainList);
 		obeservableMainList.addAll(mainRemovedFirst);
 		mainListFeedbackLabel.setText(mainFeedback);
-		setupListCell();
+		//setupListCell();
 		mainListView.setItems(obeservableMainList);
 	}
 
+	/*
+	 * Clear all nodes under the dummy root
+	 */
+	private void clearNode() {
+		overdueNode.getChildren().removeAll(overdueNode.getChildren());
+		todayNode.getChildren().removeAll(todayNode.getChildren());
+		tomorrowNode.getChildren().removeAll(tomorrowNode.getChildren());
+		everythingElseNode.getChildren().removeAll(everythingElseNode.getChildren());
+	}
 
+	/**
+	 * populate a node with arraylist of String
+	 * 
+	 * @param node: Node under the dummy root node.
+	 * @param list: ArrayList of String from LogicOut returned by Logic
+	 */
+	private void populateNode(TreeItem<String> node, ArrayList<String> list) {
+		for (String str : list) {
+			TreeItem<String> leaf = new TreeItem<String>(str);
+			node.getChildren().add(leaf);
+		}
+	}
 
-
+	/**
+	 * Handle the KeyEvent when ENTER is pressed in TextInput
+	 */
 	private void handleInput() {
+		upPressed = false;
 		String input;
 		String response;
 		input = textInput.getText();  
@@ -235,26 +239,41 @@ public class TaskieOverviewController {
 		}
 
 	}
+
+	/**
+	 * Handle the KeyEvent when UP is pressed in TextInput
+	 */
 	private void handleUp() {
-		if (cmdHistory.isEmpty()) {
+		upPressed = true;
+		if (cmdHistory.getPointer() == 0) {
 			return;
 		} else {
 			cmdHistory.decrementPointer();
 			textInput.setText(cmdHistory.getCommand());
-			textInput.positionCaret(Integer.MAX_VALUE);
+			textInput.positionCaret(MAX_INT);
 		}
 	}
 
+	/**
+	 * Handle the KeyEvent when DOWN is pressed in TextInput
+	 */
 	private void handleDown() {
-		if (cmdHistory.getPointer() == cmdHistory.getSize() - 1) {
-			return;
-
-		} else {
-			cmdHistory.incrementPointer();
-			textInput.setText(cmdHistory.getCommand());
-			textInput.positionCaret(Integer.MAX_VALUE);
+		if (upPressed) {
+			if (cmdHistory.getPointer() == cmdHistory.getSize() - 1) {
+				return;
+			} else {
+				cmdHistory.incrementPointer();
+				textInput.setText(cmdHistory.getCommand());
+				textInput.positionCaret(Integer.MAX_VALUE);
+			}
 		}
 	}
+	
+	/**
+	 * FXML Event Handler of the textInput, handles 3 key events.
+	 * 
+	 * @param event: key event that needs to be handled
+	 */
 	@FXML
 	private void handleKeyPress(KeyEvent event){
 
@@ -274,12 +293,6 @@ public class TaskieOverviewController {
 			break;
 		}
 	}
-
-
-	public void setMainApp(MainApp ma) {
-		mainApp = ma;
-	}
-
 
 }
 
