@@ -62,6 +62,7 @@ public class TaskieOverviewController {
 	private TreeItem<String> tomorrowNode;
 	private TreeItem<String> everythingElseNode;
 	private TaskieCommandHistory cmdHistory;
+	private ArrayList<String> helpList;
 	private boolean upPressed;
 
 	// ================================================================
@@ -82,6 +83,9 @@ public class TaskieOverviewController {
 	private static final String TREE_TODAY = "Today";
 	private static final String TREE_TOMORROW = "Tomorrow";
 	private static final String TREE_EVERYTHING_ELSE = "Everything Else";
+	private static final String HELP_ADD_FLOAT = "add [title] -optional[start time] to/by/till -optional[end time] -optional[date]";
+	private static final String HELP_ADD_DEMO_1 = "add finish work 5pm to 8pm today";
+	private static final String HELP_DELETE = "delete -optional l/r[index], default l[index] if no window specification given";
 
 
 	public TaskieOverviewController() {
@@ -106,6 +110,7 @@ public class TaskieOverviewController {
 		obeservableMainList = FXCollections.observableArrayList();
 		createTree(new ArrayList<String>());
 
+		iniHelpList();
 		setupListCell();
 		setupTreeCell();
 
@@ -117,6 +122,12 @@ public class TaskieOverviewController {
 			// displays the warning message to feedbackLabel.
 			feedbackLabel.setText(INVALID_COMMAND_MESSAGE);
 		}	
+	}
+
+	private void iniHelpList() {
+		helpList = new ArrayList<String>();
+		//helpList.add();
+		
 	}
 
 	/**
@@ -229,6 +240,9 @@ public class TaskieOverviewController {
 		cmdHistory.setPointer(cmdHistory.getSize());
 
 		try {
+			if (input.equals("help")) {
+				showHelp();
+			}
 			logicOut = TaskieLogic.logic().execute(input);
 			populate(logicOut.getMain(), logicOut.getAll());
 			response = logicOut.getFeedback();
@@ -238,6 +252,11 @@ public class TaskieOverviewController {
 			feedbackLabel.setText(INVALID_COMMAND_MESSAGE);
 		}
 
+	}
+
+	private void showHelp() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**

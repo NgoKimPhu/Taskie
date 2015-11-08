@@ -64,7 +64,6 @@ public class MainApp extends Application {
 		this.primaryStage.getIcons().add(icon);
 		
 		initRootLayout();
-		
 		showTaskieOverview();
 	}
 
