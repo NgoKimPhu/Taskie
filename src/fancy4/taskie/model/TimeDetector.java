@@ -11,32 +11,57 @@ import fancy4.taskie.model.TaskieEnum.TaskType;
 
 /**
  * @@author A0126586W
+ * 
+ *  Parses the date and time (range) in a given data String
+ * 
  *  @author Ngo Kim Phu
  */
 class TimeDetector {
 	private static final String PATTERN_TYPE = "(?:(?:-)?\\b(?:float|event|deadline|at|by|due))?\\s?";
 	private static final String PATTERN_DAY = "\\b(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)|"
+			// (on) weekdays
 		+ "(?:on )?(?:(?:(?:next\\s)?((?:Mon|Fri|Sun)(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|"
 		+ "Thu(?:rsday)?|Sat(?:urday)?)\\b)|"
+			// dd/mm or mm/dd or dd\mm or mm\dd
 		+ "(?:(\\d{1,2})\\s?[\\\\\\/]\\s?(\\d{1,2}))|"
+			// dd MMM or MMM dd
 		+ "(?=\\S*\\s?\\S*\\d{1,2})(\\d{1,2})?\\s?(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|"
 		+ "May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|(?:Nov|Dec)(?:ember)?)"
 		+ "\\b\\s?(\\d{1,2})?)";
 	private static final String PATTERN_TIME = "(?:\\b(?:(?<=fr(?:om)?|-|~|to|till|until)|at|by|due))?"
-		+ "\\s?(?<=fr(?:om)?|-|~|to|till|until|\\b)(?:(?:(\\d{1,2})\\s?"
+			// from/to/till
+		+ "\\s?(?<=fr(?:om)?|-|~|to|till|until|\\b)"
+			// lookahead: .mm or :mm or 'h'mm (am or pm or night)
+		+ "(?:(?:(\\d{1,2})\\s?"
 		+ "(?=[.:h]\\s?\\d{1,2}\\s?m?|am|pm|tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)"
+			// .mm or :mm or 'h'mm ('m') (am or pm or night)
 		+ "(?:[.:h]\\s?(\\d{1,2})\\s?m?)?\\s?(am|pm)?\\s?"
 		+ "(tonight|(?:today|tomorrow|tmr)\\s?(?:night)?)?)\\b|(now|(?:to|tmr |tomorrow )night)\\b)|"
+			// from/to/till hh
 		+ "(?:(?:(?<=fr(?:om)?|-|~|to|till|until)|at|by|due))\\s?(\\d{1,2})\\b"
+			// negative lookahead: month not followed by date (to ignore dd MMM but not hh MMM dd)
 		+ "(?!\\s?(?:[\\\\\\/]|(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|"
 		+ "Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|(?:Nov|Dec)(?:ember)?)\\b(?!\\s?\\d{1,2})))";
 	private static final String PATTERN_TIMERANGE_FORMAT = "(?:fr(?:om)?\\s?)?"
 		+ "(?:%1$s)\\s?(?:%2$s)?\\s?(?:-|~|to|till|until)\\s?(?:%2$s)?\\s?(?:%1$s)";
+	private static final int DEFAULT_NIGHT_TIME = 19; // tonight/tmr night... defaulting to 7pm
 	
-	private  final Map<String, Integer> MAP_WEEKDAYS = initWeekdaysMap();
-	private  final Map<String, Integer> MAP_MONTHS = initMonthsMap();
+	/**
+	 * A dictionary that maps Strings of weekday to Calendar’s weekday enum
+	 */
+	private final Map<String, Integer> MAP_WEEKDAYS = initWeekdaysMap();
 	
-	private  Map<String, Integer> initWeekdaysMap() {
+	/**
+	 * A dictionary that maps Strings of month to Calendar’s month enum
+	 */
+	private final Map<String, Integer> MAP_MONTHS = initMonthsMap();
+	
+	/**
+	 * Initializes an immutable map for weekdays map field
+	 * @return
+	 * 		An immutable map for weekdays map field
+	 */
+	private Map<String, Integer> initWeekdaysMap() {
 		Map<String, Integer> map = new HashMap<String, Integer>();
 		map.put("mon", Calendar.MONDAY);
 		map.put("tue", Calendar.TUESDAY);
@@ -48,7 +73,12 @@ class TimeDetector {
 		return Collections.unmodifiableMap(map);
 	}
 	
-	private  Map<String, Integer> initMonthsMap() {
+	/**
+	 * Initializes an immutable map for months map field
+	 * @return
+	 * 		An immutable map for months map field
+	 */
+	private Map<String, Integer> initMonthsMap() {
 		Map<String, Integer> map = new HashMap<String, Integer>();
 		map.put("jan", Calendar.JANUARY);
 		map.put("feb", Calendar.FEBRUARY);
@@ -75,6 +105,11 @@ class TimeDetector {
 		this("");
 	}
 	
+	/**
+	 * Initializes data String and start time and end time
+	 * @param dataString
+	 * 		an optional data String
+	 */
 	public TimeDetector(String dataString) {
 		this.dataString = dataString;
 		taskType = TaskType.FLOAT;
@@ -100,7 +135,10 @@ class TimeDetector {
 		detectTime();
 	}
 	
-	// expected taskType: FLOAT / DEADLINE or EVENT
+	/**
+	 * Parses date and time in dataString and stores the date and time found in startTime, endTime;
+	 * stores task type in taskType (expected value: FLOAT or DEADLINE or EVENT)
+	 */
 	public void detectTime() {
 		if (!dataString.equals("")) {
 			matchStartPos = dataString.length()-1;
@@ -143,6 +181,11 @@ class TimeDetector {
 		}
 	}
 	
+	/**
+	 * Removes the time from the input data String
+	 * @return
+	 * 		A String with the time removed
+	 */
 	public String removeTime() {
 		String dataWithoutTime = dataString;
 		if (matchStartPos < matchEndPos) {
@@ -151,6 +194,17 @@ class TimeDetector {
 		return dataWithoutTime.trim().replaceAll("\\s{2,}", " ");
 	}
 	
+	/**
+	 * Tells whether or not this String contains a match for
+	 * the given {@link java.util.regex.Pattern regular expression}.
+	 * 
+	 * @param patternString
+	 * 		the regular expression to which this string is to be matched
+	 * @param dataString
+	 * 		a String to search match in
+	 * @return
+	 * 		true if, and only if, this string contains match for the given regular expression
+	 */
 	private boolean hasMatchFound(String patternString, String dataString) {
 		matcher.usePattern(Pattern.compile("(?i)" + patternString));
 		matcher.reset(dataString);
@@ -166,6 +220,14 @@ class TimeDetector {
 		return matchFound;
 	}
 
+	/**
+	 * Sets the time's date fields based on the regular expression matcher's group
+	 * 
+	 * @param time
+	 * 		The time to be modified
+	 * @param groupOffset
+	 * 		The group offset to read groups' data from
+	 */
 	private void setDate(Calendar time, int groupOffset) {
 		if (matcher.group(groupOffset) != null) { // (today|tomorrow|tmr)
 			if (!matcher.group(groupOffset).contains("today")) {
@@ -207,6 +269,18 @@ class TimeDetector {
 		}
 	}
 	
+	/**
+	 * Sets the time's time-in-day fields based on the regular expression matcher's group
+	 * 
+	 * @param time
+	 * 		The time to be modified
+	 * @param groupOffset
+	 * 		The group offset to read groups' data from
+	 */
+	/**
+	 * @param time
+	 * @param groupOffset
+	 */
 	private void setTime(Calendar time, int groupOffset) {
 		time.set(Calendar.MINUTE, 0);
 		if (matcher.group(groupOffset) != null) { // (\d{1,2})
@@ -235,7 +309,7 @@ class TimeDetector {
 			if (matcher.group(groupOffset + 4).equals("now")) {
 				time.setTime(Calendar.getInstance().getTime());
 			} else {
-				time.set(Calendar.HOUR_OF_DAY, 19); // TODO magic 7pm
+				time.set(Calendar.HOUR_OF_DAY, DEFAULT_NIGHT_TIME);
 			}
 		} else { // \d{1,2}
 			int hour = Integer.parseInt(matcher.group(groupOffset + 5));
@@ -246,10 +320,24 @@ class TimeDetector {
 		}
 	}
 	
+	/** Returns the matched String
+	 * @return
+	 * 		The substring matching the regular expression
+	 */
 	private String timeMatchSubstr() {
 		return dataString.substring(matchStartPos, matchEndPos);
 	}
 	
+	/**
+	 * Generates a time range pattern
+	 * 
+	 * @param patternString
+	 * 		The pattern to search range for, be it date or time-in-day
+	 * @param skippedString
+	 * 		The optional pattern in between the range
+	 * @return
+	 * 		The generated time range pattern
+	 */
 	private String getTimeRangePattern (String patternString, String skippedString) {
 		return String.format(PATTERN_TIMERANGE_FORMAT, patternString, skippedString);
 	}
