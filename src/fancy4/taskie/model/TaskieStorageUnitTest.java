@@ -29,7 +29,7 @@ public class TaskieStorageUnitTest {
 		}
 		TaskieTask float2 = new TaskieTask("finish tutorial again");
 		TaskieStorage.addTask(float2);
-		assertEquals(TaskieStorage.displayFloatTask().size(), 2);
+		assertEquals(TaskieStorage.displayFloatTasks().size(), 2);
 	}
 	
 	@Test
@@ -40,20 +40,20 @@ public class TaskieStorageUnitTest {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
-		TaskieTask deadline = new TaskieTask("study", new Date());
+		TaskieTask deadline = new TaskieTask("study", Calendar.getInstance());
 		TaskieStorage.addTask(deadline);
-		assertEquals(TaskieStorage.displayDeadlineTask().size(), 1);
+		assertEquals(TaskieStorage.displayDeadlineTasks().size(), 1);
 	}
 	
 	@Test
-	public void testDeleteFloat() {
+	public void testDelete() {
 		try {
 			TaskieStorage.load("unit/");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
-		TaskieStorage.deleteTask(0, TaskieEnum.TaskType.FLOAT);
-		assertEquals(TaskieStorage.displayFloatTask().size(), 1);
+		TaskieStorage.deleteTask(0);
+		assertEquals(TaskieStorage.displayAllTasks().size(), 1);
 	}
 	
 	@Test
@@ -66,23 +66,7 @@ public class TaskieStorageUnitTest {
 		}
 		ArrayList<String> keyWords = new ArrayList<String>();
 		keyWords.add("");
-		ArrayList<IndexTaskPair> fs = TaskieStorage.searchTask(keyWords, TaskieEnum.TaskType.FLOAT);
+		ArrayList<IndexTaskPair> fs = TaskieStorage.searchTask(keyWords);
 		assertEquals(fs.size(), 1);
 	}
-	@Test
-	// This is the boundary case for upper case partition 
-	public void testSearchDeadline() {
-		try {
-			TaskieStorage.load("unit/");
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-		ArrayList<String> keyWords = new ArrayList<String>();
-		keyWords.add("");
-		ArrayList<IndexTaskPair> ds = TaskieStorage.searchTask(keyWords, TaskieEnum.TaskType.DEADLINE);
-		assertEquals(ds.size(), 0);
-	}
-	
-	
-
 }
