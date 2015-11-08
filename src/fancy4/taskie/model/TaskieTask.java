@@ -11,7 +11,6 @@ import java.util.*;
 public class TaskieTask {
 	private TaskieEnum.TaskType type;
 	private String title;
-	// private long id;
 	private String description;
 	private Calendar startTime;
 	private Calendar endTime;
@@ -85,7 +84,10 @@ public class TaskieTask {
 	}
 
 	// create event.
-	public TaskieTask(String title, Calendar startTime, Calendar endTime) {
+	public TaskieTask(String title, Calendar startTime, Calendar endTime) throws Exception{
+		if(startTime.after(endTime)){
+			throw new Exception("start time should not after end time.");
+		}
 		this.type = TaskieEnum.TaskType.EVENT;
 		this.title = title;
 		this.description = new String();
@@ -96,7 +98,10 @@ public class TaskieTask {
 	}
 
 	// create event with specific priority.
-	public TaskieTask(String title, Calendar startTime, Calendar endTime, TaskieEnum.TaskPriority priority) {
+	public TaskieTask(String title, Calendar startTime, Calendar endTime, TaskieEnum.TaskPriority priority) throws Exception{
+		if(startTime.after(endTime)){
+			throw new Exception("start time should not after end time.");
+		}
 		this.type = TaskieEnum.TaskType.EVENT;
 		this.title = title;
 		this.description = new String();

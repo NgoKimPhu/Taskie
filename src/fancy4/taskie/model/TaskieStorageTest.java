@@ -34,7 +34,7 @@ public class TaskieStorageTest {
 		}
 		Calendar startKey = getDate(2015, 10, 5, 0, 0);
 		Calendar endKey = getDate(2015, 10, 5,16,0);
-		ArrayList<IndexTaskPair> searchStart = TaskieStorage.searchTask(startKey, endKey);
+		ArrayList<IndexTaskPair> searchStart = TaskieStorage.searchTask(startKey, startKey);
 		System.out.println("search date:");
 		for(IndexTaskPair f: searchStart){
 			System.out.println(f.getTask().toString());
