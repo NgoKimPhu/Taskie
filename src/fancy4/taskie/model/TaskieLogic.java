@@ -233,6 +233,7 @@ public class TaskieLogic {
 				return;
 			case SETPATH:
 				setPath((String)action.getSearch());
+				return;
 			case RESET:
 				reset();
 				return;
