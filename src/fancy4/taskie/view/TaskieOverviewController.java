@@ -2,6 +2,7 @@ package fancy4.taskie.view;
 
 import fancy4.taskie.MainApp;
 import fancy4.taskie.model.LogicOutput;
+import fancy4.taskie.model.TaskieCommandHistory;
 import fancy4.taskie.model.TaskieLogic;
 import fancy4.taskie.model.UnrecognisedCommandException;
 
@@ -26,6 +27,8 @@ import java.io.IOException;
 
 //@@author A0130221H
 public class TaskieOverviewController {
+
+
 
 
 
@@ -70,10 +73,11 @@ public class TaskieOverviewController {
 	private Stack<String> undo_command;
 	private Stack<String> redo_command;
 	private boolean upPressed = false;
-	
+	private TaskieCommandHistory cmdHistory;
 	// ================================================================
     // Constants
     // ================================================================
+	private static final String EMPTY_STRING = "";
 	private static final String DEFAULT_INPUT_COMMAND = "Please input a command here";
 	private static final String TREE_ROOT = "root";
 	private static final String TREE_OVERDUE = "-title Overdue";
@@ -97,7 +101,7 @@ public class TaskieOverviewController {
 			}
 		});
 		
-		
+		cmdHistory = new TaskieCommandHistory();
 		undo_command = new Stack<String>();
 		redo_command = new Stack<String>();
 		mainDisplay = FXCollections.observableArrayList();
@@ -111,11 +115,9 @@ public class TaskieOverviewController {
 		try {
 			logicOut = TaskieLogic.logic().execute(SEARCH_CMD);
 			populate(logicOut.getMain(), logicOut.getAll());
-			
-			
 		} catch (UnrecognisedCommandException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			textOutput.setText("Invalid command!");
 		}
 		
 		
@@ -203,7 +205,8 @@ public class TaskieOverviewController {
 		String input;
 		String response;
 		input = textInput.getText();  
-		undo_command.push(input);
+		cmdHistory.addCommand(input);
+		cmdHistory.setPointer(cmdHistory.getSize());
 		
 		try {
 			logicOut = TaskieLogic.logic().execute(input);
@@ -211,46 +214,29 @@ public class TaskieOverviewController {
 			response = logicOut.getFeedback();
 			textOutput.setText(response);
 			textInput.clear();
-			for (String s: logicOut.getMain()) {
-				System.out.println(s);
-			}
 		} catch (UnrecognisedCommandException e) {
-
-			e.printStackTrace();
+			textOutput.setText("Invalid command!");
 		}
 
 	}
 	private void handleUp() {
-		if (!undo_command.isEmpty()) {
-			textInput.clear();
-			String poped = undo_command.pop();
-			redo_command.push(poped);
-			textInput.setText(poped);
-			upPressed = true;
+		if (cmdHistory.isEmpty()) {
+			return;
+		} else {
+			cmdHistory.decrementPointer();
+			textInput.setText(cmdHistory.getCommand());
 		}
 	}
 	
 	private void handleDown() {
-		if (upPressed == true) {
-			if (!redo_command.isEmpty()) {
-				if (!undo_command.isEmpty()) {
-					textInput.clear();
-					String poped = redo_command.pop();
-					undo_command.push(poped);
-					textInput.setText(poped);
-				} else {
-					textInput.clear();
-					String poped = redo_command.pop();
-					undo_command.push(poped);
-				
-					textInput.clear();
-					poped = redo_command.pop();
-					undo_command.push(poped);
-					textInput.setText(poped);
-				}
-			}
-		} else {
+		if (cmdHistory.getPointer() == cmdHistory.getSize() - 1) {
 			textInput.clear();
+			return;
+				
+			
+		} else {
+			cmdHistory.incrementPointer();
+			textInput.setText(cmdHistory.getCommand());
 		}
 	}
 	@FXML
