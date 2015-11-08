@@ -64,6 +64,7 @@ public class TaskieLogic {
 			if (str.equals("")) {
 				throw new UnrecognisedCommandException("Empty command.");
 			}
+			isView = false;
 			isSearch = false;
 			isMarkdone = false;
 			isUndoAction = false;
@@ -83,7 +84,7 @@ public class TaskieLogic {
 
 	private ArrayList<String> getMain() {
 		ArrayList<String> main = new ArrayList<String>();
-		String headline, number, date;
+		String headline, number, date, floating;
 		if (isFreeSlots) {
 			main = format(freeSlots);
 			int size = main.size();
@@ -105,10 +106,13 @@ public class TaskieLogic {
 				}
 			} else {
 				date = new String();
+				floating = new String();
 				if (!mainTasks.get(0).getTask().getType().equals(TaskieEnum.TaskType.FLOAT)) {
 					Date day = mainTasks.get(0).getTask().getEndTime().getTime();
 					SimpleDateFormat sdf = new SimpleDateFormat("dd, MMM, yyyy");
 					date = " on " + sdf.format(day);
+				} else {
+					floating = " floating";
 				}
 				if (isMarkdone) {
 					number = size == 1 ? new String("is one completed task") : new String("are " + size + " completed tasks");
@@ -120,8 +124,8 @@ public class TaskieLogic {
 					number = size == 1 ? new String("one task") : new String(size + " tasks");
 					headline = new String("You have " + number + " in total.");
 				} else {
-					number = size == 1 ? new String("is one task") : new String("are " + size + " tasks");
-					headline = new String("There " + number + date + ".");
+					number = size == 1 ? new String(" one" + floating + " task") : new String(size + floating + " tasks");
+					headline = new String("You have" + number + date + ".");
 				}
 			}
 			main = format(0, mainTasks);
@@ -507,7 +511,7 @@ public class TaskieLogic {
 			currTask = allTasks.get(index).getTask();
 			realIndex = allTasks.get(index).getIndex();
 		} else {
-			throw new UnrecognisedCommandException("Window preference not indicated.");
+			throw new Exception("Window preference not indicated.");
 		}
 		
 		if (task.getTitle() != null && task.getTitle().trim().length() != 0) {
@@ -518,8 +522,8 @@ public class TaskieLogic {
 				task.getType() == TaskieEnum.TaskType.DEADLINE) {
 			TaskieStorage.updateFloatToDeadline(realIndex, task.getEndTime());
 			// undoTask: Deadline/Event task with null starttime and null endtime
-			undoTask.setToFloat(); // A little bit messy :-(
-		} else if (task.getType() == TaskieEnum.TaskType.FLOAT &&
+			undoTask.setToFloat();
+		} else if (currTask.getType() == TaskieEnum.TaskType.FLOAT &&
 					task.getType() == TaskieEnum.TaskType.EVENT) {
 			TaskieStorage.updateFloatToEvent(realIndex, task.getStartTime(), task.getEndTime());
 			// undoTask: same as above
