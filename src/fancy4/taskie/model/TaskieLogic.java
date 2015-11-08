@@ -237,6 +237,9 @@ public class TaskieLogic {
 		} catch (Exception e) {
 			feedback = e.getMessage();
 		}
+		if (!action.getType().equals(TaskieEnum.Actions.FREESLOT)) {
+			isFreeSlots = false;
+		}
 	}
 
 	
