@@ -9,17 +9,15 @@ import fancy4.taskie.view.TaskieOverviewController;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+
 //@@author A0130221H
+
 public class MainApp extends Application {
 	// ================================================================
     // Constants
@@ -30,6 +28,10 @@ public class MainApp extends Application {
 	private static final String OVERVIEW_FXML_PATH = "view/TaskieOverview.fxml";
 	private static final String CSS_PATH = "fancy4/taskie/view/Theme.css";
 	
+	
+	// ================================================================
+    // Fields
+    // ================================================================
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 	
@@ -46,8 +48,10 @@ public class MainApp extends Application {
 	public static ArrayList<String> tmrData = new ArrayList<String>();
 	public static ArrayList<String> elseData = new ArrayList<String>();
 
+	// ================================================================
+    // Methods
+    // ================================================================
 	public MainApp() {
-
 		TaskieLogic.logic().initialise();
 	}
 
@@ -59,8 +63,9 @@ public class MainApp extends Application {
 		this.primaryStage.setTitle(WINDOW_TITLE);
 		Image icon = new Image(getClass().getResourceAsStream(ICON_PATH));
 		this.primaryStage.getIcons().add(icon);
+		
 		initRootLayout();
-
+		
 		showTaskieOverview();
 	}
 
@@ -84,7 +89,7 @@ public class MainApp extends Application {
 
 	private void showTaskieOverview() {
 		try {
-
+			// Load overview from fxml file.
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource(OVERVIEW_FXML_PATH));
 			AnchorPane taskieOverview = (AnchorPane) loader.load();
@@ -98,9 +103,6 @@ public class MainApp extends Application {
 		}
 	}
 	
-
-
-
 	public static void main(String[] args) {
 		launch(args);
 	}
