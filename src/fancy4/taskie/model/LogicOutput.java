@@ -1,5 +1,9 @@
 package fancy4.taskie.model;
 
+/**
+ *	@@author A0107360R
+ */
+
 import java.util.*;
 
 public class LogicOutput {

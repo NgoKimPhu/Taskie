@@ -1,15 +1,14 @@
 package fancy4.taskie.model;
 /**
- * @author Qin_ShiHuang
+ * @@author A0107360R
  *
  */
 public class TaskieAction {
 	
 	private TaskieEnum.Actions type;
-	private TaskieEnum.TaskType taskType; // used to select Task among the 3 display windows
-											// null = main, deadline = deadline+event, float = float
+	private TaskieEnum.TaskType taskType;
 	private TaskieTask task;
-	private String screen; // left or right
+	private String window; // To indicate which window: left or right
 	private	int index = -1;
 	private Object keyword;
 	
@@ -24,7 +23,7 @@ public class TaskieAction {
 	
 	public TaskieAction(TaskieEnum.Actions type, String scr, int index) {
 		this(type, index);
-		this.screen = scr;
+		this.window = scr;
 	}
 	
 	public TaskieAction(TaskieEnum.Actions type, int index, TaskieTask task) {
@@ -34,7 +33,7 @@ public class TaskieAction {
 	
 	public TaskieAction(TaskieEnum.Actions type, String scr, int index, TaskieTask task) {
 		this(type, index, task);
-		this.screen = scr;
+		this.window = scr;
 	}
 	
 	public TaskieAction(TaskieEnum.Actions type, TaskieTask task, Object obj) {
@@ -59,7 +58,7 @@ public class TaskieAction {
 	}
 	
 	public String getScreen() {
-		return screen;
+		return window;
 	}
 	
 	public TaskieTask getTask() {

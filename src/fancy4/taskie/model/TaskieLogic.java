@@ -1,14 +1,13 @@
 package fancy4.taskie.model;
 
 /**
- * @author Qin_ShiHuang 
+ * @@author A0107360R 
  *
  */
 
 import java.text.SimpleDateFormat;
 import java.util.logging.Logger;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Stack;
@@ -27,16 +26,16 @@ public class TaskieLogic {
 
 	private final Logger log = Logger.getLogger(TaskieLogic.class.getName() );
 	
-	public static TaskieLogic logic() {
+	public static TaskieLogic logic(String path) {
 		if (logic == null) {
-			logic = new TaskieLogic();
+			logic = new TaskieLogic(path);
 		}
 		return logic;
 	}
 
 	/* Constructor */
-	protected TaskieLogic() {
-		initialise();
+	protected TaskieLogic(String path) {
+		initialise(path);
 	}
 	
 
@@ -45,9 +44,9 @@ public class TaskieLogic {
 	 * 
 	 * 
 	 */
-	public void initialise() {
+	public void initialise(String path) {
 		try {
-			TaskieStorage.load("");
+			TaskieStorage.load(path);
 			undoStack = new Stack<TaskieAction>();
 			redoStack = new Stack<TaskieAction>();
 			commandSave = new Stack<TaskieAction>();
@@ -67,7 +66,6 @@ public class TaskieLogic {
 			}
 			isSearch = false;
 			isMarkdone = false;
-			isFreeSlots = false;
 			isUndoAction = false;
 			TaskieParser parser = TaskieParser.getInstance();
 			TaskieAction action = parser.parse(str);
@@ -135,8 +133,11 @@ public class TaskieLogic {
 	
 	/*  the "all" format:
 	 *		all is an ArrayList<ArrayList<String>>. all.size() == 4
-	 *		overdue, today, tmr, else
-	 * 		
+	 *		The four elements are:
+	 *		a. overdue tasks, 
+	 *		b. today's tasks, 
+	 *		c. tomorrow's tasks and 
+	 *		d. everything else which includes floating tasks and other tasks with deadlines more than two days away.
 	 * 
 	 * */
 	private ArrayList<ArrayList<String>> getAll() {
@@ -229,12 +230,6 @@ public class TaskieLogic {
 			case EXIT:
 				exit();
 				return;
-			case HELP:
-				if (action.getSearch() instanceof String) {
-					help((String)action.getSearch());
-				} else {
-					feedback = "Unrecognised help command.";
-				}
 			default:
 				add(action.getTask());
 				return;
@@ -243,7 +238,14 @@ public class TaskieLogic {
 			feedback = e.getMessage();
 		}
 	}
+
 	
+	
+	/*****
+	 * Below are auxiliary methods.
+	 * 
+	 * 
+	 */
 	private ArrayList<String> format(int index, ArrayList<IndexTaskPair> list) {
 		ArrayList<String> formatted = new ArrayList<String>();
 		
@@ -291,15 +293,8 @@ public class TaskieLogic {
 			slots.add(i + ". " + list.get(i - 1).toString());
 		}
 		return slots;
-	}
-
+	}	
 	
-	
-	/*****
-	 * Below are auxiliary methods.
-	 * 
-	 * 
-	 */
 	private void retrieveAllTasks() {
 		allTasks.clear();
 		ArrayList<TaskieTask> complete = TaskieStorage.displayAllTasks();
@@ -330,6 +325,7 @@ public class TaskieLogic {
 			end.add(Calendar.DATE, 1);
 			mainTasks = TaskieStorage.searchTask(start, end);
 		}
+		
 		Collections.sort(mainTasks);
 	}
 	
@@ -339,7 +335,7 @@ public class TaskieLogic {
 		Collections.sort(mainTasks);
 	}
 	
-	private int getListIndex(IndexTaskPair pair) {
+	private int getRightIndex(IndexTaskPair pair) {
 		return getRightIndex(pair.getIndex());
 	}
 	
@@ -380,7 +376,7 @@ public class TaskieLogic {
 		retrieve(added.getTask().getEndTime());
 		
 		if (!isUndoAction) {
-			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, "right", getListIndex(added) + 1);
+			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, "right", getRightIndex(added) + 1);
 			undoAction.setTaskType(task.getType());
 			undoStack.push(undoAction);
 		}
@@ -572,11 +568,11 @@ public class TaskieLogic {
 
 		retrieveSave = (Calendar) currTask.getEndTime().clone();
 		retrieve(retrieveSave);
-		// return update(action.getIndex() - 1, action.getTask());
 		if (!isUndoAction) {
 			TaskieAction action = new TaskieAction(TaskieEnum.Actions.UPDATE, "right", getRightIndex(realIndex), undoTask);
 			undoStack.push(action);
 		}
+		
 		feedback = new String("Updated successfully");
 	}
 	
@@ -603,15 +599,6 @@ public class TaskieLogic {
 		freeSlots = TaskieStorage.getFreeSlots();
 	}
 	
-	private void help(String o) {
-		
-	}
-	
-	
-	/*****
-	 * Below are undo/redo methods.
-	 * @throws Exception 
-	 */
 	private void undo() {
 		isUndoAction = true;
 		if (undoStack.isEmpty()) {
@@ -635,4 +622,7 @@ public class TaskieLogic {
 		
 	}
 
+	/*****************/
+	/*******END*******/
+	/*****************/
 }
