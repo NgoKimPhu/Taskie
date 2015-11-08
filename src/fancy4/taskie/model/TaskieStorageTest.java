@@ -1,3 +1,4 @@
+
 package fancy4.taskie.model;
 
 import java.util.*;
@@ -5,7 +6,7 @@ public class TaskieStorageTest {
 
 	public static void main(String[] args) throws Exception{
 		try {
-			TaskieStorage.load("/Users/misakiyuki/Desktop/year2-sem1/CS2103T/taskie/project/main");
+			TaskieStorage.load("/Users/misakiyuki/Desktop");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
