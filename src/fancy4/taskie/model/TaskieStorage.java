@@ -52,13 +52,11 @@ public class TaskieStorage {
 			}
 		}
 		taskList = new File(folder, "/taskList.json");
-		/*
 		if(existPath.exists()){
 			if((existPath != null) && !existPath.equals(taskList)){
 				existPath.renameTo(taskList);
 			}
 		} 
-		*/
 		if (taskList.exists()) {
 			HashMap<String, ArrayList<TaskieTask>> tasks = FileHandler.readFile(taskList);
 			allTasks = tasks.get("all");
