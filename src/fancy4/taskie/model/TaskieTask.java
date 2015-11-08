@@ -239,21 +239,7 @@ public class TaskieTask {
 	public static boolean isDone(TaskieTask task) {
 		return task.getStatus() == true;
 	}
-/*	
-	@Override
-	public boolean equals(Object task) {
-		if (task instanceof TaskieTask) {
-			TaskieTask tt = (TaskieTask) task;
-			return this.title.equals(tt.getTitle()) &&
-				   this.type.equals(tt.getType()) &&
-				   this.endTime.equals(tt.getEndTime()) &&
-				   this.startTime.equals(tt.getStartTime()) &&
-				   this.status == tt.getStatus();
-		} else {
-			return false;
-		}
-	}
-	*/
+
 }
 
 // This comparator will only be used when we sorting event tasks
