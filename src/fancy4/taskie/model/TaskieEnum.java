@@ -7,7 +7,7 @@ public class TaskieEnum {
 	
 	public static enum Actions {
 		ADD, SEARCH, DELETE, DELETEALL, UPDATE, MARKDONE, 
-		UNDO, REDO, FREESLOT, RESET, EXIT, INVALID;
+		UNDO, REDO, SETPATH, FREESLOT, RESET, EXIT, INVALID;
 	}
 	
 	public static enum TaskType {

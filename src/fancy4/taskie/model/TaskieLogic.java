@@ -35,23 +35,24 @@ public class TaskieLogic {
 
 	/* Constructor */
 	protected TaskieLogic() {
-		undoStack = new Stack<TaskieAction>();
-		redoStack = new Stack<TaskieAction>();
-		commandSave = new Stack<TaskieAction>();
-		freeSlots = new ArrayList<CalendarPair>();
 		allTasks = new ArrayList<IndexTaskPair>();
 		mainTasks = new ArrayList<IndexTaskPair>();
+		undoStack = new Stack<TaskieAction>();
+		redoStack = new Stack<TaskieAction>();
+		freeSlots = new ArrayList<CalendarPair>();
+		commandSave = new Stack<TaskieAction>();
 	}
+	
 	
 
 	/*****
 	 * Below are backbone functions.
-	 * 
+	 * initialise, execute, getMain, getAll, takeAction
 	 * 
 	 */
-	public void initialise(String path) {
+	public void initialise() {
 		try {
-			TaskieStorage.load(path);
+			TaskieStorage.load("");
 			retrieve(retrieveSave);
 			log.fine("Initialisation Completed.");
 		} catch (Exception e) {
@@ -70,7 +71,9 @@ public class TaskieLogic {
 			TaskieParser parser = TaskieParser.getInstance();
 			TaskieAction action = parser.parse(str);
 			if (action.getType().equals(TaskieEnum.Actions.ADD) ||
-				action.getType().equals(TaskieEnum.Actions.DELETE)) {
+				action.getType().equals(TaskieEnum.Actions.DELETE) ||
+				action.getType().equals(TaskieEnum.Actions.UPDATE) ||
+				action.getType().equals(TaskieEnum.Actions.MARKDONE)) {
 				commandSave.push(action);
 			}
 			if (action.getType() != TaskieEnum.Actions.UNDO &&
@@ -91,7 +94,7 @@ public class TaskieLogic {
 				headline = "There is no free slots. Take some break.";
 			} else {
 				number = size == 1 ? "is one free slot" : "are " + size + " free slots";
-				headline = new String("There " + number + ".");
+				headline = new String("You have " + number + " in the next seven days.");
 			}
 		} else {
 			int size = mainTasks.size();
@@ -227,6 +230,8 @@ public class TaskieLogic {
 			case FREESLOT:
 				getFreeSlots();
 				return;
+			case SETPATH:
+				setPath((String)action.getSearch());
 			case RESET:
 				reset();
 				return;
@@ -626,6 +631,10 @@ public class TaskieLogic {
 			takeAction(action);
 		} 
 		
+	}
+	
+	private void setPath(String path) throws Exception {
+		TaskieStorage.load(path);
 	}
 
 	/*****************/
