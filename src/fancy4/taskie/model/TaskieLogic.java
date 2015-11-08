@@ -18,7 +18,7 @@ public class TaskieLogic {
 
 	private static TaskieLogic logic;
 
-	private boolean isFreeSlots, isMarkdone, isSearch, isUndoAction;
+	private boolean isFreeSlots, isMarkdone, isSearch, isView, isUndoAction;
 	private Stack<TaskieAction> commandSave, undoStack, redoStack;
 	private ArrayList<IndexTaskPair> mainTasks, allTasks;
 	private ArrayList<CalendarPair> freeSlots;
@@ -116,6 +116,12 @@ public class TaskieLogic {
 				if (isMarkdone) {
 					number = size == 1 ? new String("is one completed task") : new String("are " + size + " completed tasks");
 					headline = new String("There " + number + ".");
+				} else if (isSearch) {
+					number = size == 1 ? new String("is one task") : new String("are " + size + " tasks");
+					headline = new String("There " + number + " found.");
+				} else if (isView) {
+					number = size == 1 ? new String("one task") : new String(size + " tasks");
+					headline = new String("You have " + number + " in total.");
 				} else {
 					number = size == 1 ? new String("is one task") : new String("are " + size + " tasks");
 					headline = new String("There " + number + date + ".");
@@ -468,6 +474,7 @@ public class TaskieLogic {
 			searchList.add((String)searchKey);
 			indexTaskList = TaskieStorage.searchTask(searchList);
 			isSearch = searchKey.equals("") ? false : true;
+			isView = !isSearch;
 		} else if (searchKey instanceof Calendar) {
 			indexTaskList = TaskieStorage.searchTask((Calendar) searchKey, (Calendar) searchKey);
 		} else if (searchKey instanceof Integer) {
