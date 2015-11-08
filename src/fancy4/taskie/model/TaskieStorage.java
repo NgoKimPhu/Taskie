@@ -109,7 +109,7 @@ public class TaskieStorage {
 	}
 
 	// add task
-	public static IndexTaskPair addTask(TaskieTask task) throws Exception {
+	public static IndexTaskPair addTask(TaskieTask task){
 		allTasks.add(task);
 		int index = allTasks.indexOf(task);
 		if (TaskieTask.isEvent(task)) {
