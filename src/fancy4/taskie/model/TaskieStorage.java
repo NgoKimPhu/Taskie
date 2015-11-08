@@ -183,7 +183,7 @@ public class TaskieStorage {
 		return searchResult;
 	}
 
-	public static ArrayList<TaskieTask> markDone(int index) throws IndexOutOfBoundsException {
+	public static ArrayList<TaskieTask> changeStatus(int index) throws IndexOutOfBoundsException {
 		// 0-based index
 		if (index >= allTasks.size()) {
 			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
