@@ -140,22 +140,8 @@ public class TaskieLogic {
 								 tod = new ArrayList<IndexTaskPair>(),
 								 tmr = new ArrayList<IndexTaskPair>(),
 								 els = new ArrayList<IndexTaskPair>();
+		
 		Calendar now = Calendar.getInstance();
-		for (IndexTaskPair pair : allTasks) {
-			if (pair.getTask().getEndTime() == null) {
-				els.add(pair);
-			} else {
-				if (pair.getTask().getEndTime().before(now)) {
-					ovd.add(pair);
-				}
-				now = new Calendar.Builder().setDate(now.get(Calendar.YEAR), 
-						now.get(Calendar.MONTH), now.get(Calendar.DATE) + 2).build();
-				if (pair.getTask().getEndTime().after(now)) {
-					els.add(pair);
-				}
-				now = Calendar.getInstance();
-			}
-		}
 		
 		Calendar endOfToday = (Calendar) now.clone();
 		endOfToday.add(Calendar.DATE, 1);
@@ -163,18 +149,30 @@ public class TaskieLogic {
 		endOfToday.set(Calendar.MINUTE, 0);
 		endOfToday.set(Calendar.SECOND, 0);
 		endOfToday.set(Calendar.MILLISECOND, 0);
-		try {
-			tod = TaskieStorage.searchTask(now, endOfToday);
-		} catch (Exception e) {
-			assert 1 == 0;
-		}
 		
 		Calendar endOfTmr = (Calendar) endOfToday.clone();
 		endOfTmr.add(Calendar.DATE, 1);
-		try {
-			tmr = TaskieStorage.searchTask(endOfToday, endOfTmr);
-		} catch (Exception e) {
-			assert 1 == 0;
+		
+		for (IndexTaskPair pair : allTasks) {
+			Calendar time = pair.getTask().getEndTime();
+			if (time == null) {
+				els.add(pair);
+			} else {
+				if (time.before(now)) {
+					ovd.add(pair);
+				} else if (time.before(endOfToday) && time.after(now)) {
+					tod.add(pair);
+				} else if (time.before(endOfTmr) && time.after(endOfToday)) {
+					tmr.add(pair);
+				} else {
+					now = new Calendar.Builder().setDate(now.get(Calendar.YEAR), 
+							now.get(Calendar.MONTH), now.get(Calendar.DATE) + 2).build();
+					if (pair.getTask().getEndTime().after(now)) {
+						els.add(pair);
+					} 
+					now = Calendar.getInstance();
+				}
+			}
 		}
 		
 		Collections.sort(ovd);
@@ -422,6 +420,8 @@ public class TaskieLogic {
 	}
 	
 	private void markdone(String screen, int index) throws Exception {
+		isMarkdone = true;
+		
 		try {
 			String title;
 			int realIndex;
@@ -434,8 +434,6 @@ public class TaskieLogic {
 			} else {
 				throw new UnrecognisedCommandException("Screen preference not indicated.");
 			}
-			
-			isMarkdone = true;
 			
 			feedback = new String("\"" + title + "\"" + " is marked done");
 			TaskieStorage.markDone(realIndex);
