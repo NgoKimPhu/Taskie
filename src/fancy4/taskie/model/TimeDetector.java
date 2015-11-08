@@ -153,8 +153,6 @@ class TimeDetector {
 			taskType = TaskType.DEADLINE;
 			setDate(startTime, 1);
 			setDate(endTime, 1);
-		} else {
-			System.out.println("No match found for date!");
 		}
 		
 		if (hasMatchFound(getTimeRangePattern(PATTERN_TIME, PATTERN_DAY), dataString)) {
@@ -168,8 +166,6 @@ class TimeDetector {
 				taskType = TaskType.DEADLINE;
 			}
 			setTime(endTime, 1);
-		} else {
-			System.out.println("No match found for time!");
 		}
 		
 		if (taskType != TaskieEnum.TaskType.EVENT) {
@@ -276,10 +272,6 @@ class TimeDetector {
 	 * @param groupOffset
 	 * 		The group offset to read groups' data from
 	 */
-	/**
-	 * @param time
-	 * @param groupOffset
-	 */
 	private void setTime(Calendar time, int groupOffset) {
 		time.set(Calendar.MINUTE, 0);
 		if (matcher.group(groupOffset) != null) { // (\d{1,2})
@@ -319,7 +311,9 @@ class TimeDetector {
 		}
 	}
 	
-	/** Returns the matched String
+	/** 
+	 * Returns the matched String
+	 * 
 	 * @return
 	 * 		The substring matching the regular expression
 	 */
