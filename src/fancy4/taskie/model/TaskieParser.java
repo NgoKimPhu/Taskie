@@ -246,7 +246,8 @@ public final class TaskieParser {
 		}
 		
 		TaskCompiler tC = new TaskCompiler();
-		return new TaskieAction(TaskieEnum.Actions.SEARCH, tC.compileTask(commandData), commandData);
+		TaskieTask task = tC.compileTask(commandData);
+		return new TaskieAction(TaskieEnum.Actions.SEARCH, task, task.getTitle());
 	}
 
 	private TaskieAction parseMarkDone(String commandData) {
