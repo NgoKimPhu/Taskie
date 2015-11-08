@@ -443,7 +443,8 @@ public class TaskieLogic {
 			}
 			
 			feedback = new String("\"" + title + "\"" + " is marked done");
-			TaskieStorage.markDone(realIndex);
+			
+			TaskieStorage.changeStatus(realIndex);
 			retrieve(true);
 			
 			// Construct undo action
