@@ -174,7 +174,7 @@ public class TaskieStorage {
 		return searchResult;
 	}
 
-	// search event based on start time
+	// search tasks based on time specification
 	public static ArrayList<IndexTaskPair> searchTask(Calendar start, Calendar end) throws Exception {
 		if (start.after(end)) {
 			throw new Exception("end time should equals or after start time");
