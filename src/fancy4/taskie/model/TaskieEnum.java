@@ -11,7 +11,7 @@ public class TaskieEnum {
 	}
 	
 	public static enum TaskType {
-		EVENT, DEADLINE, FLOAT, UNKNOWN
+		EVENT, DEADLINE, FLOAT
 	}
 	
 	public static enum TaskPriority{
