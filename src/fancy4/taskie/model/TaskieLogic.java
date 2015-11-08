@@ -26,16 +26,21 @@ public class TaskieLogic {
 
 	private final Logger log = Logger.getLogger(TaskieLogic.class.getName() );
 	
-	public static TaskieLogic logic(String path) {
+	public static TaskieLogic logic() {
 		if (logic == null) {
-			logic = new TaskieLogic(path);
+			logic = new TaskieLogic();
 		}
 		return logic;
 	}
 
 	/* Constructor */
-	protected TaskieLogic(String path) {
-		initialise(path);
+	protected TaskieLogic() {
+		undoStack = new Stack<TaskieAction>();
+		redoStack = new Stack<TaskieAction>();
+		commandSave = new Stack<TaskieAction>();
+		freeSlots = new ArrayList<CalendarPair>();
+		allTasks = new ArrayList<IndexTaskPair>();
+		mainTasks = new ArrayList<IndexTaskPair>();
 	}
 	
 
@@ -47,12 +52,6 @@ public class TaskieLogic {
 	public void initialise(String path) {
 		try {
 			TaskieStorage.load(path);
-			undoStack = new Stack<TaskieAction>();
-			redoStack = new Stack<TaskieAction>();
-			commandSave = new Stack<TaskieAction>();
-			freeSlots = new ArrayList<CalendarPair>();
-			allTasks = new ArrayList<IndexTaskPair>();
-			mainTasks = new ArrayList<IndexTaskPair>();
 			retrieve(retrieveSave);
 			log.fine("Initialisation Completed.");
 		} catch (Exception e) {
@@ -349,7 +348,7 @@ public class TaskieLogic {
 	private int getRightIndex(int realIndex) {
 		for (int i = 0; i < allTasks.size(); i++) {
 			if (realIndex == allTasks.get(i).getIndex()) {
-				return i;
+				return i + 1;
 			}
 		}
 		return -1;
@@ -358,7 +357,7 @@ public class TaskieLogic {
 	private int getLeftIndex(int realIndex) {
 		for (int i = 0; i < mainTasks.size(); i++) {
 			if (realIndex == mainTasks.get(i).getIndex()) {
-				return i;
+				return i + 1;
 			}
 		}
 		return -1;
@@ -383,7 +382,7 @@ public class TaskieLogic {
 		retrieve(added.getTask().getEndTime());
 		
 		if (!isUndoAction) {
-			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, "right", getRightIndex(added) + 1);
+			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, "right", getRightIndex(added));
 			undoAction.setTaskType(task.getType());
 			undoStack.push(undoAction);
 		}
