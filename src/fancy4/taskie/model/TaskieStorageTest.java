@@ -5,7 +5,7 @@ public class TaskieStorageTest {
 
 	public static void main(String[] args) throws Exception{
 		try {
-			TaskieStorage.load("");
+			TaskieStorage.load("/Users/misakiyuki/Desktop/year2-sem1/CS2103T/taskie/project/main");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
