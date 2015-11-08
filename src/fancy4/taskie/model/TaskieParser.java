@@ -70,7 +70,11 @@ public final class TaskieParser {
 					return new TaskieTask(title, timeDetector.getEndTime());
 				
 				case EVENT:
-					return new TaskieTask(title, timeDetector.getStartTime(), timeDetector.getEndTime());
+					try {
+						return new TaskieTask(title, timeDetector.getStartTime(), timeDetector.getEndTime());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				
 				default: // should never reach here
 					throw new Error(STRING_FATAL_TIMEDETECTOR + "\"" + commandData + "\"");
