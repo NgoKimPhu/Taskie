@@ -19,9 +19,12 @@ import javafx.stage.Stage;
 //@@author A0130221H
 
 public class MainApp extends Application {
+
 	// ================================================================
     // Constants
     // ================================================================
+	private static final int MIN_WIDTH = 900;
+	private static final int MIN_HEIGHT = 600;
 	private static final String WINDOW_TITLE = "Taskie";
 	private static final String ICON_PATH = "view/TaskieIcon.png";
 	private static final String ROOT_FXML_PATH = "view/RootLayout.fxml";
@@ -34,8 +37,6 @@ public class MainApp extends Application {
     // ================================================================
 	private Stage primaryStage;
 	private BorderPane rootLayout;
-	
-	
 	public static ObservableList<String> mainDisplay = FXCollections.observableArrayList();
 	public static ObservableList<String> overdueDisplay = FXCollections.observableArrayList();
 	public static ObservableList<String> todayDisplay = FXCollections.observableArrayList();
@@ -82,6 +83,8 @@ public class MainApp extends Application {
 			primaryStage.setScene(scene);
 
 			primaryStage.show();
+			primaryStage.setMinHeight(MIN_HEIGHT);
+			primaryStage.setMinWidth(MIN_WIDTH);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
