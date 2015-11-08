@@ -1,6 +1,10 @@
-//@@author A0130221H
-
 package fancy4.taskie.view;
+
+import fancy4.taskie.MainApp;
+import fancy4.taskie.model.LogicOutput;
+import fancy4.taskie.model.TaskieLogic;
+import fancy4.taskie.model.UnrecognisedCommandException;
+
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,56 +19,68 @@ import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.util.Callback;
+
+import java.util.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Stack;
 
 
-import fancy4.taskie.MainApp;
-import fancy4.taskie.model.LogicOutput;
-import fancy4.taskie.model.TaskieLogic;
-import fancy4.taskie.model.UnrecognisedCommandException;
-
-
+//@@author A0130221H
 public class TaskieOverviewController {
-	ObservableList<String> mainDisplay;
+
+
+
+	// ================================================================
+    // FXML Fields
+    // ================================================================
+	
+	private static final String SEARCH_CMD = "search";
+
 	@FXML
 	private ListView<String> MainList;
+	
 	@FXML
 	private Label mainLabel;
+	
 	@FXML
 	private Label allLabel;
+	
 	@FXML
 	private Label textOutput;
+	
 	@FXML
 	private Label mainListFeedback;
+	
 	@FXML
 	private TreeView<String> AllTree;
+	
 	@FXML
 	private TextField textInput;
-	//@FXML
-	//private TextArea textOutput;
-
+	
+	// ================================================================
+    // other Fields
+    // ================================================================
+	private ObservableList<String> mainDisplay;
 	private MainApp mainApp;
-
-
-	private ArrayList<ArrayList<String>> testList;
 	private LogicOutput logicOut;
-	private ArrayList<String> testMain;
 	private TreeItem<String> dummyRoot;
 	private TreeItem<String> overdueNode;
-
 	private TreeItem<String> todayNode;
-
 	private TreeItem<String> tomorrowNode;
-
 	private TreeItem<String> everythingElseNode;
-
-	
-
 	private Stack<String> undo_command;
 	private Stack<String> redo_command;
 	private boolean upPressed = false;
+	
+	// ================================================================
+    // Constants
+    // ================================================================
+	private static final String DEFAULT_INPUT_COMMAND = "Please input a command here";
+	private static final String TREE_ROOT = "root";
+	private static final String TREE_OVERDUE = "-title Overdue";
+	private static final String TREE_TODAY = "-title Today";
+	private static final String TREE_TOMORROW = "-title Tomorrow";
+	private static final String TREE_EVERYTHING_ELSE = "-title Everything Else";
+
 	public TaskieOverviewController() {
 
 	}
@@ -76,8 +92,12 @@ public class TaskieOverviewController {
 			@Override
 			public void run() {
 				textInput.requestFocus();
+				textInput.setText(DEFAULT_INPUT_COMMAND);
+				textInput.selectAll();
 			}
 		});
+		
+		
 		undo_command = new Stack<String>();
 		redo_command = new Stack<String>();
 		mainDisplay = FXCollections.observableArrayList();
@@ -89,7 +109,7 @@ public class TaskieOverviewController {
 		setupTreeCell();
 		
 		try {
-			logicOut = TaskieLogic.logic().execute("search");
+			logicOut = TaskieLogic.logic().execute(SEARCH_CMD);
 			populate(logicOut.getMain(), logicOut.getAll());
 			
 			
@@ -97,6 +117,8 @@ public class TaskieOverviewController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		
 	
 	}
 	
@@ -117,31 +139,31 @@ public class TaskieOverviewController {
 
 
 
-	public void populate(ArrayList<String> main, ArrayList<ArrayList<String>> list) {
+	public void populate(ArrayList<String> mainList, ArrayList<ArrayList<String>> allList) {
 		
 		
 		overdueNode.getChildren().removeAll(overdueNode.getChildren());
 		todayNode.getChildren().removeAll(todayNode.getChildren());
 		tomorrowNode.getChildren().removeAll(tomorrowNode.getChildren());
 		everythingElseNode.getChildren().removeAll(everythingElseNode.getChildren());
-		for (String str : list.get(0)) {
+		for (String str : allList.get(0)) {
 			TreeItem<String> overdueLeaf = new TreeItem<String>(str);
 			overdueNode.getChildren().add(overdueLeaf);
 		}
-		for (String str : list.get(1)) {
+		for (String str : allList.get(1)) {
 			TreeItem<String> todayLeaf = new TreeItem<String>(str);
 			todayNode.getChildren().add(todayLeaf);
 		}
-		for (String str : list.get(2)) {
+		for (String str : allList.get(2)) {
 			TreeItem<String> tomorrowLeaf = new TreeItem<String>(str);
 			tomorrowNode.getChildren().add(tomorrowLeaf);
 		}
-		for (String str : list.get(3)) {
+		for (String str : allList.get(3)) {
 			TreeItem<String> everythingElseLeaf = new TreeItem<String>(str);
 			everythingElseNode.getChildren().add(everythingElseLeaf);
 		}
-		String mainFeedback = main.get(0);
-		ArrayList<String> mainRemovedFirst = main;
+		String mainFeedback = mainList.get(0);
+		ArrayList<String> mainRemovedFirst = mainList;
 		
 		mainRemovedFirst.remove(0);
 		mainDisplay.removeAll(mainDisplay);
@@ -155,15 +177,15 @@ public class TaskieOverviewController {
 
 
 	private void createTree(ArrayList<String> allTask) {
-		dummyRoot = new TreeItem<>("root");
-		overdueNode = new TreeItem<>("-title Overdue");
+		dummyRoot = new TreeItem<>(TREE_ROOT);
+		overdueNode = new TreeItem<>(TREE_OVERDUE);
 		overdueNode.setExpanded(true);
 
-		todayNode = new TreeItem<>("-title Today");
+		todayNode = new TreeItem<>(TREE_TODAY);
 		todayNode.setExpanded(true);
-		tomorrowNode = new TreeItem<>("-title Tomorrow");
+		tomorrowNode = new TreeItem<>(TREE_TOMORROW);
 		tomorrowNode.setExpanded(true);
-		everythingElseNode = new TreeItem<>("-title Everything Else");
+		everythingElseNode = new TreeItem<>(TREE_EVERYTHING_ELSE);
 		everythingElseNode.setExpanded(true);
 
 
@@ -174,79 +196,86 @@ public class TaskieOverviewController {
 		dummyRoot.getChildren().add(everythingElseNode);
 		AllTree.setRoot(dummyRoot);
 		AllTree.setShowRoot(false);
-		//root.setExpanded(true);
+
 	}
-	public void inputEnter(KeyEvent event) throws IOException {
-		
+	
+	private void handleInput() {
 		String input;
 		String response;
-		LogicOutput fromLogic;
-		ArrayList<String> mainData;
-		ArrayList<ArrayList<String>> allData; 
-		if (event.getCode() == KeyCode.ENTER) { 
-			input = textInput.getText();  
-			undo_command.push(input);
-			if (input.equals("help")) {
-				mainApp.showHelp();
-			}
-
-			try {
-				logicOut = TaskieLogic.logic().execute(input);
-				populate(logicOut.getMain(), logicOut.getAll());
-				response = logicOut.getFeedback();
-				textOutput.setText(response);
-				textInput.clear();
-				for (String s: logicOut.getMain()) {
-					System.out.println(s);
-				}
-			} catch (UnrecognisedCommandException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
-	
-		if (event.getCode() == KeyCode.UP) {
-			
-			if (!undo_command.isEmpty()) {
-				textInput.clear();
-				String poped = undo_command.pop();
-				redo_command.push(poped);
-				textInput.setText(poped);
-				upPressed = true;
-			}
-		}
-		if (event.getCode() == KeyCode.DOWN) {
+		input = textInput.getText();  
+		undo_command.push(input);
 		
-			if (upPressed == true) {
-				if (!redo_command.isEmpty()) {
-					if (!undo_command.isEmpty()) {
-						textInput.clear();
-						String poped = redo_command.pop();
-						undo_command.push(poped);
-						textInput.setText(poped);
-					} else {
-						textInput.clear();
-						String poped = redo_command.pop();
-						undo_command.push(poped);
-					
-						textInput.clear();
-						poped = redo_command.pop();
-						undo_command.push(poped);
-						textInput.setText(poped);
-					}
-				}
-			} else {
-				textInput.clear();
+		try {
+			logicOut = TaskieLogic.logic().execute(input);
+			populate(logicOut.getMain(), logicOut.getAll());
+			response = logicOut.getFeedback();
+			textOutput.setText(response);
+			textInput.clear();
+			for (String s: logicOut.getMain()) {
+				System.out.println(s);
 			}
+		} catch (UnrecognisedCommandException e) {
+
+			e.printStackTrace();
 		}
 
-
+	}
+	private void handleUp() {
+		if (!undo_command.isEmpty()) {
+			textInput.clear();
+			String poped = undo_command.pop();
+			redo_command.push(poped);
+			textInput.setText(poped);
+			upPressed = true;
+		}
+	}
+	
+	private void handleDown() {
+		if (upPressed == true) {
+			if (!redo_command.isEmpty()) {
+				if (!undo_command.isEmpty()) {
+					textInput.clear();
+					String poped = redo_command.pop();
+					undo_command.push(poped);
+					textInput.setText(poped);
+				} else {
+					textInput.clear();
+					String poped = redo_command.pop();
+					undo_command.push(poped);
+				
+					textInput.clear();
+					poped = redo_command.pop();
+					undo_command.push(poped);
+					textInput.setText(poped);
+				}
+			}
+		} else {
+			textInput.clear();
+		}
+	}
+	@FXML
+	private void handleKeyPress(KeyEvent event){
+		
+		switch (event.getCode()) {
+		case ENTER:
+			handleInput();
+			break;
+		case UP:
+			event.consume();
+			handleUp();
+			break;
+		case DOWN:
+			event.consume();
+			handleDown();
+			break;
+		default:
+			break;
+		}
 	}
 
 
-	public void setMainApp(MainApp mainApp) {
-		this.mainApp = mainApp;
+	public void setMainApp(MainApp ma) {
+		mainApp = ma;
 	}
 
 
