@@ -27,9 +27,6 @@ public class TaskieCommandHistory {
 		return history.get(pointer);
 	}
 	
-	public boolean isEmpty() {
-		return pointer == 0;
-	}
 	
 	public int getSize() {
 		return history.size();
