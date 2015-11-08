@@ -1,33 +1,40 @@
 //@@author A0130221H
 package fancy4.taskie.view;
 
-import javafx.css.PseudoClass;
+
 import javafx.scene.Node;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.TreeCell;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 
 class TaskTreeCell extends TreeCell<String> {
-	public static final String PLACEHOLDER = "%f";
+	// ================================================================
+    // Constants
+    // ================================================================
+	private static final String PLAIN_CLASS_CSS = "plain";
+	private static final String TIME_CLASS_CSS = "time";
+	private static final String TITLE_CLASS_CSS = "titleCell";
+	private static final int TITLE_STARTING_INDEX = 7;
+	private static final int STARTING_INDEX = 0;
+	private static final int TIME_STARTING_INDEX = 5;
+	private static final String TITLE_FLAG = "-title";
+	private static final String TIME_FLAG = "-time";
+	private static final String PLACEHOLDER = "%f";
+
 	
-	private PseudoClass titileCell = PseudoClass.getPseudoClass("titileCell");
 	@Override protected void updateItem(String s, boolean empty) {
 		super.updateItem(s, empty);
 		setDisclosureNode(null);
 		if (!isEmpty()) {
 
-			if (s.contains("-time")) {
-				String time = s.substring(s.indexOf("-time")+5);
+			if (s.contains(TIME_FLAG)) {
+				String time = s.substring(s.indexOf(TIME_FLAG) + TIME_STARTING_INDEX);
 				System.out.println(time);
-				String text = s.substring(0, s.indexOf("-time"));
+				String text = s.substring(STARTING_INDEX, s.indexOf(TIME_FLAG));
 				setGraphic(createTextFlow(text, PLACEHOLDER, time));
 
-			} else if (s.contains("-title")) {
-				String text = s.substring(7);
-				//String title = "title";
+			} else if (s.contains(TITLE_FLAG)) {
+				String text = s.substring(TITLE_STARTING_INDEX);
 				setGraphic(createTitleFlow(text)); 
 			} else {
 				setGraphic(createTextFlow(s));
@@ -40,18 +47,11 @@ class TaskTreeCell extends TreeCell<String> {
 	private Node createTitleFlow(String... msg) {
 		FlowPane flow = new FlowPane();
 
-
 		for (String s: msg) {
-
-
 			Text text = new Text(s);
-
-			text.getStyleClass().addAll("titleCell");
-
-
+			text.getStyleClass().addAll(TITLE_CLASS_CSS);
 			flow.getChildren().add(text);
 		}
-
 		return flow;
 	}
 
@@ -67,10 +67,10 @@ class TaskTreeCell extends TreeCell<String> {
 
 			Text text = new Text(s);
 			if (isTime) {
-				text.getStyleClass().addAll("time");
+				text.getStyleClass().addAll(TIME_CLASS_CSS);
 				isTime = false;
 			} else {
-				text.getStyleClass().add("plain");
+				text.getStyleClass().add(PLAIN_CLASS_CSS);
 			}
 			flow.getChildren().add(text);
 		}
@@ -78,14 +78,6 @@ class TaskTreeCell extends TreeCell<String> {
 		return flow;
 	}
 
-	private Node createSpacer(int width) {
-		HBox spacer = new HBox();
-		spacer.setMinWidth(HBox.USE_PREF_SIZE);
-		spacer.setPrefWidth(width);
-		spacer.setMaxWidth(HBox.USE_PREF_SIZE);
 
-		return spacer;
-	}
-	
 }
 
