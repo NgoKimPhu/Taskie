@@ -1,3 +1,4 @@
+//@@author A0119390E
 package fancy4.taskie.model;
 
 /**
@@ -9,11 +10,11 @@ import java.util.*;
 import java.io.*;
 import java.text.*;
 import java.util.logging.*;
-
 import org.json.*;
 
 public class TaskieStorage {
 	private static File taskList;
+	private static File taskFilePath;
 	private static ArrayList<TaskieTask> allTasks;
 	private static ArrayList<TaskieTask> eventTaskList;
 	private static ArrayList<TaskieTask> deadlineTaskList;
@@ -23,8 +24,17 @@ public class TaskieStorage {
 	private static FloatComparator fc = new FloatComparator();
 
 	public static void load(String pathName) throws Exception {
-		File folder;
-		
+		String currentPath = new String();
+		taskFilePath = new File("taskFilePath.txt");
+		File existPath = null;
+		if(taskFilePath.exists()){
+			BufferedReader reader = new BufferedReader(new FileReader(taskFilePath));
+			currentPath = reader.readLine();
+			existPath = new File(currentPath);
+		}else{
+			taskFilePath.createNewFile();
+		}
+		File folder;		
 		if (pathName.trim().length() == 0) {
 			folder = new File("TaskieData");
 			if (!folder.exists()) {
@@ -41,8 +51,14 @@ public class TaskieStorage {
 				}
 			}
 		}
-		
 		taskList = new File(folder, "/taskList.json");
+		/*
+		if(existPath.exists()){
+			if((existPath != null) && !existPath.equals(taskList)){
+				existPath.renameTo(taskList);
+			}
+		} 
+		*/
 		if (taskList.exists()) {
 			HashMap<String, ArrayList<TaskieTask>> tasks = FileHandler.readFile(taskList);
 			allTasks = tasks.get("all");
@@ -56,6 +72,10 @@ public class TaskieStorage {
 			deadlineTaskList = new ArrayList<TaskieTask>();
 			floatTaskList = new ArrayList<TaskieTask>();
 		}
+		FileWriter writer = new FileWriter(taskFilePath);
+		FileHandler.clearFile(taskFilePath);
+		System.out.println(taskList.getPath());
+		writer.write(taskList.getPath());
 	}
 
 	public static ArrayList<TaskieTask> displayAllTasks() {
@@ -477,15 +497,12 @@ public class TaskieStorage {
 	private static void rewriteFile() {
 		FileHandler.clearFile(taskList);
 		for (TaskieTask t : eventTaskList) {
-			// System.out.println(t.getTitle());
 			FileHandler.writeFile(taskList, t);
 		}
 		for (TaskieTask t : deadlineTaskList) {
-			// System.out.println(t.getTitle());
 			FileHandler.writeFile(taskList, t);
 		}
 		for (TaskieTask t : floatTaskList) {
-			// System.out.println(t.getTitle());
 			FileHandler.writeFile(taskList, t);
 		}
 	}
@@ -659,7 +676,6 @@ class FileHandler {
 	}
 
 	public static void clearFile(File file) {
-		// String fileName = file.getName();
 		assert file.exists() && file != null;
 		try {
 			FileWriter writer = new FileWriter(file);
@@ -685,40 +701,41 @@ class FileHandler {
 		return calendar;
 	}
 
-	private static TaskieEnum.TaskType getTaskType(int type) {
+	private static TaskieEnum.TaskType getTaskType(int type) throws Exception{
 		if (isEvent(type)) {
 			return TaskieEnum.TaskType.EVENT;
 		} else if (isDeadline(type)) {
 			return TaskieEnum.TaskType.DEADLINE;
-		} else {
+		} else if(isFloat(type)){
 			return TaskieEnum.TaskType.FLOAT;
+		} else{
+			throw new Exception("invalid task type");
 		}
 	}
-
 	private static boolean isEvent(int type) {
 		return type == 0;
 	}
-
 	private static boolean isDeadline(int type) {
 		return type == 1;
 	}
-
 	private static boolean isFloat(int type) {
 		return type == 2;
 	}
 
-	private static TaskieEnum.TaskPriority getTaskPriority(int priority) {
-		if (priority == 0) {
-			return TaskieEnum.TaskPriority.VERY_HIGH;
-		} else if (priority == 1) {
-			return TaskieEnum.TaskPriority.HIGH;
-		} else if (priority == 2) {
-			return TaskieEnum.TaskPriority.MEDIUM;
-		} else if (priority == 3) {
+	private static TaskieEnum.TaskPriority getTaskPriority(int priority) throws Exception{
+		if (isLow(priority)) {
 			return TaskieEnum.TaskPriority.LOW;
+		} else if (isHigh(priority)) {
+			return TaskieEnum.TaskPriority.HIGH;
 		} else {
-			return TaskieEnum.TaskPriority.VERY_LOW;
+			throw new Exception("invalid priority");
 		}
+	}
+	private static boolean isLow(int priority) {
+		return priority == 0;
+	}
+	private static boolean isHigh(int priority) {
+		return priority == 1;
 	}
 }
 
