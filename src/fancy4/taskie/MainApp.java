@@ -56,8 +56,6 @@ public class MainApp extends Application {
 		TaskieLogic.logic().initialise();
 	}
 
-
-
 	@Override
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
@@ -98,9 +96,6 @@ public class MainApp extends Application {
 			AnchorPane taskieOverview = (AnchorPane) loader.load();
 
 			rootLayout.setCenter(taskieOverview);
-
-			TaskieOverviewController controller = loader.getController();
-			controller.setMainApp(this);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
