@@ -1,3 +1,4 @@
+// @@author A0126586W
 package fancy4.taskie.model;
 import static org.junit.Assert.*;
 
@@ -6,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @@author A0126586W
  *  @author Ngo Kim Phu
  */
 public class TaskieParserTest {

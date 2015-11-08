@@ -1,3 +1,4 @@
+// @@author A0126586W
 package fancy4.taskie.model;
 
 import java.io.FileNotFoundException;
@@ -6,8 +7,6 @@ import java.io.InputStream;
 import java.util.*;
 
 /**
- * @@author A0126586W
- *  
  *  TaskieParser is the component that takes user's input data in the form of a String,
  *  analyzes then builds and returns a TaskieAction object with Action type and optional
  *  attributes like TaskieTask or index depending on its type of Action.

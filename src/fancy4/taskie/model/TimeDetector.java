@@ -1,3 +1,4 @@
+// @@author A0126586W
 package fancy4.taskie.model;
 
 import java.util.Calendar;
@@ -10,8 +11,6 @@ import java.util.regex.Pattern;
 import fancy4.taskie.model.TaskieEnum.TaskType;
 
 /**
- * @@author A0126586W
- * 
  *  Parses the date and time (range) in a given data String
  * 
  *  @author Ngo Kim Phu
