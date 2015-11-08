@@ -1,10 +1,7 @@
 package fancy4.taskie.model;
 
 import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Date;
-
+import java.util.*;
 import org.junit.Test;
 
 public class TaskieStorageUnitTest {
@@ -20,7 +17,7 @@ public class TaskieStorageUnitTest {
 		}
 		TaskieTask float1 = new TaskieTask("finish tutorial");
 		TaskieStorage.addTask(float1);
-		assertEquals(TaskieStorage.displayFloatTask().size(), 1);
+		assertEquals(TaskieStorage.displayFloatTasks().size(), 1);
 	}
 	
 	@Test
