@@ -1,3 +1,4 @@
+//@@author A0119390E
 package fancy4.taskie.model;
 
 /** 
@@ -29,7 +30,7 @@ public class TaskieTask {
 		this.startTime = null;
 		this.endTime = null;
 		// the new task's priority is the lowest
-		this.priority = TaskieEnum.TaskPriority.VERY_LOW;
+		this.priority = TaskieEnum.TaskPriority.LOW;
 		this.status = false;
 	}
 
@@ -68,7 +69,7 @@ public class TaskieTask {
 		this.description = new String();
 		this.startTime = null;
 		this.endTime = endTime;
-		this.priority = TaskieEnum.TaskPriority.VERY_LOW;
+		this.priority = TaskieEnum.TaskPriority.LOW;
 		this.status = false;
 	}
 
@@ -90,7 +91,7 @@ public class TaskieTask {
 		this.description = new String();
 		this.startTime = startTime;
 		this.endTime = endTime;
-		this.priority = TaskieEnum.TaskPriority.VERY_LOW;
+		this.priority = TaskieEnum.TaskPriority.LOW;
 		this.status = false;
 	}
 
@@ -239,7 +240,6 @@ public class TaskieTask {
 	public static boolean isDone(TaskieTask task) {
 		return task.getStatus() == true;
 	}
-
 }
 
 // This comparator will only be used when we sorting event tasks
