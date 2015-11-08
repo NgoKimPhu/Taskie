@@ -1,4 +1,3 @@
-//@@author A0130221H
 
 package fancy4.taskie;
 
@@ -20,15 +19,21 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-
+//@@author A0130221H
 public class MainApp extends Application {
-
+	// ================================================================
+    // Constants
+    // ================================================================
+	private static final String WINDOW_TITLE = "Taskie";
+	private static final String ICON_PATH = "view/TaskieIcon.png";
+	private static final String ROOT_FXML_PATH = "view/RootLayout.fxml";
+	private static final String OVERVIEW_FXML_PATH = "view/TaskieOverview.fxml";
+	private static final String CSS_PATH = "fancy4/taskie/view/Theme.css";
+	
 	private Stage primaryStage;
 	private BorderPane rootLayout;
-	/* public ObservableList<String> taskData = FXCollections.observableArrayList();
-    public ObservableList<String> dTaskData = FXCollections.observableArrayList();
-    public ObservableList<String> fTaskData = FXCollections.observableArrayList();
-	 */
+	
+	
 	public static ObservableList<String> mainDisplay = FXCollections.observableArrayList();
 	public static ObservableList<String> overdueDisplay = FXCollections.observableArrayList();
 	public static ObservableList<String> todayDisplay = FXCollections.observableArrayList();
@@ -42,6 +47,7 @@ public class MainApp extends Application {
 	public static ArrayList<String> elseData = new ArrayList<String>();
 
 	public MainApp() {
+
 		TaskieLogic.logic().initialise();
 	}
 
@@ -50,27 +56,24 @@ public class MainApp extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
-		this.primaryStage.setTitle("Taskie");
-		Image icon = new Image(getClass().getResourceAsStream("view/TaskieIcon.png"));
+		this.primaryStage.setTitle(WINDOW_TITLE);
+		Image icon = new Image(getClass().getResourceAsStream(ICON_PATH));
 		this.primaryStage.getIcons().add(icon);
 		initRootLayout();
 
 		showTaskieOverview();
 	}
 
-	/**
-	 * Initializes the root layout.
-	 */
 	public void initRootLayout() {
 		try {
 			// Load root layout from fxml file.
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
+			loader.setLocation(MainApp.class.getResource(ROOT_FXML_PATH));
 			rootLayout = (BorderPane) loader.load();
 
 			// Show the scene containing the root layout.
 			Scene scene = new Scene(rootLayout);
-			scene.getStylesheets().add("JMetroLightTheme.css");
+			scene.getStylesheets().add(CSS_PATH);
 			primaryStage.setScene(scene);
 
 			primaryStage.show();
@@ -79,17 +82,13 @@ public class MainApp extends Application {
 		}
 	}
 
-	/**
-	 * Shows the person overview inside the root layout.
-	 */
-	public void showTaskieOverview() {
+	private void showTaskieOverview() {
 		try {
-			// Load person overview.
+
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/TaskieOverview.fxml"));
+			loader.setLocation(MainApp.class.getResource(OVERVIEW_FXML_PATH));
 			AnchorPane taskieOverview = (AnchorPane) loader.load();
 
-			// Set person overview into the center of root layout.
 			rootLayout.setCenter(taskieOverview);
 
 			TaskieOverviewController controller = loader.getController();
@@ -98,32 +97,9 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 	}
-	public void showHelp() throws IOException {
-		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(MainApp.class.getResource("view/HelpScene.fxml"));
-		StackPane help = (StackPane) loader.load();
-		Stage helpStage = new Stage();
-		helpStage.setTitle("help");
-		
-		Scene helpScene = new Scene(help);
-		helpScene.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-	        public void handle(KeyEvent ke) {
-	            if (ke.getCode() == KeyCode.ESCAPE) {
-	                System.out.println("Key Pressed: " + ke.getCode());
-	                helpStage.close();
-	            }
-	        }
-	    });
+	
 
-		helpStage.show();
-	}
-	/**
-	 * Returns the main stage.
-	 * @return
-	 */
-	public Stage getPrimaryStage() {
-		return primaryStage;
-	}
+
 
 	public static void main(String[] args) {
 		launch(args);
