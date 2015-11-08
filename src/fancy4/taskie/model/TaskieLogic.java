@@ -48,7 +48,6 @@ public class TaskieLogic {
 	public void initialise() {
 		try {
 			TaskieStorage.load("");
-			//retrieveSave = Calendar.getInstance();
 			undoStack = new Stack<TaskieAction>();
 			redoStack = new Stack<TaskieAction>();
 			commandSave = new Stack<TaskieAction>();
@@ -248,7 +247,7 @@ public class TaskieLogic {
 	private ArrayList<String> format(int index, ArrayList<IndexTaskPair> list) {
 		ArrayList<String> formatted = new ArrayList<String>();
 		
-		SimpleDateFormat sdf = new SimpleDateFormat("E dd-MM HH:mm");
+		SimpleDateFormat sdf1 = new SimpleDateFormat("E dd-MM HH:mm");
 		SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
 		SimpleDateFormat sdf3 = new SimpleDateFormat("dd-MM-YYYY");
 		for (IndexTaskPair pair : list) {
@@ -264,12 +263,12 @@ public class TaskieLogic {
 			}
 			
 			if (st != null) {
-				sst = sdf.format(st.getTime());
+				sst = sdf1.format(st.getTime());
 			} else {
 				sst = "";
 			}
 			if (et != null) {
-				set = sdf.format(et.getTime());
+				set = sdf1.format(et.getTime());
 			} else {
 				set = "";
 			}
@@ -294,6 +293,8 @@ public class TaskieLogic {
 		return slots;
 	}
 
+	
+	
 	/*****
 	 * Below are auxiliary methods.
 	 * 
