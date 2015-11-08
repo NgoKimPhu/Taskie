@@ -30,13 +30,26 @@ public class TaskieStorage {
 		if(taskFilePath.exists()){
 			BufferedReader reader = new BufferedReader(new FileReader(taskFilePath));
 			currentPath = reader.readLine();
-			existPath = new File(currentPath);
+			if(currentPath == null || currentPath.trim().length()==0){
+				existPath = new File("TaskieData");
+				FileWriter writer = new FileWriter(taskFilePath);
+				writer.write(existPath.getPath());
+				writer.flush();
+				writer.close();
+			}else{
+				existPath = new File(currentPath);
+			}
 		}else{
 			taskFilePath.createNewFile();
+			existPath = new File("TaskieData");
+			FileWriter writer = new FileWriter(taskFilePath);
+			writer.write(existPath.getPath());
+			writer.flush();
+			writer.close();
 		}
 		File folder;		
-		if (pathName.trim().length() == 0) {
-			folder = new File("TaskieData");
+		if (pathName.trim().length() == 0) {			
+			folder = existPath;
 			if (!folder.exists()) {
 				folder.mkdir();
 			}
@@ -53,8 +66,8 @@ public class TaskieStorage {
 		}
 		taskList = new File(folder, "/taskList.json");
 		if(existPath.exists()){
-			if((existPath != null) && !existPath.equals(taskList)){
-				existPath.renameTo(taskList);
+			if((existPath != null) && !existPath.equals(folder)){
+				existPath.renameTo(folder);
 			}
 		} 
 		if (taskList.exists()) {
@@ -70,10 +83,13 @@ public class TaskieStorage {
 			deadlineTaskList = new ArrayList<TaskieTask>();
 			floatTaskList = new ArrayList<TaskieTask>();
 		}
-		FileWriter writer = new FileWriter(taskFilePath);
 		FileHandler.clearFile(taskFilePath);
-		System.out.println(taskList.getPath());
-		writer.write(taskList.getPath());
+		FileWriter writer = new FileWriter(taskFilePath, true);	
+		System.out.println("path:");
+		System.out.println(folder.getPath());
+		writer.write(folder.getPath());
+		writer.close();
+		
 	}
 
 	public static ArrayList<TaskieTask> displayAllTasks() {
