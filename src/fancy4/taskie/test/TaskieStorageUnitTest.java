@@ -1,9 +1,10 @@
 //@@author A0119390E
-package fancy4.taskie.model;
+package fancy4.taskie.test;
 
 import static org.junit.Assert.*;
 import java.util.*;
 import org.junit.Test;
+import fancy4.taskie.model.*;
 
 public class TaskieStorageUnitTest {
 	@Test
