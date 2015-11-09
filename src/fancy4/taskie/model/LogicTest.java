@@ -18,11 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class LogicTest {
-	/*
-	public static TestSuite suite() {
-		return new TestSuite(LogicTest.class);
-	}
-	 */
+	
 	@Test
 	public void testReset() throws UnrecognisedCommandException {
 		TaskieLogic logic = TaskieLogic.getInstance();

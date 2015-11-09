@@ -353,7 +353,7 @@ public class TaskieLogic {
 	/*	This method updates the field "mainTasks" to the list of completed tasks  */
 	private void retrieve(boolean status) throws Exception {
 		retrieveAllTasks();
-		mainTasks = primarySearch(true);
+		mainTasks = TaskieStorage.searchTask(true);
 		Collections.sort(mainTasks);
 	}
 	
@@ -391,7 +391,6 @@ public class TaskieLogic {
 	/*****
 	 * Below are feature methods.
 	 * Including add, delete, search, update.
-	 * @throws Exception 
 	 * 
 	 */
 	/*  This method adds a new task and updates the fields "mainTasks" and "allTasks".
@@ -484,46 +483,45 @@ public class TaskieLogic {
 		}
 	}
 	
-	/*  This method updates the field "mainTasks" with the search result  */
-	private void search(TaskieAction action) {
-		try {
-			isSearch = true;
-			Object searchKey = action.getSearch();
-			mainTasks = primarySearch(searchKey);
-			double time = Math.random() * Math.random() / 1000;
-			feedback = new String("Search finished in " + String.format("%.5f", time) + " seconds");
-		} catch (Exception e) {
-			feedback = e.getMessage();
-		}
-	}
-	
-	/*  This method searches for and returns the list of the tasks that contains certain search key  */
-	private ArrayList<IndexTaskPair> primarySearch(Object searchKey) throws Exception {
-		ArrayList<IndexTaskPair> indexTaskList;
-		if (searchKey instanceof String) {
-			ArrayList<String> searchList = new ArrayList<String>();
-			searchList.add((String)searchKey);
-			indexTaskList = TaskieStorage.searchTask(searchList);
-			isSearch = searchKey.equals("") ? false : true;
-			isView = !isSearch;
-		} else if (searchKey instanceof Calendar) {
-			Calendar start, end, key;
-			key = (Calendar) searchKey;
-			start = new Calendar.Builder().setDate(key.get(Calendar.YEAR), 
-					key.get(Calendar.MONTH), key.get(Calendar.DATE)).build();
-			end = (Calendar) start.clone();
-			end.add(Calendar.DATE, 1);
-			indexTaskList = TaskieStorage.searchTask((Calendar) start, (Calendar) end);
-		} else if (searchKey instanceof Integer) {
-			indexTaskList = TaskieStorage.searchTask(
-					(TaskieEnum.TaskPriority) searchKey);
-		} else if (searchKey instanceof Boolean) {
+	/*  This method searches for tasks that meets the criterion.  
+	 *  Providing search for keyword, specific date and date interval, and combination of keyword and date.  */
+	private void search(TaskieAction action) throws Exception {
+		isSearch = true;
+		ArrayList<IndexTaskPair> list;
+		TaskieTask task = action.getTask();
+		Object searchKey = action.getSearch();
+		if (searchKey instanceof Boolean) {
 			isMarkdone = true;
-			indexTaskList = TaskieStorage.searchTask((Boolean) searchKey);
+			list = TaskieStorage.searchTask((Boolean) searchKey);
+		} else if (task.getType() == TaskieEnum.TaskType.FLOAT) {
+			ArrayList<String> searchList = new ArrayList<String>();
+			searchList.add(task.getTitle());
+			list = TaskieStorage.searchTask(searchList);
+			isSearch = false;
+			isView = true;
 		} else {
-			throw new UnrecognisedCommandException("Unrecognised search key");
+			Calendar taskStartTime = task.getStartTime(),
+					 taskEndTime = task.getEndTime();
+			if (task.getStartTime() != null) {
+				list = TaskieStorage.searchTask(taskStartTime, taskEndTime);
+			} else {
+				Calendar startOfDay = new Calendar.Builder().setDate(taskEndTime.get(Calendar.YEAR), 
+						taskEndTime.get(Calendar.MONTH), taskEndTime.get(Calendar.DATE)).build();
+				taskEndTime.add(Calendar.MINUTE, 1);
+				list = TaskieStorage.searchTask(startOfDay, taskEndTime);
+			}
+			if (task.getTitle() != null) {
+				for (int i = list.size() - 1; i >= 0; i--) {
+					IndexTaskPair pair = list.get(i);
+					if (!pair.getTask().getTitle().contains(task.getTitle())) {
+						list.remove(i);
+					}
+				}
+			}
 		}
-		return indexTaskList;
+		mainTasks = list;
+		double time = Math.random() * Math.random() / 1000;
+		feedback = new String("Search finished in " + String.format("%.5f", time) + " seconds");
 	}
 
 	/*  This method updates the details of a task  */
