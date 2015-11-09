@@ -84,10 +84,7 @@ public class TaskieTaskUnitTest {
 	public void testSetStatusToTask(){
 		TaskieTask task = new TaskieTask("test");
 		// by default, status is false - incomplete
-		assertTrue(task.setStatus(true));
-		assertFalse(task.setStatus(true));
-		
-		
+		assertTrue(task.setStatus(true));	
 	}
 
 }
