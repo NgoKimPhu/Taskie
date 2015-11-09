@@ -89,9 +89,53 @@ public class LogicTest {
 	public void testUpdate() throws UnrecognisedCommandException {
 		logic = TaskieLogic.getInstance();
 		logic.execute("reset");
-		logic.execute("test1 0am");
-		LogicOutput output = logic.execute("update r1 test2");
+		logic.execute("test1 11pm");
 		
+		String titleUpdated = new String("1.  test2-time   Mon 09-11 23:00");
+		String timeUpdated = new String("1.  test2-time   Tue 10-11 08:00");
+		
+		LogicOutput output1 = logic.execute("update r1 test2");
+		Assert.assertTrue(output1.getAll().get(1).get(0).trim().equals(titleUpdated));
+		
+		LogicOutput output2 = logic.execute("update r1 tmr 8am");
+		Assert.assertTrue(output2.getAll().get(2).get(0).trim().equals(timeUpdated));
+	}
+	
+	@Test
+	public void testMarkdone() throws UnrecognisedCommandException {
+		logic = TaskieLogic.getInstance();
+		logic.execute("reset");
+		logic.execute("test1");
+		logic.execute("test2");
+		logic.execute("markdone r1");
+		LogicOutput output = logic.execute("markdone r1");
+		
+		String feedbackExpected = new String("\"test2\" is marked done");
+		String headline = new String("There are 2 completed tasks.");
+		String main = new String("1.  test1-time       Completed");
+		
+		Assert.assertTrue(output.getFeedback().equals(feedbackExpected));
+		Assert.assertTrue(output.getMain().get(0).equals(headline));
+		Assert.assertTrue(output.getMain().get(1).equals(main));
+		Assert.assertTrue(output.getAll().get(3).isEmpty());
+	}
+	
+	@Test
+	public void testSearch() throws UnrecognisedCommandException {
+		logic = TaskieLogic.getInstance();
+		logic.execute("reset");
+		logic.execute("test1");
+		logic.execute("test2 28 Nov");
+
+		String headline1 = new String("There are 2 tasks found.");
+		String headline2 = new String("There is one task found.");
+
+		LogicOutput output1 = logic.execute("search test");
+		Assert.assertTrue(output1.getMain().get(0).equals(headline1));
+		Assert.assertTrue(output1.getMain().size() == 3);
+		LogicOutput output2 = logic.execute("search 28 Nov");
+		Assert.assertTrue(output2.getMain().get(0).equals(headline2));
+		Assert.assertTrue(output2.getMain().size() == 2);
 	}
 	
 	@Test
@@ -99,8 +143,15 @@ public class LogicTest {
 		logic = TaskieLogic.getInstance();
 		logic.execute("reset");
 		logic.execute("pizza");
-		logic.execute("coffee");
-		Assert.assertTrue(true);
+		LogicOutput output = logic.execute("undo");
+		
+		String feedbackExpected = new String("\"pizza\" is deleted");
+		String headline = new String("There is no task. Feed me some, or take a nap.");
+		
+		Assert.assertTrue(output.getFeedback().equals(feedbackExpected));
+		Assert.assertTrue(output.getMain().get(0).equals(headline));
+		Assert.assertTrue(output.getMain().size() == 1);
+		Assert.assertTrue(output.getAll().get(3).isEmpty());
 	}
 	
 	@Test
@@ -108,9 +159,16 @@ public class LogicTest {
 		logic = TaskieLogic.getInstance();
 		logic.execute("reset");
 		logic.execute("pizza");
-		logic.execute("coffee");
-		Assert.assertTrue(true);
+		logic.execute("undo");
+		LogicOutput output = logic.execute("redo");
 		
+		String feedbackExpected = new String("\"pizza\" is added");
+		String headline = new String("You have one floating task.");
+		
+		Assert.assertTrue(output.getFeedback().equals(feedbackExpected));
+		Assert.assertTrue(output.getMain().get(0).equals(headline));
+		Assert.assertTrue(output.getMain().size() == 2);
+		Assert.assertTrue(output.getAll().get(3).size() == 1);
 	}
 
 }

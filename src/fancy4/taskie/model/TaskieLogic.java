@@ -15,6 +15,35 @@ import java.util.Date;
 
 public class TaskieLogic {
 
+	private static final String DATE_FORMAT_DAY_MONTH_HOUR_MIN = "E dd-MM HH:mm";
+	private static final String DATE_FORMAT_HOUR_MIN = "HH:mm";
+	private static final String DATE_FORMAT_DAY_MON_YEAR = "dd-MM-YYYY";
+	private static final String FORMAT_COMPLETED_SPACING = "    ";
+	private static final String FORMAT_EMPTY_STRING = "";
+	private static final String FORMAT_SAMEDAY_WAVE = " ~ ";
+	private static final String FORMAT_SPACING = "  ";
+	private static final String FORMAT_UI_TIME_INDICATOR = "-time ";
+	private static final String FORMAT_INDEXPERIOD = ".  ";
+	private static final String FORMAT_COMPLETED = "Completed";
+	private static final String ON_DAY = " on %1$s";
+	private static final String DATE_FORMAT_MAIN = "dd, MMM, yyyy";
+	private static final String HEADLINE_MANY_TASKS = "%1$s%2$s tasks";
+	private static final String HEADLINE_ONE_TASK = "one%1$s task";
+	private static final String HEADLINE_FREESLOTS = "You have %1$s in the next seven days.";
+	private static final String HEADLINE_MANY_FREESLOTS = "are %1$s free slots";
+	private static final String HEADLINE_ONE_FREESLOT = "is one free slot";
+	private static final String FLOATING = " floating";
+	private static final String HEADLINE_FLOATING = "You have %1$s%2$s.";
+	private static final String HEADLINE_MANY_TASKS_VIEW = "%1$s tasks";
+	private static final String HEADLINE_ONE_TASK_VIEW = "one task";
+	private static final String HEADLINE_VIEW = "You have %1$s in total.";
+	private static final String HEADLINE_MARKDONE = "There %1$s.";
+	private static final String HEADLINE_SEARCH = "There %1$s found.";
+	private static final String HEADLINE_ONE_TASK_SEARCH = "is one task";
+	private static final String HEADLINE_MANY_TASKS_SEARCH = "are %1$s tasks";
+	private static final String HEADLINE_ONE_COMPLETED = "is one completed task";
+	private static final String HEADLINE_MANY_COMPLETED = "are %1$s completed tasks";
+
 	private static TaskieLogic logic;
 	
 	private final String HEADLINE_NO_TASK_GENERAL = new String("There is no task. Feed me some, or take a nap.");
@@ -59,7 +88,7 @@ public class TaskieLogic {
 		freeSlots = new ArrayList<CalendarPair>();
 		mainTasks = new ArrayList<IndexTaskPair>();
 		try {
-			TaskieStorage.load("");
+			TaskieStorage.load(FORMAT_EMPTY_STRING);
 			retrieve(retrieveSave);
 			log.fine("Initialisation Completed.");
 		} catch (Exception e) {
@@ -68,7 +97,7 @@ public class TaskieLogic {
 	}
 
 	public LogicOutput execute(String str) throws UnrecognisedCommandException {
-			if (str.equals("")) {
+			if (str.equals(FORMAT_EMPTY_STRING)) {
 				throw new UnrecognisedCommandException("Empty command.");
 			}
 			isView = false;
@@ -77,7 +106,7 @@ public class TaskieLogic {
 			isUndoAction = false;
 			TaskieParser parser = TaskieParser.getInstance();
 			TaskieAction action = parser.parse(str);
-			// Save the undo- and redo-able actions
+			// Save the undo- and re-do-able actions
 			if (action.getType().equals(TaskieEnum.Actions.ADD) ||
 				action.getType().equals(TaskieEnum.Actions.DELETE) ||
 				action.getType().equals(TaskieEnum.Actions.UPDATE) ||
@@ -104,8 +133,8 @@ public class TaskieLogic {
 			if (size == 0) {
 				headline = HEADLINE_NO_FREESLOTS;
 			} else {
-				number = size == 1 ? "is one free slot" : "are " + size + " free slots";
-				headline = new String("You have " + number + " in the next seven days.");
+				number = size == 1 ? HEADLINE_ONE_FREESLOT : String.format(HEADLINE_MANY_FREESLOTS, size);
+				headline = String.format(HEADLINE_FREESLOTS, number);
 			}
 		} else {
 			int size = mainTasks.size();
@@ -122,23 +151,23 @@ public class TaskieLogic {
 				floating = new String();
 				if (!mainTasks.get(0).getTask().getType().equals(TaskieEnum.TaskType.FLOAT)) {
 					Date day = mainTasks.get(0).getTask().getEndTime().getTime();
-					SimpleDateFormat sdf = new SimpleDateFormat("dd, MMM, yyyy");
-					date = " on " + sdf.format(day);
+					SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_MAIN);
+					date = String.format(ON_DAY, sdf.format(day));
 				} else {
-					floating = " floating";
+					floating = FLOATING;
 				}
 				if (isMarkdone) {
-					number = size == 1 ? new String("is one completed task") : new String("are " + size + " completed tasks");
-					headline = new String("There " + number + ".");
+					number = size == 1 ? new String(HEADLINE_ONE_COMPLETED) : String.format(HEADLINE_MANY_COMPLETED, size);
+					headline = String.format(HEADLINE_MARKDONE, number);
 				} else if (isSearch) {
-					number = size == 1 ? new String("is one task") : new String("are " + size + " tasks");
-					headline = new String("There " + number + " found.");
+					number = size == 1 ? new String(HEADLINE_ONE_TASK_SEARCH) : String.format(HEADLINE_MANY_TASKS_SEARCH, size);
+					headline = String.format(HEADLINE_SEARCH, number);
 				} else if (isView) {
-					number = size == 1 ? new String("one task") : new String(size + " tasks");
-					headline = new String("You have " + number + " in total.");
+					number = size == 1 ? new String(HEADLINE_ONE_TASK_VIEW) : String.format(HEADLINE_MANY_TASKS_VIEW, size);
+					headline = String.format(HEADLINE_VIEW, number);
 				} else {
-					number = size == 1 ? new String(" one" + floating + " task") : new String(" " + size + floating + " tasks");
-					headline = new String("You have" + number + date + ".");
+					number = size == 1 ? String.format(HEADLINE_ONE_TASK, floating) : String.format(HEADLINE_MANY_TASKS, size, floating);
+					headline = String.format(HEADLINE_FLOATING, number, date);
 				}
 			}
 			main = format(0, mainTasks);
@@ -267,9 +296,9 @@ public class TaskieLogic {
 	private ArrayList<String> format(int index, ArrayList<IndexTaskPair> list) {
 		ArrayList<String> formatted = new ArrayList<String>();
 		
-		SimpleDateFormat sdf1 = new SimpleDateFormat("E dd-MM HH:mm");
-		SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
-		SimpleDateFormat sdf3 = new SimpleDateFormat("dd-MM-YYYY");
+		SimpleDateFormat sdf1 = new SimpleDateFormat(DATE_FORMAT_DAY_MONTH_HOUR_MIN);
+		SimpleDateFormat sdf2 = new SimpleDateFormat(DATE_FORMAT_HOUR_MIN);
+		SimpleDateFormat sdf3 = new SimpleDateFormat(DATE_FORMAT_DAY_MON_YEAR);
 		for (IndexTaskPair pair : list) {
 			index++;
 			TaskieTask task = pair.getTask();
@@ -277,30 +306,31 @@ public class TaskieLogic {
 			Calendar et = task.getEndTime();
 			boolean isSameDay = false;
 			String sst, set, taskDetail, status;
-			
-			if (st != null && et != null && sdf3.format(st.getTime()).equals(sdf3.format(et.getTime()))) {
+			// Check if start time and end time are on the same day.
+			if (st != null && et != null && 
+				sdf3.format(st.getTime()).equals(sdf3.format(et.getTime()))) {
 				isSameDay = true;
 			}
 			
 			if (st != null) {
 				sst = sdf1.format(st.getTime());
 			} else {
-				sst = "";
+				sst = FORMAT_EMPTY_STRING;
 			}
 			if (et != null) {
 				set = sdf1.format(et.getTime());
 			} else {
-				set = "";
+				set = FORMAT_EMPTY_STRING;
 			}
 			
-			status = pair.getTask().getStatus() ? "Completed" : "";
+			status = pair.getTask().getStatus() ? FORMAT_COMPLETED : FORMAT_EMPTY_STRING;
 			
 			if (isSameDay) {
-				taskDetail = new String(index + ".  " + task.getTitle() + "-time " + "  " + sst + " ~ " + sdf2.format(et.getTime()) + "  " + (status = pair.getTask().getStatus() ? "Completed" : ""));
+				taskDetail = new String(index + FORMAT_INDEXPERIOD + task.getTitle() + FORMAT_UI_TIME_INDICATOR + FORMAT_SPACING + sst + FORMAT_SAMEDAY_WAVE + sdf2.format(et.getTime()) + FORMAT_SPACING + (status = pair.getTask().getStatus() ? FORMAT_COMPLETED : FORMAT_EMPTY_STRING));
 			} else {
-				taskDetail = new String(index + ".  " + task.getTitle() + "-time " + sst + "  " + set);
+				taskDetail = new String(index + FORMAT_INDEXPERIOD + task.getTitle() + FORMAT_UI_TIME_INDICATOR + sst + FORMAT_SPACING + set);
 			}
-			formatted.add(new String(taskDetail + "    " + status));
+			formatted.add(new String(taskDetail + FORMAT_COMPLETED_SPACING + status));
 		}
 		return formatted;
 	}
@@ -497,8 +527,8 @@ public class TaskieLogic {
 			ArrayList<String> searchList = new ArrayList<String>();
 			searchList.add(task.getTitle());
 			list = TaskieStorage.searchTask(searchList);
-			isSearch = false;
-			isView = true;
+			isSearch = task.getTitle().equals(FORMAT_EMPTY_STRING) ? false : true;
+			isView = !isSearch;
 		} else {
 			Calendar taskStartTime = task.getStartTime(),
 					 taskEndTime = task.getEndTime();
@@ -520,6 +550,7 @@ public class TaskieLogic {
 			}
 		}
 		mainTasks = list;
+		// Below is for fun :D
 		double time = Math.random() * Math.random() / 1000;
 		feedback = new String("Search finished in " + String.format("%.5f", time) + " seconds");
 	}
@@ -547,12 +578,12 @@ public class TaskieLogic {
 		
 		if (task.getTitle() != null && task.getTitle().trim().length() != 0) {
 			TaskieStorage.updateTaskTitle(realIndex, task.getTitle());
-			// undoTask: new task with old title
+			// undoTask: task with old title
 			undoTask.setTitle(currTask.getTitle());
 		} else if (currTask.getType() == TaskieEnum.TaskType.FLOAT &&
 				task.getType() == TaskieEnum.TaskType.DEADLINE) {
 			TaskieStorage.updateFloatToDeadline(realIndex, task.getEndTime());
-			// undoTask: Deadline/Event task with null starttime and null endtime
+			// undoTask: Deadline/Event task with null start-time and null end-time
 			undoTask.setToFloat();
 		} else if (currTask.getType() == TaskieEnum.TaskType.FLOAT &&
 					task.getType() == TaskieEnum.TaskType.EVENT) {
