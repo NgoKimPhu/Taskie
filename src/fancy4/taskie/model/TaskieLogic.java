@@ -26,6 +26,7 @@ public class TaskieLogic {
 	private static final String FEEDBACK_CANNOT_DELETE_FREESLOT = "You cannot update a slot.";
 	private static final String FEEDBACK_DELETE = "\"%1$s\" is deleted";
 	private static final String FEEDBACK_DELETEALL = "All deleted";
+	private static final String FEEDBACK_EMPTY_PATH = "Empty path!";
 	private static final String FEEDBACK_MARKDONE = "\"%1$s\" is marked done";
 	private static final String FEEDBACK_NO_MORE_REDO = "No more action to redo";
 	private static final String FEEDBACK_NO_MORE_UNDO = "No more action to undo";
@@ -720,6 +721,10 @@ public class TaskieLogic {
 	/*  This method changes the directory of the saved tasks file  */
 	private void setPath(String path) {
 		try {
+			if (path == null || path.equals(FORMAT_EMPTY_STRING)) {
+				feedback = FEEDBACK_EMPTY_PATH;
+				return;
+			}
 			TaskieStorage.load(path);
 			feedback = String.format(FEEDBACK_SETPATH, path);
 		} catch (Exception e) {
