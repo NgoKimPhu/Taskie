@@ -57,7 +57,7 @@ public class MainApp extends Application {
 	// Methods
 	// ================================================================
 	public MainApp() {
-
+		
 	}
 
 	@Override

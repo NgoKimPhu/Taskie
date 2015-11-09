@@ -2,14 +2,15 @@
 package fancy4.taskie.view;
 
 import javafx.scene.Node;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Text;
 
 class TaskListCell extends ListCell<String> {
 	// ================================================================
-    // Constants
-    // ================================================================
+	// Constants
+	// ================================================================
 	private static final String PLAIN_CLASS_CSS = "plain";
 	private static final String TIME_CLASS_CSS = "time";
 	private static final int STARTING_INDEX = 0;
@@ -25,21 +26,23 @@ class TaskListCell extends ListCell<String> {
 				System.out.println(time);
 				String text = s.substring(STARTING_INDEX, s.indexOf(TIME_FLAG));
 				setGraphic(createTextFlow(text, TIME_PLACEHOLDER, time));
-				} else {
-					setText(s);
-				}
+		
 			} else {
-				setGraphic(null);
+				setGraphic(createTextFlow(s));
 			}
+		} else {
+			setGraphic(null);
 		}
-	
+
+	}
+
 	/**
 	 * Create a FlowPane to display the content and time with different css styles.
 	 */
 	private Node createTextFlow(String... msg) {
 		FlowPane flow = new FlowPane();
 		boolean isTime = false;
-		
+
 		for (String s: msg) {
 			if (TIME_PLACEHOLDER.equals(s)) {
 				isTime = true;
