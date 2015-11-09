@@ -1,21 +1,15 @@
-
 package fancy4.taskie;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
-import fancy4.taskie.model.*;
 import fancy4.taskie.view.HelpController;
 import fancy4.taskie.view.TaskieOverviewController;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -60,7 +54,6 @@ public class MainApp extends Application {
 	// Methods
 	// ================================================================
 	public MainApp() {
-		
 	}
 
 	@Override
@@ -91,8 +84,6 @@ public class MainApp extends Application {
 			overviewScene.getStylesheets().add(CSS_PATH);
 			primaryStage.setScene(overviewScene);
 
-		
-
 			primaryStage.show();
 			
 		} catch (IOException e) {
@@ -103,6 +94,7 @@ public class MainApp extends Application {
 	private void initHelpScene() {
 		try {
 			FXMLLoader loader = new FXMLLoader();
+			// Load help scene from fxml file.
 			loader.setLocation(MainApp.class.getResource(HELP_FXML_PATH));
 			AnchorPane help = (AnchorPane) loader.load();
 			
@@ -111,17 +103,22 @@ public class MainApp extends Application {
 			
 			HelpController controller = loader.getController();
 	        controller.setMainApp(this);
-
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 	}
 	
+	/**
+	 * Switch the scene to help Scene on PrimaryStage
+	 */
 	public void switchToHelp() {
 		primaryStage.setScene(helpScene);
 
 	}
 	
+	/**
+	 * Switch the scene to overview Scene on PrimaryStage
+	 */
 	public void switchToOverview() {
 		primaryStage.setScene(overviewScene);
 	}

@@ -1,6 +1,12 @@
 package fancy4.taskie.model;
 
 import java.util.ArrayList;
+//@@author: A0130221H
+/**
+ * TaskieCommandHistory is a class to keep track of commands input in the GUI.
+ * It enables the user to use UP and DOWN arrow key to browse through the command history
+ * by keeping track of a pointer.
+ */
 
 public class TaskieCommandHistory {
 	private ArrayList<String> history;
@@ -23,6 +29,9 @@ public class TaskieCommandHistory {
 		history.add(cmd);
 	}
 	
+	/*
+	 * Retrieves the command that the current pointer points to.
+	 */
 	public String getCommand() {
 		return history.get(pointer);
 	}
@@ -30,7 +39,6 @@ public class TaskieCommandHistory {
 	public String getCommand(int index) {
 		return history.get(index);
 	}
-	
 	
 	public int getSize() {
 		return history.size();
