@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
-import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -19,10 +18,6 @@ public class IntegrationTest {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
-	}
-
-	@After
-	public void tearDown() throws Exception {
 	}
 
 	@Test
