@@ -62,9 +62,7 @@ public class TaskieOverviewController {
 	private TreeItem<String> tomorrowNode;
 	private TreeItem<String> everythingElseNode;
 	private TaskieCommandHistory cmdHistory;
-	private ArrayList<String> helpList;
-	private boolean newestCommandReached;
-	private boolean enterPressed;
+	private boolean upPressed;
 
 	// ================================================================
 	// Constants
@@ -84,9 +82,6 @@ public class TaskieOverviewController {
 	private static final String TREE_TODAY = "Today";
 	private static final String TREE_TOMORROW = "Tomorrow";
 	private static final String TREE_EVERYTHING_ELSE = "Everything Else";
-	private static final String HELP_ADD_FLOAT = "add [title] -optional[start time] to/by/till -optional[end time] -optional[date]";
-	private static final String HELP_ADD_DEMO_1 = "add finish work 5pm to 8pm today";
-	private static final String HELP_DELETE = "delete -optional l/r[index], default l[index] if no window specification given";
 
 
 	public TaskieOverviewController() {
@@ -106,13 +101,11 @@ public class TaskieOverviewController {
 
 		// Construct the TaskieCommandHistory to keep track of commands typed in by user
 		cmdHistory = new TaskieCommandHistory();
-		newestCommandReached = false;
-		enterPressed = false;
+		upPressed = false;
 
 		obeservableMainList = FXCollections.observableArrayList();
 		createTree(new ArrayList<String>());
 
-		iniHelpList();
 		setupListCell();
 		setupTreeCell();
 
@@ -124,12 +117,6 @@ public class TaskieOverviewController {
 			// displays the warning message to feedbackLabel.
 			feedbackLabel.setText(INVALID_COMMAND_MESSAGE);
 		}	
-	}
-
-	private void iniHelpList() {
-		helpList = new ArrayList<String>();
-		//helpList.add();
-
 	}
 
 	/**
@@ -155,7 +142,7 @@ public class TaskieOverviewController {
 		dummyRoot.getChildren().add(node);
 		return node;
 	}
-
+	
 	/**
 	 * Initialize the ListView by populating it with custom ListCell class
 	 */
@@ -234,23 +221,14 @@ public class TaskieOverviewController {
 	 * Handle the KeyEvent when ENTER is pressed in TextInput
 	 */
 	private void handleInput() {
-
+		upPressed = false;
 		String input;
 		String response;
 		input = textInput.getText();  
-
+		cmdHistory.addCommand(input);
+		cmdHistory.setPointer(cmdHistory.getSize());
 
 		try {
-			if (input.equals("help")) {
-				showHelp();
-			}
-			newestCommandReached = false;
-			enterPressed = true;
-			cmdHistory.addCommand(input);
-			cmdHistory.setPointer(cmdHistory.getSize());
-			System.out.println("ENTER");
-			System.out.println("pointer: " + cmdHistory.getPointer());
-			System.out.println("size: " + cmdHistory.getSize());
 			logicOut = TaskieLogic.logic().execute(input);
 			populate(logicOut.getMain(), logicOut.getAll());
 			response = logicOut.getFeedback();
@@ -262,26 +240,14 @@ public class TaskieOverviewController {
 
 	}
 
-	private void showHelp() {
-		// TODO Auto-generated method stub
-
-	}
-
 	/**
 	 * Handle the KeyEvent when UP is pressed in TextInput
 	 */
 	private void handleUp() {
-		if (newestCommandReached) {
-			textInput.setText(cmdHistory.getCommand());
-			newestCommandReached = false;
-			textInput.positionCaret(Integer.MAX_VALUE);
-			return;
-		}
+		upPressed = true;
 		if (cmdHistory.getPointer() == 0) {
 			return;
 		} else {
-			newestCommandReached = false;
-			enterPressed = false;
 			cmdHistory.decrementPointer();
 			textInput.setText(cmdHistory.getCommand());
 			textInput.positionCaret(MAX_INT);
@@ -292,29 +258,17 @@ public class TaskieOverviewController {
 	 * Handle the KeyEvent when DOWN is pressed in TextInput
 	 */
 	private void handleDown() {
-		if (cmdHistory.isEmpty()) {
-			return;
-		}
-		if (cmdHistory.getPointer() == cmdHistory.getSize() - 1) {
-			newestCommandReached = true;
-			textInput.clear();
-			return;
-		} else {
-			if (enterPressed) {
-				textInput.setText(cmdHistory.getCommand(cmdHistory.getPointer() - 1));
-				textInput.positionCaret(Integer.MAX_VALUE);
+		if (upPressed) {
+			if (cmdHistory.getPointer() == cmdHistory.getSize() - 1) {
 				return;
 			} else {
-				newestCommandReached = false;
-
 				cmdHistory.incrementPointer();
 				textInput.setText(cmdHistory.getCommand());
 				textInput.positionCaret(Integer.MAX_VALUE);
 			}
 		}
-
 	}
-
+	
 	/**
 	 * FXML Event Handler of the textInput, handles 3 key events.
 	 * 
