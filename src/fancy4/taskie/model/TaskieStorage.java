@@ -27,19 +27,19 @@ public class TaskieStorage {
 		String currentPath = new String();
 		taskFilePath = new File("taskFilePath.txt");
 		File existPath = null;
-		if(taskFilePath.exists()){
+		if (taskFilePath.exists()) {
 			BufferedReader reader = new BufferedReader(new FileReader(taskFilePath));
 			currentPath = reader.readLine();
-			if(currentPath == null || currentPath.trim().length()==0){
+			if (currentPath == null || currentPath.trim().length() == 0) {
 				existPath = new File("TaskieData");
 				FileWriter writer = new FileWriter(taskFilePath);
 				writer.write(existPath.getPath());
 				writer.flush();
 				writer.close();
-			}else{
+			} else {
 				existPath = new File(currentPath);
 			}
-		}else{
+		} else {
 			taskFilePath.createNewFile();
 			existPath = new File("TaskieData");
 			FileWriter writer = new FileWriter(taskFilePath);
@@ -47,29 +47,30 @@ public class TaskieStorage {
 			writer.flush();
 			writer.close();
 		}
-		File folder;		
-		if (pathName.trim().length() == 0) {			
+		File folder;
+		if (pathName.trim().length() == 0) {
 			folder = existPath;
 			if (!folder.exists()) {
 				folder.mkdir();
 			}
 		} else {
 			File userPath = new File(pathName);
+			//the path is not exist, create new path
 			if (!userPath.exists()) {
-				throw new Exception("Ooops! Invalid user path.");
-			} else {
-				folder = new File(pathName + "/TaskieData");
-				if (!folder.exists()) {
-					folder.mkdir();
-				}
+				userPath.mkdir();
+			}
+			folder = new File(pathName + "/TaskieData");
+			if (!folder.exists()) {
+				folder.mkdir();
+
 			}
 		}
 		taskList = new File(folder, "/taskList.json");
-		if(existPath.exists()){
-			if((existPath != null) && !existPath.equals(folder)){
+		if (existPath.exists()) {
+			if ((existPath != null) && !existPath.equals(folder)) {
 				existPath.renameTo(folder);
 			}
-		} 
+		}
 		if (taskList.exists()) {
 			HashMap<String, ArrayList<TaskieTask>> tasks = FileHandler.readFile(taskList);
 			allTasks = tasks.get("all");
@@ -84,12 +85,12 @@ public class TaskieStorage {
 			floatTaskList = new ArrayList<TaskieTask>();
 		}
 		FileHandler.clearFile(taskFilePath);
-		FileWriter writer = new FileWriter(taskFilePath, true);	
+		FileWriter writer = new FileWriter(taskFilePath, true);
 		System.out.println("path:");
 		System.out.println(folder.getPath());
 		writer.write(folder.getPath());
 		writer.close();
-		
+
 	}
 
 	public static ArrayList<TaskieTask> displayAllTasks() {
@@ -109,7 +110,7 @@ public class TaskieStorage {
 	}
 
 	// add task
-	public static IndexTaskPair addTask(TaskieTask task){
+	public static IndexTaskPair addTask(TaskieTask task) {
 		allTasks.add(task);
 		int index = allTasks.indexOf(task);
 		if (TaskieTask.isEvent(task)) {
@@ -209,7 +210,7 @@ public class TaskieStorage {
 	public static ArrayList<IndexTaskPair> searchTask(boolean status) {
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 		for (TaskieTask task : allTasks) {
-			if (task.getStatus()==status) {//fix bug
+			if (task.getStatus() == status) {// fix bug
 				IndexTaskPair pair = new IndexTaskPair(allTasks.indexOf(task), task);
 				searchResult.add(pair);
 			}
@@ -294,14 +295,17 @@ public class TaskieStorage {
 		}
 	}
 
-	public static ArrayList<TaskieTask> updateFloatToEvent(int index, Calendar start, Calendar end)
-			throws IndexOutOfBoundsException {
+	public static ArrayList<TaskieTask> updateFloatToEvent(int index, Calendar start, Calendar end) throws Exception {
 		if (index >= allTasks.size()) {
 			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
 		} else {
 			TaskieTask task = allTasks.get(index);
 			floatTaskList.remove(task);
-			task.setToEvent(start, end);
+			try {
+				task.setToEvent(start, end);
+			} catch (Exception e) {
+				throw e;
+			}
 			eventTaskList.add(task);
 			Collections.sort(eventTaskList, ec);
 			rewriteFile();
@@ -342,14 +346,17 @@ public class TaskieStorage {
 
 	}
 
-	public static ArrayList<TaskieTask> updateDeadlineToEvent(int index, Calendar start)
-			throws IndexOutOfBoundsException {
+	public static ArrayList<TaskieTask> updateDeadlineToEvent(int index, Calendar start) throws Exception {
 		if (index >= allTasks.size()) {
 			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
 		} else {
 			TaskieTask task = allTasks.get(index);
 			deadlineTaskList.remove(task);
-			task.setToEvent(start, task.getEndTime());
+			try {
+				task.setToEvent(start, task.getEndTime());
+			} catch (Exception e) {
+				throw e;
+			}
 			eventTaskList.add(task);
 			Collections.sort(eventTaskList, ec);
 			rewriteFile();
@@ -421,61 +428,64 @@ public class TaskieStorage {
 		}
 	}
 
-	// get the free slot in seven days start from current time. 00:00-06:00 is auto blocked
+	// get the free slot in seven days start from current time. 00:00-06:00 is
+	// auto blocked
 	public static ArrayList<CalendarPair> getFreeSlots() {
 		ArrayList<CalendarPair> slots = new ArrayList<CalendarPair>();
+		CalendarPair slot;
+		
 		Calendar currentEndOfDay = Calendar.getInstance();
 		currentEndOfDay.set(Calendar.HOUR_OF_DAY, 0);
 		currentEndOfDay.set(Calendar.MINUTE, 0);
 		currentEndOfDay.set(Calendar.SECOND, 0);
-		
+
 		Calendar currentSixAM = (Calendar) currentEndOfDay.clone();
 		Calendar sixDaysLater = (Calendar) currentEndOfDay.clone();
-		
+
 		currentEndOfDay.add(Calendar.DATE, 1);
 		currentEndOfDay.add(Calendar.SECOND, -1);
 		currentSixAM.set(Calendar.HOUR_OF_DAY, 6);
 		sixDaysLater.add(Calendar.DATE, 7);
-		
-		Calendar currentEnd = Calendar.getInstance().after(currentSixAM)
-							? Calendar.getInstance()
-							: currentSixAM;
-		
+
+		Calendar currentEnd = Calendar.getInstance().after(currentSixAM) ? Calendar.getInstance() : currentSixAM;
+
 		for (TaskieTask task : eventTaskList) {
-			while (currentEndOfDay.before(sixDaysLater) && 
-				   currentEndOfDay.before(task.getStartTime())) {
-				if (currentEnd.before(currentEndOfDay)) {
-					CalendarPair slot = new CalendarPair(currentEnd, currentEndOfDay);
-					slots.add(slot);
+			if (!TaskieTask.isDone(task)) {
+				while (currentEndOfDay.before(sixDaysLater) && 
+					   currentEndOfDay.before(task.getStartTime())) {
+					if (currentEnd.before(currentEndOfDay)) {
+						slot = new CalendarPair(currentEnd, currentEndOfDay);
+						slots.add(slot);
+					}
+					currentEndOfDay.add(Calendar.DATE, 1);
+					currentSixAM.add(Calendar.DATE, 1);
+					currentEnd = currentEnd.after(currentSixAM) ? currentEnd : currentSixAM;
 				}
-				currentEndOfDay.add(Calendar.DATE, 1);
-				currentSixAM.add(Calendar.DATE, 1);
-				currentEnd = currentEnd.after(currentSixAM) ? currentEnd : currentSixAM;
-			}
-			if (currentEndOfDay.after(sixDaysLater)) {
-				break;
-			}
-			if (task.getEndTime().after(currentEnd)) {
-				if (task.getStartTime().after(currentEnd)) {
-					CalendarPair slot = new CalendarPair(currentEnd, task.getStartTime());
-					slots.add(slot);
-					currentEnd = task.getEndTime();
-				} else {
-					currentEnd = task.getEndTime();
+				
+				if (currentEndOfDay.after(sixDaysLater)) {
+					break;
+				} else if (task.getEndTime().after(currentEnd)) {
+					if (task.getStartTime().after(currentEnd)) {
+						slot = new CalendarPair(currentEnd, task.getStartTime());
+						slots.add(slot);
+						currentEnd = task.getEndTime();
+					} else {
+						currentEnd = task.getEndTime();
+					}
 				}
 			}
 		}
-		
+
 		while (currentEndOfDay.before(sixDaysLater)) {
 			if (currentEnd.before(currentEndOfDay)) {
-				CalendarPair slot = new CalendarPair(currentEnd, currentEndOfDay);
+				slot = new CalendarPair(currentEnd, currentEndOfDay);
 				slots.add(slot);
 			}
 			currentEndOfDay.add(Calendar.DATE, 1);
 			currentSixAM.add(Calendar.DATE, 1);
 			currentEnd = currentEnd.after(currentSixAM) ? currentEnd : currentSixAM;
 		}
-		
+
 		return slots;
 	}
 
@@ -542,75 +552,75 @@ class FileHandler {
 					JSONObject taskData = taskLine.getJSONObject("event");
 					String title = taskData.getString("title");
 					TaskieEnum.TaskType type;
-					try{
+					try {
 						type = getTaskType(taskData.getInt("type"));
-					}catch(Exception e){
+					} catch (Exception e) {
 						type = TaskieEnum.TaskType.EVENT;
 					}
 					Calendar start = getDate(taskData.getString("start-time"));
 					Calendar end = getDate(taskData.getString("end-time"));
 					TaskieEnum.TaskPriority priority;
-					try{
+					try {
 						priority = getTaskPriority(taskData.getInt("priority"));
-					}catch(Exception e){
+					} catch (Exception e) {
 						priority = TaskieEnum.TaskPriority.LOW;
 					}
 					boolean status = taskData.getBoolean("status");
 					String description = taskData.getString("description");
-					try{
+					try {
 						TaskieTask task = new TaskieTask(title, type, start, end, priority, status, description);
 						events.add(task);
 						all.add(task);
-					}catch(Exception e){
+					} catch (Exception e) {
 						continue;
-					}		
+					}
 				} else if (taskLine.has("deadline")) {
 					JSONObject taskData = taskLine.getJSONObject("deadline");
 					String title = taskData.getString("title");
 					TaskieEnum.TaskType type;
-					try{
+					try {
 						type = getTaskType(taskData.getInt("type"));
-					}catch(Exception e){
+					} catch (Exception e) {
 						type = TaskieEnum.TaskType.DEADLINE;
 					}
 					Calendar end = getDate(taskData.getString("end-time"));
 					TaskieEnum.TaskPriority priority;
-					try{
+					try {
 						priority = getTaskPriority(taskData.getInt("priority"));
-					}catch(Exception e){
+					} catch (Exception e) {
 						priority = TaskieEnum.TaskPriority.LOW;
 					}
 					boolean status = taskData.getBoolean("status");
 					String description = taskData.getString("description");
-					try{
+					try {
 						TaskieTask task = new TaskieTask(title, type, end, priority, status, description);
 						deadlines.add(task);
 						all.add(task);
-					}catch(Exception e){
+					} catch (Exception e) {
 						continue;
 					}
 				} else if (taskLine.has("float")) {
 					JSONObject taskData = taskLine.getJSONObject("float");
 					String title = taskData.getString("title");
-					TaskieEnum.TaskType type ;
-					try{
+					TaskieEnum.TaskType type;
+					try {
 						type = getTaskType(taskData.getInt("type"));
-					}catch(Exception e){
+					} catch (Exception e) {
 						type = TaskieEnum.TaskType.FLOAT;
 					}
 					TaskieEnum.TaskPriority priority;
-					try{
+					try {
 						priority = getTaskPriority(taskData.getInt("priority"));
-					}catch(Exception e){
+					} catch (Exception e) {
 						priority = TaskieEnum.TaskPriority.LOW;
 					}
 					boolean status = taskData.getBoolean("status");
 					String description = taskData.getString("description");
-					try{
+					try {
 						TaskieTask task = new TaskieTask(title, type, priority, status, description);
 						floats.add(task);
 						all.add(task);
-					}catch(Exception e){
+					} catch (Exception e) {
 						continue;
 					}
 				}
@@ -757,28 +767,31 @@ class FileHandler {
 		return calendar;
 	}
 
-	private static TaskieEnum.TaskType getTaskType(int type) throws Exception{
+	private static TaskieEnum.TaskType getTaskType(int type) throws Exception {
 		if (isEvent(type)) {
 			return TaskieEnum.TaskType.EVENT;
 		} else if (isDeadline(type)) {
 			return TaskieEnum.TaskType.DEADLINE;
-		} else if(isFloat(type)){
+		} else if (isFloat(type)) {
 			return TaskieEnum.TaskType.FLOAT;
-		} else{
+		} else {
 			throw new Exception("invalid task type");
 		}
 	}
+
 	private static boolean isEvent(int type) {
 		return type == 0;
 	}
+
 	private static boolean isDeadline(int type) {
 		return type == 1;
 	}
+
 	private static boolean isFloat(int type) {
 		return type == 2;
 	}
 
-	private static TaskieEnum.TaskPriority getTaskPriority(int priority) throws Exception{
+	private static TaskieEnum.TaskPriority getTaskPriority(int priority) throws Exception {
 		if (isLow(priority)) {
 			return TaskieEnum.TaskPriority.LOW;
 		} else if (isHigh(priority)) {
@@ -787,9 +800,11 @@ class FileHandler {
 			throw new Exception("invalid priority");
 		}
 	}
+
 	private static boolean isLow(int priority) {
 		return priority == 0;
 	}
+
 	private static boolean isHigh(int priority) {
 		return priority == 1;
 	}
@@ -820,10 +835,10 @@ class CalendarPair {
 	public void setEnd(Calendar end) {
 		this.end = end;
 	}
-	
-	public String toString(){
+
+	public String toString() {
 		String pair;
-		pair = "("+sdf.format(this.start.getTime()) + " - " + sdf.format(this.end.getTime()) + ")";
+		pair = "(" + sdf.format(this.start.getTime()) + " - " + sdf.format(this.end.getTime()) + ")";
 		return pair;
 	}
 }

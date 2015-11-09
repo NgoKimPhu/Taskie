@@ -6,7 +6,7 @@ public class TaskieStorageTest {
 
 	public static void main(String[] args) throws Exception{
 		try {
-			TaskieStorage.load("/Users/misakiyuki/Desktop");
+			TaskieStorage.load("/Users/misakiyuki/Desktop/test");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}

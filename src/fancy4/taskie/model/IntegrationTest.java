@@ -1,15 +1,24 @@
+// @@author A0126586W
 package fancy4.taskie.model;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
 import org.junit.After;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class IntegrationTest {
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+		try {
+			TaskieStorage.load("test");
+			TaskieStorage.deleteAll();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 	}
 
 	@After
@@ -18,61 +27,41 @@ public class IntegrationTest {
 
 	@Test
 	public void testAddFloat() throws UnrecognisedCommandException {
-		TaskieLogic.getInstance().execute("reset");
-		try {
-			TaskieStorage.load("unit/");
-			TaskieStorage.deleteAll();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
 		TaskieLogic.getInstance().execute("finish tutorial");
-		assertEquals(TaskieStorage.displayFloatTask().size(), 1);
+		assertEquals(1, TaskieStorage.displayFloatTasks().size());
 	}
 	
 	@Test
 	public void testAddFloatAgain() throws UnrecognisedCommandException {
-		try {
-			TaskieStorage.load("unit/");
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
 		TaskieLogic.getInstance().execute("finish ps");
-		assertEquals(TaskieStorage.displayFloatTask().size(), 2);
+		assertEquals(2, TaskieStorage.displayFloatTasks().size());
 	}
 	
 	@Test
 	public void testAddDeadline() throws UnrecognisedCommandException {
-		try {
-			TaskieStorage.load("unit/");
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-		TaskieLogic.getInstance().execute("finish hw by tmr 9pm");
-		assertEquals(TaskieStorage.displayEventDeadline().size(), 1);
+		TaskieLogic.getInstance().execute("\"finish\" hw by tmr 9pm");
+		assertEquals(1, TaskieStorage.displayDeadlineTasks().size());
 	}
 	
 	@Test
 	public void testDelete() throws UnrecognisedCommandException {
-		try {
-			TaskieStorage.load("unit/");
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
 		TaskieLogic.getInstance().execute("del 1");
-		assertEquals(TaskieStorage.displayFloatTask().size(), 1);
+		assertEquals(1, TaskieStorage.displayFloatTasks().size());
+		TaskieLogic.getInstance().execute("undo");
+		TaskieLogic.getInstance().execute("- r2");
+		assertEquals(1, TaskieStorage.displayFloatTasks().size());
 	}
 	
 	@Test
 	// This is the boundary case search empty string, should display all result
-	public void testSearchFloat() throws UnrecognisedCommandException {
-		try {
-			TaskieStorage.load("unit/");
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
+	public void testSearch() throws UnrecognisedCommandException {
 		LogicOutput out = TaskieLogic.getInstance().execute("view");
-		assertEquals(0, out.getMain().size());
-		assertEquals(0, out.getAll().size());
+		assertEquals(2, out.getMain().size() - 1);
+		int allSize = 0;
+		for (ArrayList<String> subAll : out.getAll()) {
+			allSize += subAll.size();
+		}
+		assertEquals(2, allSize);
 	}
 
 }

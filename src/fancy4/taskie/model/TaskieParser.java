@@ -15,6 +15,7 @@ import java.util.*;
  */
 public final class TaskieParser {
 	private static final String MESSAGE_INVALID_COMMAND_FORMAT = "invalid command format : %1$s";
+	private static final String PATTERN_INVALID_PATH_CHARACTERS = "[^A-Za-z0-9 /.\\[\\]\\(\\)~]| $|.$";
 	private static final String PATTERN_DONE = "(marked )?done|finished";
 	private static final String PATTERN_UNDONE = "(marked )?(not |un)(done|finished)|pending";
 	private static final String PATTERN_COMMAND_DELIMITER = "\\s+|(?<=[+-])(?=\\w)";
@@ -97,8 +98,10 @@ public final class TaskieParser {
 		 * 
 		 * @param dataString
 		 * 		A data String
+		 * @throws UnrecognisedCommandException
+		 * 		Invalid tokens for MARKDONE command, ADD command will be used instead 
 		 */
-		public TaskSelectorDetector(String dataString) {
+		public TaskSelectorDetector(String dataString) throws UnrecognisedCommandException {
 			Scanner sc = new Scanner(dataString);
 			sc.useDelimiter(PATTERN_DELIMITER);
 				
@@ -107,10 +110,20 @@ public final class TaskieParser {
 			} else if (sc.hasNext(PATTERN_RIGHT_WINDOW)) {
 				sc.next();
 				screen = "right";
-				index = sc.nextInt();
+				if (sc.hasNextInt()) {
+					index = sc.nextInt();
+				} else {
+					sc.close();
+					throw new UnrecognisedCommandException("Invalid markdone command, using add instead");
+				}
 			} else {
 				sc.next();
-				index = sc.nextInt();
+				if (sc.hasNextInt()) {
+					index = sc.nextInt();
+				} else {
+					sc.close();
+					throw new UnrecognisedCommandException("Invalid markdone command, using add instead");
+				}
 			}
 
 			this.taskDataString = sc.hasNext() ? sc.nextLine().trim() : "";
@@ -204,24 +217,31 @@ public final class TaskieParser {
 			commandData = removeFirstWord(command);
 		}
 		
-		switch (actionType) {
-			case ADD:
-				return parseAdd(commandData);
-			
-			case DELETE:
-				return parseDelete(commandData);
-			
-			case SEARCH:
-				return parseSearch(commandData);
-			
-			case MARKDONE:
-				return parseMarkDone(commandData);
-			
-			case UPDATE:
-				return parseUpdate(commandData);
-			
-			default:
-				return new TaskieAction(actionType, null, commandData);
+		try {
+			switch (actionType) {
+				case ADD:
+					return parseAdd(commandData);
+				
+				case DELETE:
+					return parseDelete(commandData);
+				
+				case SEARCH:
+					return parseSearch(commandData);
+				
+				case MARKDONE:
+					return parseMarkDone(commandData);
+				
+				case UPDATE:
+					return parseUpdate(commandData);
+				
+				case SETPATH:
+					return parseSetPath(commandData);
+				
+				default:
+					return new TaskieAction(actionType, null);
+			}
+		} catch (UnrecognisedCommandException e) {
+			return parseAdd(command);
 		}
 		
 	}
@@ -233,7 +253,7 @@ public final class TaskieParser {
 		return new TaskieAction(TaskieEnum.Actions.ADD, task);
 	}
 
-	private TaskieAction parseDelete(String commandData) {
+	private TaskieAction parseDelete(String commandData) throws UnrecognisedCommandException {
 		if (commandData.matches("a|all")) {
 			return new TaskieAction(TaskieEnum.Actions.DELETEALL, null);
 		}
@@ -254,13 +274,13 @@ public final class TaskieParser {
 		return new TaskieAction(TaskieEnum.Actions.SEARCH, task, task.getTitle());
 	}
 
-	private TaskieAction parseMarkDone(String commandData) {
+	private TaskieAction parseMarkDone(String commandData) throws UnrecognisedCommandException {
 		TaskSelectorDetector tSD = new TaskSelectorDetector(commandData);
 		
 		return new TaskieAction(TaskieEnum.Actions.MARKDONE, tSD.getScreen(), tSD.getIndex());
 	}
 
-	private TaskieAction parseUpdate(String commandData) {
+	private TaskieAction parseUpdate(String commandData) throws UnrecognisedCommandException {
 		TaskSelectorDetector tSD = new TaskSelectorDetector(commandData);
 		TaskCompiler tC = new TaskCompiler();
 		TaskieTask task = tC.compileTask(tSD.getTaskDataString());
@@ -270,6 +290,12 @@ public final class TaskieParser {
 		} else {
 			return new TaskieAction(TaskieEnum.Actions.UPDATE, tSD.getScreen(), tSD.getIndex(), task);
 		}
+	}
+	
+	private TaskieAction parseSetPath(String commandData) {
+		String path = commandData.replaceAll(PATTERN_INVALID_PATH_CHARACTERS, "");
+		
+		return new TaskieAction(TaskieEnum.Actions.SETPATH, null, path);
 	}
 
 	private TaskieEnum.Actions determineTaskieAction(String actionTypeString) {
