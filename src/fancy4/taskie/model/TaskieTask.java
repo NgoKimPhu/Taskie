@@ -18,7 +18,8 @@ public class TaskieTask {
 	private TaskieEnum.TaskPriority priority;
 	// true==done, false==haven't done;
 	private boolean status;
-
+	private static final String START_AFTER_END_EXCEPTION_MESSAGE = "Start time should not after end time.";
+	private static final String TYPE_NOT_MATCH_EXCEPTION_MESSAGE = "Task type not match.";
 	// keep counting the no. of tasks create and be used as the task id.
 	// private static long count = 0;
 	// create float task.
@@ -48,7 +49,7 @@ public class TaskieTask {
 	public TaskieTask(String title, TaskieEnum.TaskType type, TaskieEnum.TaskPriority priority, boolean status,
 			String description) throws Exception {
 		if (!type.equals(TaskieEnum.TaskType.FLOAT)) {
-			throw new Exception("Task type not match.");
+			throw new Exception(TYPE_NOT_MATCH_EXCEPTION_MESSAGE);
 		} else {
 			this.type = TaskieEnum.TaskType.FLOAT;
 			this.title = title;
@@ -85,7 +86,7 @@ public class TaskieTask {
 	// create event.
 	public TaskieTask(String title, Calendar startTime, Calendar endTime) throws Exception{
 		if(startTime.after(endTime)){
-			throw new Exception("start time should not after end time.");
+			throw new Exception(START_AFTER_END_EXCEPTION_MESSAGE);
 		}
 		this.type = TaskieEnum.TaskType.EVENT;
 		this.title = title;
@@ -99,7 +100,7 @@ public class TaskieTask {
 	// create event with specific priority.
 	public TaskieTask(String title, Calendar startTime, Calendar endTime, TaskieEnum.TaskPriority priority) throws Exception{
 		if(startTime.after(endTime)){
-			throw new Exception("start time should not after end time.");
+			throw new Exception(START_AFTER_END_EXCEPTION_MESSAGE);
 		}
 		this.type = TaskieEnum.TaskType.EVENT;
 		this.title = title;
@@ -114,7 +115,7 @@ public class TaskieTask {
 	public TaskieTask(String title, TaskieEnum.TaskType type, Calendar endTime, TaskieEnum.TaskPriority priority,
 			boolean status, String description) throws Exception {
 		if (type.equals(TaskieEnum.TaskType.FLOAT)) {
-			throw new Exception("Task type not match.");
+			throw new Exception(TYPE_NOT_MATCH_EXCEPTION_MESSAGE);
 		} else {
 			this.type = type;
 			this.title = title;
@@ -130,7 +131,7 @@ public class TaskieTask {
 	public TaskieTask(String title, TaskieEnum.TaskType type, Calendar startTime, Calendar endTime,
 			TaskieEnum.TaskPriority priority, boolean status, String description) throws Exception {
 		if (type.equals(TaskieEnum.TaskType.FLOAT)) {
-			throw new Exception("Task type not match.");
+			throw new Exception(TYPE_NOT_MATCH_EXCEPTION_MESSAGE);
 		} else {
 			this.type = type;
 			this.title = title;
@@ -164,7 +165,7 @@ public class TaskieTask {
 
 	public void setToEvent(Calendar startTime, Calendar endTime) throws Exception{
 		if(startTime.after(endTime)){
-			throw new Exception("start time should not after end time.");
+			throw new Exception(START_AFTER_END_EXCEPTION_MESSAGE);
 		}
 		this.startTime = startTime;
 		this.endTime = endTime;
