@@ -18,15 +18,22 @@ public class TaskieCommandHistory {
 	}
 	
 	public void incrementPointer() {
+		if (pointer >= getSize()) {
+			return;
+		}
 		pointer ++;
 	}
 	
 	public void decrementPointer() {
+		if (pointer <= 0) {
+			return;
+		}
 		pointer --;
 	}
 	
 	public void addCommand(String cmd) {
 		history.add(cmd);
+		setPointer(getSize());
 	}
 	
 	/*
@@ -36,7 +43,10 @@ public class TaskieCommandHistory {
 		return history.get(pointer);
 	}
 	
-	public String getCommand(int index) {
+	public String getCommand(int index) throws Exception {
+		if (index > getSize() || index < 0) {
+			throw new Exception("IndexOutOfBound");
+		}
 		return history.get(index);
 	}
 	
@@ -49,6 +59,9 @@ public class TaskieCommandHistory {
 	}
 	
 	public void setPointer(int i) {
+		if (i > getSize() || i < 0) {
+			return;
+		}
 		pointer = i;
 	}
 

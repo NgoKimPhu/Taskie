@@ -19,12 +19,14 @@ import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyEvent;
 import javafx.util.Callback;
 import java.util.*;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 //@@author A0130221H
 
 public class TaskieOverviewController {
+
 	// ================================================================
 	// FXML Fields
 	// ================================================================
@@ -48,7 +50,7 @@ public class TaskieOverviewController {
 
 	@FXML
 	private TextField textInput;
-	
+
 
 	// ================================================================
 	// other Fields
@@ -73,6 +75,7 @@ public class TaskieOverviewController {
 	private static final int TODAY_LOGICOUT_INDEX = 1;
 	private static final int TOMORROW_LOGICOUT_INDEX = 2;
 	private static final int EVERYTHING_ELSE_LOGICOUT_INDEX = 3;
+	private static final String COMMAND_HELP = "help";
 	private static final String INVALID_COMMAND_MESSAGE = "Invalid command!";
 	private static final String VIEW_COMMAND = "view";
 	private static final String DEFAULT_INPUT_COMMAND = "Please input a command here";
@@ -83,6 +86,7 @@ public class TaskieOverviewController {
 	private static final String TREE_TOMORROW = "Tomorrow";
 	private static final String TREE_EVERYTHING_ELSE = "Everything Else";
 	
+	private final Logger logger = Logger.getLogger(TaskieOverviewController.class.getName() );
 
 
 	public TaskieOverviewController() {
@@ -116,6 +120,7 @@ public class TaskieOverviewController {
 		} catch (UnrecognisedCommandException e) {
 			// catch the exception thrown by logic
 			// displays the warning message to feedbackLabel.
+			logger.log(Level.SEVERE, "invalid command at UI initialization", e);
 			feedbackLabel.setText(INVALID_COMMAND_MESSAGE);
 		}	
 	}
@@ -143,7 +148,7 @@ public class TaskieOverviewController {
 		dummyRoot.getChildren().add(node);
 		return node;
 	}
-	
+
 	/**
 	 * Initialize the ListView by populating it with custom ListCell class
 	 */
@@ -191,7 +196,6 @@ public class TaskieOverviewController {
 		obeservableMainList.removeAll(obeservableMainList);
 		obeservableMainList.addAll(mainRemovedFirst);
 		mainListFeedbackLabel.setText(mainFeedback);
-		//setupListCell();
 		mainListView.setItems(obeservableMainList);
 	}
 
@@ -227,21 +231,27 @@ public class TaskieOverviewController {
 		String response;
 		input = textInput.getText();  
 		cmdHistory.addCommand(input);
-		cmdHistory.setPointer(cmdHistory.getSize());
 
 		try {
-			if (input.equals("help")) {
+			if (input.equals(COMMAND_HELP)) {
 				mainApp.switchToHelp();
 				textInput.clear();
 				return;
 			}
-			
+
 			logicOut = TaskieLogic.getInstance().execute(input);
+			
+			//logicOut can never be null as returned by Logic
+			assert !(logicOut == null);
+			//main list can never be empty as the first element is always a description of the content in the list
+			assert !(logicOut.getMain().isEmpty());
+			
 			populate(logicOut.getMain(), logicOut.getAll());
 			response = logicOut.getFeedback();
 			feedbackLabel.setText(response);
 			textInput.clear();
 		} catch (UnrecognisedCommandException e) {
+			logger.log(Level.FINE, "invalid command at input", e);
 			feedbackLabel.setText(INVALID_COMMAND_MESSAGE);
 		}
 
@@ -251,7 +261,7 @@ public class TaskieOverviewController {
 	 * Handle the KeyEvent when UP is pressed in TextInput
 	 */
 	private void handleUp() {
-		upPressed = true;
+
 		if (cmdHistory.getPointer() == 0) {
 			return;
 		} else {
@@ -265,17 +275,16 @@ public class TaskieOverviewController {
 	 * Handle the KeyEvent when DOWN is pressed in TextInput
 	 */
 	private void handleDown() {
-		if (upPressed) {
-			if (cmdHistory.getPointer() == cmdHistory.getSize() - 1) {
-				return;
-			} else {
-				cmdHistory.incrementPointer();
-				textInput.setText(cmdHistory.getCommand());
-				textInput.positionCaret(Integer.MAX_VALUE);
-			}
+		if (cmdHistory.getPointer() == cmdHistory.getSize() - 1) {
+			return;
+		} else {
+			cmdHistory.incrementPointer();
+			textInput.setText(cmdHistory.getCommand());
+			textInput.positionCaret(Integer.MAX_VALUE);
 		}
+
 	}
-	
+
 	/**
 	 * FXML Event Handler of the textInput, handles 3 key events.
 	 * 
@@ -300,9 +309,9 @@ public class TaskieOverviewController {
 			break;
 		}
 	}
-	 public void setMainApp(MainApp mainApp) {
-	        this.mainApp = mainApp;
-	 }
+	public void setMainApp(MainApp mainApp) {
+		this.mainApp = mainApp;
+	}
 
 }
 

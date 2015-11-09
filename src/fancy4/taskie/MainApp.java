@@ -2,6 +2,9 @@ package fancy4.taskie;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import fancy4.taskie.view.HelpController;
 import fancy4.taskie.view.TaskieOverviewController;
 import javafx.application.Application;
@@ -50,6 +53,7 @@ public class MainApp extends Application {
 	public static ArrayList<String> tmrData = new ArrayList<String>();
 	public static ArrayList<String> elseData = new ArrayList<String>();
 
+	private final Logger logger = Logger.getLogger(MainApp.class.getName() );
 	// ================================================================
 	// Methods
 	// ================================================================
@@ -87,6 +91,7 @@ public class MainApp extends Application {
 			primaryStage.show();
 			
 		} catch (IOException e) {
+			logger.log(Level.SEVERE, "IOException at UI rootLayout initialization", e);
 			e.printStackTrace();
 		}
 	}
@@ -104,6 +109,7 @@ public class MainApp extends Application {
 			HelpController controller = loader.getController();
 	        controller.setMainApp(this);
 			} catch (IOException e) {
+				logger.log(Level.SEVERE, "IOException at UI helpScene initialization", e);
 				e.printStackTrace();
 			}
 	}
@@ -137,6 +143,7 @@ public class MainApp extends Application {
 	        controller.setMainApp(this);
 	        
 		} catch (IOException e) {
+			logger.log(Level.SEVERE, "IOException at UI showTaskieOverview", e);
 			e.printStackTrace();
 		}
 	}
