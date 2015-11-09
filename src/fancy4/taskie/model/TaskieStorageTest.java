@@ -1,4 +1,5 @@
 //@@ A0119390E
+//Cannot be moved to test package as some non public classes are used.
 package fancy4.taskie.model;
 
 import java.util.*;
