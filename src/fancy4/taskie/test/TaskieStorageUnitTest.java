@@ -64,8 +64,10 @@ public class TaskieStorageUnitTest {
 		assertEquals(TaskieStorage.displayEventTasks().size(), 1);
 		assertEquals(TaskieStorage.displayAllTasks().size(), 1);
 	}
+	
 	@Test
-	public void testDelete() {
+	// test a valid deletion
+	public void testValidDelete() {
 		try {
 			TaskieStorage.load("unit/");
 		} catch (Exception e) {
@@ -75,6 +77,27 @@ public class TaskieStorageUnitTest {
 		TaskieStorage.addTask(float1);
 		TaskieStorage.deleteTask(0);
 		assertEquals(TaskieStorage.displayAllTasks().size(), 0);
+	}
+	
+	@Test
+	// test a invalid deletion
+	public void testInvalidDelete() {
+		try {
+			TaskieStorage.load("unit/");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		TaskieTask float1 = new TaskieTask("finish tutorial");
+		TaskieStorage.addTask(float1);
+		try{
+			TaskieStorage.deleteTask(1);
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+			assertEquals("Ooops! index out of the bonds!", e.getMessage());
+		}
+		//not deleted
+		assertEquals(TaskieStorage.displayAllTasks().size(), 1);
+		
 	}
 
 }
