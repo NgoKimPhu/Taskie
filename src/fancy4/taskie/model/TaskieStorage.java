@@ -526,7 +526,7 @@ class FileHandler {
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 	private static Logger logger = Logger.getLogger(FileHandler.class.getName());
 
-	public static HashMap<String, ArrayList<TaskieTask>> readFile(File file) throws Exception {
+	public static HashMap<String, ArrayList<TaskieTask>> readFile(File file) {
 		String line = new String();
 		ArrayList<TaskieTask> events = new ArrayList<TaskieTask>();
 		ArrayList<TaskieTask> deadlines = new ArrayList<TaskieTask>();
@@ -541,36 +541,78 @@ class FileHandler {
 				if (taskLine.has("event")) {
 					JSONObject taskData = taskLine.getJSONObject("event");
 					String title = taskData.getString("title");
-					TaskieEnum.TaskType type = getTaskType(taskData.getInt("type"));
+					TaskieEnum.TaskType type;
+					try{
+						type = getTaskType(taskData.getInt("type"));
+					}catch(Exception e){
+						type = TaskieEnum.TaskType.EVENT;
+					}
 					Calendar start = getDate(taskData.getString("start-time"));
 					Calendar end = getDate(taskData.getString("end-time"));
-					TaskieEnum.TaskPriority priority = getTaskPriority(taskData.getInt("priority"));
+					TaskieEnum.TaskPriority priority;
+					try{
+						priority = getTaskPriority(taskData.getInt("priority"));
+					}catch(Exception e){
+						priority = TaskieEnum.TaskPriority.LOW;
+					}
 					boolean status = taskData.getBoolean("status");
 					String description = taskData.getString("description");
-					TaskieTask task = new TaskieTask(title, type, start, end, priority, status, description);
-					events.add(task);
-					all.add(task);
+					try{
+						TaskieTask task = new TaskieTask(title, type, start, end, priority, status, description);
+						events.add(task);
+						all.add(task);
+					}catch(Exception e){
+						continue;
+					}		
 				} else if (taskLine.has("deadline")) {
 					JSONObject taskData = taskLine.getJSONObject("deadline");
 					String title = taskData.getString("title");
-					TaskieEnum.TaskType type = getTaskType(taskData.getInt("type"));
+					TaskieEnum.TaskType type;
+					try{
+						type = getTaskType(taskData.getInt("type"));
+					}catch(Exception e){
+						type = TaskieEnum.TaskType.DEADLINE;
+					}
 					Calendar end = getDate(taskData.getString("end-time"));
-					TaskieEnum.TaskPriority priority = getTaskPriority(taskData.getInt("priority"));
+					TaskieEnum.TaskPriority priority;
+					try{
+						priority = getTaskPriority(taskData.getInt("priority"));
+					}catch(Exception e){
+						priority = TaskieEnum.TaskPriority.LOW;
+					}
 					boolean status = taskData.getBoolean("status");
 					String description = taskData.getString("description");
-					TaskieTask task = new TaskieTask(title, type, end, priority, status, description);
-					deadlines.add(task);
-					all.add(task);
+					try{
+						TaskieTask task = new TaskieTask(title, type, end, priority, status, description);
+						deadlines.add(task);
+						all.add(task);
+					}catch(Exception e){
+						continue;
+					}
 				} else if (taskLine.has("float")) {
 					JSONObject taskData = taskLine.getJSONObject("float");
 					String title = taskData.getString("title");
-					TaskieEnum.TaskType type = getTaskType(taskData.getInt("type"));
-					TaskieEnum.TaskPriority priority = getTaskPriority(taskData.getInt("priority"));
+					TaskieEnum.TaskType type ;
+					try{
+						type = getTaskType(taskData.getInt("type"));
+					}catch(Exception e){
+						type = TaskieEnum.TaskType.FLOAT;
+					}
+					TaskieEnum.TaskPriority priority;
+					try{
+						priority = getTaskPriority(taskData.getInt("priority"));
+					}catch(Exception e){
+						priority = TaskieEnum.TaskPriority.LOW;
+					}
 					boolean status = taskData.getBoolean("status");
 					String description = taskData.getString("description");
-					TaskieTask task = new TaskieTask(title, type, priority, status, description);
-					floats.add(task);
-					all.add(task);
+					try{
+						TaskieTask task = new TaskieTask(title, type, priority, status, description);
+						floats.add(task);
+						all.add(task);
+					}catch(Exception e){
+						continue;
+					}
 				}
 				line = in.readLine();
 			}
