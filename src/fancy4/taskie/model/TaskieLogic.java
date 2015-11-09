@@ -15,34 +15,35 @@ import java.util.Date;
 
 public class TaskieLogic {
 
-	private static final String DATE_FORMAT_DAY_MONTH_HOUR_MIN = "E dd-MM HH:mm";
-	private static final String DATE_FORMAT_HOUR_MIN = "HH:mm";
-	private static final String DATE_FORMAT_DAY_MON_YEAR = "dd-MM-YYYY";
-	private static final String FORMAT_COMPLETED_SPACING = "    ";
-	private static final String FORMAT_EMPTY_STRING = "";
-	private static final String FORMAT_SAMEDAY_WAVE = " ~ ";
-	private static final String FORMAT_SPACING = "  ";
-	private static final String FORMAT_UI_TIME_INDICATOR = "-time ";
-	private static final String FORMAT_INDEXPERIOD = ".  ";
-	private static final String FORMAT_COMPLETED = "Completed";
-	private static final String ON_DAY = " on %1$s";
-	private static final String DATE_FORMAT_MAIN = "dd, MMM, yyyy";
-	private static final String HEADLINE_MANY_TASKS = "%1$s%2$s tasks";
-	private static final String HEADLINE_ONE_TASK = "one%1$s task";
 	private static final String HEADLINE_FREESLOTS = "You have %1$s in the next seven days.";
-	private static final String HEADLINE_MANY_FREESLOTS = "are %1$s free slots";
-	private static final String HEADLINE_ONE_FREESLOT = "is one free slot";
-	private static final String FLOATING = " floating";
-	private static final String HEADLINE_FLOATING = "You have %1$s%2$s.";
-	private static final String HEADLINE_MANY_TASKS_VIEW = "%1$s tasks";
-	private static final String HEADLINE_ONE_TASK_VIEW = "one task";
-	private static final String HEADLINE_VIEW = "You have %1$s in total.";
-	private static final String HEADLINE_MARKDONE = "There %1$s.";
-	private static final String HEADLINE_SEARCH = "There %1$s found.";
-	private static final String HEADLINE_ONE_TASK_SEARCH = "is one task";
-	private static final String HEADLINE_MANY_TASKS_SEARCH = "are %1$s tasks";
-	private static final String HEADLINE_ONE_COMPLETED = "is one completed task";
 	private static final String HEADLINE_MANY_COMPLETED = "are %1$s completed tasks";
+	private static final String DATE_FORMAT_DAY_MONTH_HOUR_MIN = "E dd-MM HH:mm";
+	private static final String HEADLINE_ONE_COMPLETED = "is one completed task";
+	private static final String HEADLINE_MANY_FREESLOTS = "are %1$s free slots";
+	private static final String HEADLINE_MANY_TASKS_SEARCH = "are %1$s tasks";
+	private static final String HEADLINE_ONE_FREESLOT = "is one free slot";
+	private static final String HEADLINE_VIEW = "You have %1$s in total.";
+	private static final String HEADLINE_ONE_TASK_SEARCH = "is one task";
+	private static final String HEADLINE_FLOATING = "You have %1$s%2$s.";
+	private static final String DATE_FORMAT_DAY_MON_YEAR = "dd-MM-YYYY";
+	private static final String HEADLINE_MANY_TASKS_VIEW = "%1$s tasks";
+	private static final String HEADLINE_MANY_TASKS = "%1$s%2$s tasks";
+	private static final String HEADLINE_SEARCH = "There %1$s found.";
+	private static final String FORMAT_UI_TIME_INDICATOR = "-time ";
+	private static final String HEADLINE_ONE_TASK_VIEW = "one task";
+	private static final String HEADLINE_ONE_TASK = "one%1$s task";
+	private static final String DATE_FORMAT_MAIN = "dd, MMM, yyyy";
+	private static final String FORMAT_COMPLETED_SPACING = "    ";
+	private static final String HEADLINE_MARKDONE = "There %1$s.";
+	private static final String DATE_FORMAT_HOUR_MIN = "HH:mm";
+	private static final String FORMAT_COMPLETED = "Completed";
+	private static final String FORMAT_SAMEDAY_WAVE = " ~ ";
+	private static final String FORMAT_INDEXPERIOD = ".  ";
+	private static final String FORMAT_EMPTY_STRING = "";
+	private static final String FLOATING = " floating";
+	private static final String FORMAT_SPACING = "  ";
+	private static final String ON_DAY = " on %1$s";
+	private static final int ONE_THOUSAND = 1000;
 
 	private static TaskieLogic logic;
 	
@@ -520,26 +521,28 @@ public class TaskieLogic {
 		ArrayList<IndexTaskPair> list;
 		TaskieTask task = action.getTask();
 		Object searchKey = action.getSearch();
-		if (searchKey instanceof Boolean) {
+		if (searchKey instanceof Boolean) { // Search for completed tasks
 			isMarkdone = true;
 			list = TaskieStorage.searchTask((Boolean) searchKey);
-		} else if (task.getType() == TaskieEnum.TaskType.FLOAT) {
+		} else if (task.getType() == TaskieEnum.TaskType.FLOAT) { // Search for keywords
 			ArrayList<String> searchList = new ArrayList<String>();
 			searchList.add(task.getTitle());
 			list = TaskieStorage.searchTask(searchList);
+			// Check if it is a View command
 			isSearch = task.getTitle().equals(FORMAT_EMPTY_STRING) ? false : true;
 			isView = !isSearch;
-		} else {
+		} else { // Search by date
 			Calendar taskStartTime = task.getStartTime(),
-					 taskEndTime = task.getEndTime();
-			if (task.getStartTime() != null) {
+					   taskEndTime = task.getEndTime();
+			if (task.getStartTime() != null) { // Search by a date interval
 				list = TaskieStorage.searchTask(taskStartTime, taskEndTime);
-			} else {
+			} else { // Search by exact date
 				Calendar startOfDay = new Calendar.Builder().setDate(taskEndTime.get(Calendar.YEAR), 
 						taskEndTime.get(Calendar.MONTH), taskEndTime.get(Calendar.DATE)).build();
 				taskEndTime.add(Calendar.MINUTE, 1);
 				list = TaskieStorage.searchTask(startOfDay, taskEndTime);
 			}
+			// Date + keywords composite searching, removing tasks which do not contain the keywords
 			if (task.getTitle() != null) {
 				for (int i = list.size() - 1; i >= 0; i--) {
 					IndexTaskPair pair = list.get(i);
@@ -551,7 +554,7 @@ public class TaskieLogic {
 		}
 		mainTasks = list;
 		// Below is for fun :D
-		double time = Math.random() * Math.random() / 1000;
+		double time = Math.random() * Math.random() / ONE_THOUSAND;
 		feedback = new String("Search finished in " + String.format("%.5f", time) + " seconds");
 	}
 
@@ -575,7 +578,7 @@ public class TaskieLogic {
 		} else {
 			throw new Exception("Window preference not indicated.");
 		}
-		
+		// For the section below, the name of the method called gives a good description of what the code does.
 		if (task.getTitle() != null && task.getTitle().trim().length() != 0) {
 			TaskieStorage.updateTaskTitle(realIndex, task.getTitle());
 			// undoTask: task with old title
@@ -634,8 +637,8 @@ public class TaskieLogic {
 		} else {
 			throw new UnrecognisedCommandException("Unrecognised update criterion");
 		}
-
-		retrieveSave = (Calendar) currTask.getEndTime().clone();
+		
+		retrieveSave = (Calendar) currTask.getEndTime().clone(); // Update the left display to the end date of the task that is being updated
 		retrieve(retrieveSave);
 		if (!isUndoAction) {
 			TaskieAction action = new TaskieAction(TaskieEnum.Actions.UPDATE, "right", getRightIndex(realIndex), undoTask);
