@@ -9,6 +9,7 @@ tmp/
 *.bak
 *.swp
 *~.nib
+*.txt
 local.properties
 .metadata
 .gradle
