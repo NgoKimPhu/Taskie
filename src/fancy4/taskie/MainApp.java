@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import fancy4.taskie.model.*;
+import fancy4.taskie.view.HelpController;
 import fancy4.taskie.view.TaskieOverviewController;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -21,21 +22,24 @@ import javafx.stage.Stage;
 public class MainApp extends Application {
 
 	// ================================================================
-    // Constants
-    // ================================================================
-	private static final int MIN_WIDTH = 900;
+	// Constants
+	// ================================================================
+	private static final int MIN_WIDTH = 800;
 	private static final int MIN_HEIGHT = 600;
 	private static final String WINDOW_TITLE = "Taskie";
 	private static final String ICON_PATH = "view/TaskieIcon.png";
 	private static final String ROOT_FXML_PATH = "view/RootLayout.fxml";
 	private static final String OVERVIEW_FXML_PATH = "view/TaskieOverview.fxml";
+	private static final String HELP_FXML_PATH = "view/HelpScene.fxml";
 	private static final String CSS_PATH = "fancy4/taskie/view/Theme.css";
-	
-	
+
+
 	// ================================================================
-    // Fields
-    // ================================================================
+	// Fields
+	// ================================================================
 	private Stage primaryStage;
+	private Scene overviewScene;
+	private Scene helpScene;
 	private BorderPane rootLayout;
 	public static ObservableList<String> mainDisplay = FXCollections.observableArrayList();
 	public static ObservableList<String> overdueDisplay = FXCollections.observableArrayList();
@@ -50,10 +54,10 @@ public class MainApp extends Application {
 	public static ArrayList<String> elseData = new ArrayList<String>();
 
 	// ================================================================
-    // Methods
-    // ================================================================
+	// Methods
+	// ================================================================
 	public MainApp() {
-		TaskieLogic.getInstance().initialise();
+
 	}
 
 	@Override
@@ -63,7 +67,12 @@ public class MainApp extends Application {
 		Image icon = new Image(getClass().getResourceAsStream(ICON_PATH));
 		this.primaryStage.getIcons().add(icon);
 		
+		this.primaryStage.setMinHeight(MIN_HEIGHT);
+		this.primaryStage.setMinWidth(MIN_WIDTH);
+		
 		initRootLayout();
+		initHelpScene();
+	
 		showTaskieOverview();
 	}
 
@@ -75,19 +84,47 @@ public class MainApp extends Application {
 			rootLayout = (BorderPane) loader.load();
 
 			// Show the scene containing the root layout.
-			Scene scene = new Scene(rootLayout);
-			scene.getStylesheets().add(CSS_PATH);
-			primaryStage.setScene(scene);
+			overviewScene = new Scene(rootLayout);
+			overviewScene.getStylesheets().add(CSS_PATH);
+			primaryStage.setScene(overviewScene);
+
+		
 
 			primaryStage.show();
-			primaryStage.setMinHeight(MIN_HEIGHT);
-			primaryStage.setMinWidth(MIN_WIDTH);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	
+	private void initHelpScene() {
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource(HELP_FXML_PATH));
+			AnchorPane help = (AnchorPane) loader.load();
+			
+			helpScene = new Scene(help);
+			helpScene.getStylesheets().add(CSS_PATH);
+			
+			HelpController controller = loader.getController();
+	        controller.setMainApp(this);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	}
+	
+	public void switchToHelp() {
+		primaryStage.setScene(helpScene);
 
-	private void showTaskieOverview() {
+	}
+	
+	public void switchToOverview() {
+		primaryStage.setScene(overviewScene);
+	}
+	
+	
+
+	public void showTaskieOverview() {
 		try {
 			// Load overview from fxml file.
 			FXMLLoader loader = new FXMLLoader();
@@ -95,11 +132,17 @@ public class MainApp extends Application {
 			AnchorPane taskieOverview = (AnchorPane) loader.load();
 
 			rootLayout.setCenter(taskieOverview);
+			TaskieOverviewController controller = loader.getController();
+	        controller.setMainApp(this);
+	        
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
+	public Stage getPrimaryStage() {
+		return primaryStage;
+	}
 	public static void main(String[] args) {
 		launch(args);
 	}
