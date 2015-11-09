@@ -18,6 +18,18 @@
     -fx-text-fill: white;
     -fx-opacity: 1;
 }
+.label-blue {
+    -fx-font-size: 11pt;
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-text-fill: #33CCFF;
+    -fx-opacity: 1;
+}
+.label-cmd {
+    -fx-font-size: 11pt;
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
 .label-big {
     -fx-font-size: 20pt;
     -fx-font-family: "Segoe UI Semibold";

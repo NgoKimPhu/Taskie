@@ -85,14 +85,6 @@ public class TaskieOverviewController {
 	private static final String TREE_TOMORROW = "Tomorrow";
 	private static final String TREE_EVERYTHING_ELSE = "Everything Else";
 	
-	private static final String HELP_ADD_FLOAT = "add a float task: add [title]";
-	private static final String HELP_ADD_DEADLINE = "add a deadline task: add [title] (op)due/end/by/deadline [end time] (op)[date]";
-	private static final String HELP_ADD_EVENT = "add a deadline task: add [title] (op)from/fr [start time] (op)[date] (op)to/till/- (op)[date]";
-	private static final String HELP_DELETE = "delete a task based on index: delete/del l/r[index] *default [index] is l[index] if not specified";
-	private static final String HELP_UPDATE = "update a task based on index: update l/r[index] (new task full details / new time or date  *default [index] is l[index] if not specified)";
-	private static final String HELP_MARK_DONE = "mark a task done based on index: markdone/done/finish l/r[index] *default [index] is l[index] if not specified";
-	private static final String HELP_UNDO = "undo a previous command: undo";
-	private static final String HELP_ADD_DEMO_1 = "add finish work 5pm to 8pm today";
 
 
 	public TaskieOverviewController() {
@@ -242,6 +234,8 @@ public class TaskieOverviewController {
 		try {
 			if (input.equals("help")) {
 				mainApp.switchToHelp();
+				textInput.clear();
+				return;
 			}
 			
 			logicOut = TaskieLogic.getInstance().execute(input);

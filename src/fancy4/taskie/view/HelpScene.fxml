@@ -1,13 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane onKeyPressed="#handleKey" prefHeight="600.0" prefWidth="800.0" styleClass="background" stylesheets="@Theme.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fancy4.taskie.view.HelpController">
+<AnchorPane fx:id="anchorPane" prefHeight="600.0" prefWidth="800.0" styleClass="background" stylesheets="@Theme.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fancy4.taskie.view.HelpController">
    <children>
-      <Label fx:id="helpLabel" layoutX="267.0" layoutY="232.0" prefHeight="147.0" prefWidth="290.0" text="Help" />
-      <Button fx:id="backButton" layoutX="290.0" layoutY="205.0" mnemonicParsing="false" text="Button" />
+      <VBox fx:id="helpBox" layoutX="121.0" layoutY="150.0" prefHeight="310.0" prefWidth="201.0" stylesheets="@Theme.css" AnchorPane.bottomAnchor="142.0" AnchorPane.leftAnchor="121.0" AnchorPane.rightAnchor="478.0" AnchorPane.topAnchor="150.0" />
+      <Label fx:id="backLabel" alignment="CENTER" layoutX="-1.0" layoutY="565.0" prefHeight="33.0" prefWidth="800.0" styleClass="label-bright" stylesheets="@Theme.css" text="Press Esc to go back to main interface" />
+      <VBox fx:id="cmdBox" layoutX="321.0" layoutY="150.0" prefHeight="310.0" prefWidth="415.0" stylesheets="@Theme.css" />
+      <HBox alignment="CENTER" layoutX="2.0" layoutY="28.0" prefHeight="86.0" prefWidth="794.0">
+         <children>
+            <ImageView fx:id="imageView" fitHeight="85.0" fitWidth="86.0" pickOnBounds="true" preserveRatio="true" />
+            <Label fx:id="helpLabel" alignment="CENTER" prefHeight="84.0" prefWidth="235.0" styleClass="label-big" stylesheets="@Theme.css" text="Help">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
    </children>
 </AnchorPane>
