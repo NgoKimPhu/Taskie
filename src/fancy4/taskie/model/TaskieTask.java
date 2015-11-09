@@ -192,8 +192,14 @@ public class TaskieTask {
 		}
 	}
 
-	public void setStatus(boolean status) {
-		this.status = status;
+	public boolean setStatus(boolean status) {
+		if(this.status == status){
+			return false;
+		}
+		else{
+			this.status = status;
+			return true;
+		}
 	}
 
 	public void setDescription(String description) {
@@ -324,17 +330,6 @@ class IndexTaskPair implements Comparable<IndexTaskPair> {
 	public void setTask(TaskieTask task) {
 		this.task = task;
 	}
-	
-/*	
-	@Override
-	public boolean equals(Object pair) {
-		if (pair instanceof IndexTaskPair) {
-			return this.index == ((IndexTaskPair)pair).getIndex();
-		} else {
-			return false;
-		}
-	}
-	*/
 
 	@Override
 	public int compareTo(IndexTaskPair p) {
