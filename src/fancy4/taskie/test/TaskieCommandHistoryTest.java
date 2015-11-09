@@ -5,6 +5,11 @@ import org.junit.Test;
 import fancy4.taskie.model.TaskieCommandHistory;
 
 //@@author: A0130221H
+
+/**
+ * Junit test class for TaskieCommandHistory class.
+ * Tests isEmpty, add, get methods, pointer behavior and exceptions.
+ */
 public class TaskieCommandHistoryTest {
 
 	@Test
@@ -115,7 +120,6 @@ public class TaskieCommandHistoryTest {
 			assertTrue(cmdHistory.getCommand(2).equals("add 3"));
 			assertTrue(cmdHistory.getCommand(3).equals("add 4"));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -123,7 +127,6 @@ public class TaskieCommandHistoryTest {
 	
 	@Test
 	public void testException() {
-		boolean caught1 = false;
 		TaskieCommandHistory cmdHistory = new TaskieCommandHistory();
 		try {
 			cmdHistory.getCommand(-1);
