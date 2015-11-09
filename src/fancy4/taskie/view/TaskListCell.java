@@ -1,12 +1,15 @@
-//@author A0130221H
 package fancy4.taskie.view;
 
 import javafx.scene.Node;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Text;
 
+//@@author A0130221H
+/**
+ * This class is a customized ListCell class that inherits the JavaFX ListCell class.
+ *  Each Cell consists of a FlowPane to accommodate texts with different css styles.
+ */
 class TaskListCell extends ListCell<String> {
 	// ================================================================
 	// Constants
@@ -18,6 +21,10 @@ class TaskListCell extends ListCell<String> {
 	private static final String TIME_FLAG = "-time";
 	public static final String TIME_PLACEHOLDER = "%f";
 
+	/**
+	 * Override the updateItem method, populate the cell with a flowpane node
+	 * @param s: String input, either is a time or a task.
+	 */
 	@Override 
 	protected void updateItem(String s, boolean empty) {
 		super.updateItem(s, empty);
@@ -33,7 +40,6 @@ class TaskListCell extends ListCell<String> {
 		} else {
 			setGraphic(null);
 		}
-
 	}
 
 	/**
@@ -58,7 +64,6 @@ class TaskListCell extends ListCell<String> {
 			}
 			flow.getChildren().add(text);
 		}
-
 		return flow;
 	}
 

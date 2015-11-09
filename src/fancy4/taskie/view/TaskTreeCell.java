@@ -1,16 +1,19 @@
-//@@author A0130221H
 package fancy4.taskie.view;
-
 
 import javafx.scene.Node;
 import javafx.scene.control.TreeCell;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Text;
 
+//@@author A0130221H
+/**
+ * This class is a customized TreeCell class that inherits the JavaFX TreeCell class.
+ *  Each Cell consists of a FlowPane to accommodate texts with different css styles.
+ */
 class TaskTreeCell extends TreeCell<String> {
 	// ================================================================
-    // Constants
-    // ================================================================
+	// Constants
+	// ================================================================
 	private static final String PLAIN_CLASS_CSS = "plain";
 	private static final String TIME_CLASS_CSS = "time";
 	private static final String TITLE_CLASS_CSS = "titleCell";
@@ -21,18 +24,19 @@ class TaskTreeCell extends TreeCell<String> {
 	private static final String TIME_FLAG = "-time";
 	private static final String PLACEHOLDER = "%f";
 
-	
-	@Override protected void updateItem(String s, boolean empty) {
+	/**
+	 * Override the updateItem method, populate the cell with a flowpane node
+	 * @param s: String input, either is a title or a time or a task.
+	 */
+	@Override 
+	protected void updateItem(String s, boolean empty) {
 		super.updateItem(s, empty);
 		setDisclosureNode(null);
 		if (!isEmpty()) {
-
 			if (s.contains(TIME_FLAG)) {
 				String time = s.substring(s.indexOf(TIME_FLAG) + TIME_STARTING_INDEX);
-				System.out.println(time);
 				String text = s.substring(STARTING_INDEX, s.indexOf(TIME_FLAG));
 				setGraphic(createTextFlow(text, PLACEHOLDER, time));
-
 			} else if (s.contains(TITLE_FLAG)) {
 				String text = s.substring(TITLE_STARTING_INDEX);
 				setGraphic(createTitleFlow(text)); 
@@ -57,7 +61,7 @@ class TaskTreeCell extends TreeCell<String> {
 		}
 		return flow;
 	}
-	
+
 	/**
 	 * Create a FlowPane to display the content and time with different css styles.
 	 */
@@ -80,10 +84,7 @@ class TaskTreeCell extends TreeCell<String> {
 			}
 			flow.getChildren().add(text);
 		}
-
 		return flow;
 	}
-
-
 }
 
