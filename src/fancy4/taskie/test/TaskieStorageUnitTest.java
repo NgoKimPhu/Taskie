@@ -98,5 +98,25 @@ public class TaskieStorageUnitTest {
 		//not deleted
 		assertEquals(TaskieStorage.displayAllTasks().size(), 1);
 	}
+	
+	@Test 
+	// search without case constrain
+	public void testSearchWithoutCaseConstrain() {
+		try {
+			TaskieStorage.load("unit/");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		TaskieTask float1 = new TaskieTask("finish tutorial");
+		TaskieStorage.addTask(float1);
+		try{
+			TaskieStorage.deleteTask(1);
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+			assertEquals("Ooops! index out of the bonds!", e.getMessage());
+		}
+		//not deleted
+		assertEquals(TaskieStorage.displayAllTasks().size(), 1);
+	}
 
 }
