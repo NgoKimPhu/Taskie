@@ -14,45 +14,60 @@ import java.util.Stack;
 import java.util.Date;
 
 public class TaskieLogic {
-
+	
+	private static final String DATE_FORMAT_DAY_MON_YEAR = "dd-MM-YYYY";
+	private static final String DATE_FORMAT_DAY_MONTH_HOUR_MIN = "E dd-MM HH:mm";
+	private static final String DATE_FORMAT_HOUR_MIN = "HH:mm";
+	private static final String DATE_FORMAT_MAIN = "dd, MMM, yyyy";
+	private static final String EXCEPTION_INVALID_INDEX_NUMBER = "Invalid index number";
+	private static final String EXCEPTION_UNRECOGNISED_UPDATE_CRITERION = "Unrecognised update criterion";
+	private static final String EXCEPTION_WINDOW_PREFERENCE_NOT_INDICATED = "Window preference not indicated.";
+	private static final String FEEDBACK_ADD = "\"%1$s\" is added";
+	private static final String FEEDBACK_CANNOT_DELETE_FREESLOT = "You cannot update a slot.";
+	private static final String FEEDBACK_DELETE = "\"%1$s\" is deleted";
+	private static final String FEEDBACK_DELETEALL = "All deleted";
+	private static final String FEEDBACK_MARKDONE = "\"%1$s\" is marked done";
+	private static final String FEEDBACK_NO_MORE_REDO = "No more action to redo";
+	private static final String FEEDBACK_NO_MORE_UNDO = "No more action to undo";
+	private static final String FEEDBACK_RESET = "Restored to factory settings";
+	private static final String FEEDBACK_SEARCH = "Search finished in %1$s seconds";
+	private static final String FEEDBACK_SETPATH = "File path is set to %1$s";
+	private static final String FEEDBACK_UPDATE = "Updated successfully";
+	private static final String FLOATING = " floating";
+	private static final String FORMAT_COMPLETED = "Completed";
+	private static final String FORMAT_COMPLETED_SPACING = "    ";
+	private static final String FORMAT_EMPTY_STRING = "";
+	private static final String FORMAT_INDEXPERIOD = ".  ";
+	private static final String FORMAT_SAMEDAY_WAVE = " ~ ";
+	private static final String FORMAT_SPACING = "  ";
+	private static final String FORMAT_UI_TIME_INDICATOR = "-time ";
+	private static final String HEADLINE_FLOATING = "You have %1$s%2$s.";
 	private static final String HEADLINE_FREESLOTS = "You have %1$s in the next seven days.";
 	private static final String HEADLINE_MANY_COMPLETED = "are %1$s completed tasks";
-	private static final String DATE_FORMAT_DAY_MONTH_HOUR_MIN = "E dd-MM HH:mm";
-	private static final String HEADLINE_ONE_COMPLETED = "is one completed task";
 	private static final String HEADLINE_MANY_FREESLOTS = "are %1$s free slots";
-	private static final String HEADLINE_MANY_TASKS_SEARCH = "are %1$s tasks";
-	private static final String HEADLINE_ONE_FREESLOT = "is one free slot";
-	private static final String HEADLINE_VIEW = "You have %1$s in total.";
-	private static final String HEADLINE_ONE_TASK_SEARCH = "is one task";
-	private static final String HEADLINE_FLOATING = "You have %1$s%2$s.";
-	private static final String DATE_FORMAT_DAY_MON_YEAR = "dd-MM-YYYY";
-	private static final String HEADLINE_MANY_TASKS_VIEW = "%1$s tasks";
 	private static final String HEADLINE_MANY_TASKS = "%1$s%2$s tasks";
-	private static final String HEADLINE_SEARCH = "There %1$s found.";
-	private static final String FORMAT_UI_TIME_INDICATOR = "-time ";
-	private static final String HEADLINE_ONE_TASK_VIEW = "one task";
-	private static final String HEADLINE_ONE_TASK = "one%1$s task";
-	private static final String DATE_FORMAT_MAIN = "dd, MMM, yyyy";
-	private static final String FORMAT_COMPLETED_SPACING = "    ";
+	private static final String HEADLINE_MANY_TASKS_SEARCH = "are %1$s tasks";
+	private static final String HEADLINE_MANY_TASKS_VIEW = "%1$s tasks";
 	private static final String HEADLINE_MARKDONE = "There %1$s.";
-	private static final String DATE_FORMAT_HOUR_MIN = "HH:mm";
-	private static final String FORMAT_COMPLETED = "Completed";
-	private static final String FORMAT_SAMEDAY_WAVE = " ~ ";
-	private static final String FORMAT_INDEXPERIOD = ".  ";
-	private static final String FORMAT_EMPTY_STRING = "";
-	private static final String FLOATING = " floating";
-	private static final String FORMAT_SPACING = "  ";
+	private static final String HEADLINE_NO_FREESLOTS = "There is no free slots. Take some break.";
+	private static final String HEADLINE_NO_TASK_GENERAL = "There is no task. Feed me some, or take a nap.";
+	private static final String HEADLINE_NO_TASK_MARKDONE = "There is no completed task.";
+	private static final String HEADLINE_NO_TASK_SEARCH = "Your search did not match any tasks.";
+	private static final String HEADLINE_ONE_COMPLETED = "is one completed task";
+	private static final String HEADLINE_ONE_FREESLOT = "is one free slot";
+	private static final String HEADLINE_ONE_TASK = "one%1$s task";
+	private static final String HEADLINE_ONE_TASK_SEARCH = "is one task";
+	private static final String HEADLINE_ONE_TASK_VIEW = "one task";
+	private static final String HEADLINE_SEARCH = "There %1$s found.";
+	private static final String HEADLINE_VIEW = "You have %1$s in total.";
 	private static final String ON_DAY = " on %1$s";
-	private static final int ONE_THOUSAND = 1000;
+	private static final String WINDOW_LEFT = "left";
+	private static final String WINDOW_RIGHT = "right";
+	
+    private static final int SEARCH_TIME_ONE_THOUSAND = 1000;
 
 	private static TaskieLogic logic;
 	
-	private final String HEADLINE_NO_TASK_GENERAL = new String("There is no task. Feed me some, or take a nap.");
-	private final String HEADLINE_NO_TASK_SEARCH = new String("Your search did not match any tasks.");
-	private final String HEADLINE_NO_TASK_MARKDONE = new String("There is no completed task.");
-	
-	private final String HEADLINE_NO_FREESLOTS = new String("There is no free slots. Take some break.");
-
 	private boolean isFreeSlots, isMarkdone, isSearch, isView, isUndoAction;
 	private Stack<TaskieAction> commandSave, undoStack, redoStack;
 	private ArrayList<IndexTaskPair> mainTasks, allTasks;
@@ -139,7 +154,7 @@ public class TaskieLogic {
 			}
 		} else {
 			int size = mainTasks.size();
-			if (mainTasks.isEmpty()) {	
+			if (mainTasks.isEmpty()) {	// Handles the situation when no task is on display
 				if (isMarkdone) {
 					headline = HEADLINE_NO_TASK_MARKDONE;
 				} else if (isSearch) {
@@ -147,7 +162,7 @@ public class TaskieLogic {
 				} else {
 					headline = HEADLINE_NO_TASK_GENERAL;
 				}
-			} else {
+			} else {  // Handles the various situation when one or multiply tasks are on display
 				date = new String();
 				floating = new String();
 				if (!mainTasks.get(0).getTask().getType().equals(TaskieEnum.TaskType.FLOAT)) {
@@ -171,7 +186,7 @@ public class TaskieLogic {
 					headline = String.format(HEADLINE_FLOATING, number, date);
 				}
 			}
-			main = format(0, mainTasks);
+			main = format(0, mainTasks); // index start from 0
 		}
 		main.add(0, headline);
 		return main;
@@ -231,6 +246,7 @@ public class TaskieLogic {
 		Collections.sort(tmr);
 		Collections.sort(els);
 		
+		// continuous indexing
 		all.add(format(0, ovd));
 		all.add(format(ovd.size(), tod));
 		all.add(format(ovd.size() + tod.size(), tmr));
@@ -297,39 +313,39 @@ public class TaskieLogic {
 	private ArrayList<String> format(int index, ArrayList<IndexTaskPair> list) {
 		ArrayList<String> formatted = new ArrayList<String>();
 		
-		SimpleDateFormat sdf1 = new SimpleDateFormat(DATE_FORMAT_DAY_MONTH_HOUR_MIN);
-		SimpleDateFormat sdf2 = new SimpleDateFormat(DATE_FORMAT_HOUR_MIN);
-		SimpleDateFormat sdf3 = new SimpleDateFormat(DATE_FORMAT_DAY_MON_YEAR);
+		SimpleDateFormat formatDayMonHourMin = new SimpleDateFormat(DATE_FORMAT_DAY_MONTH_HOUR_MIN);
+		SimpleDateFormat formatHourMin = new SimpleDateFormat(DATE_FORMAT_HOUR_MIN);
+		SimpleDateFormat formatDayMonYear = new SimpleDateFormat(DATE_FORMAT_DAY_MON_YEAR);
 		for (IndexTaskPair pair : list) {
 			index++;
 			TaskieTask task = pair.getTask();
-			Calendar st = task.getStartTime();
-			Calendar et = task.getEndTime();
+			Calendar start = task.getStartTime();
+			Calendar end = task.getEndTime();
 			boolean isSameDay = false;
-			String sst, set, taskDetail, status;
+			String startTimeFormatted, endTimeFormatted, taskDetail, status;
 			// Check if start time and end time are on the same day.
-			if (st != null && et != null && 
-				sdf3.format(st.getTime()).equals(sdf3.format(et.getTime()))) {
+			if (start != null && end != null && 
+				formatDayMonYear.format(start.getTime()).equals(formatDayMonYear.format(end.getTime()))) {
 				isSameDay = true;
 			}
 			
-			if (st != null) {
-				sst = sdf1.format(st.getTime());
+			if (start != null) {
+				startTimeFormatted = formatDayMonHourMin.format(start.getTime());
 			} else {
-				sst = FORMAT_EMPTY_STRING;
+				startTimeFormatted = FORMAT_EMPTY_STRING;
 			}
-			if (et != null) {
-				set = sdf1.format(et.getTime());
+			if (end != null) {
+				endTimeFormatted = formatDayMonHourMin.format(end.getTime());
 			} else {
-				set = FORMAT_EMPTY_STRING;
+				endTimeFormatted = FORMAT_EMPTY_STRING;
 			}
 			
 			status = pair.getTask().getStatus() ? FORMAT_COMPLETED : FORMAT_EMPTY_STRING;
 			
 			if (isSameDay) {
-				taskDetail = new String(index + FORMAT_INDEXPERIOD + task.getTitle() + FORMAT_UI_TIME_INDICATOR + FORMAT_SPACING + sst + FORMAT_SAMEDAY_WAVE + sdf2.format(et.getTime()) + FORMAT_SPACING + (status = pair.getTask().getStatus() ? FORMAT_COMPLETED : FORMAT_EMPTY_STRING));
+				taskDetail = new String(index + FORMAT_INDEXPERIOD + task.getTitle() + FORMAT_UI_TIME_INDICATOR + FORMAT_SPACING + startTimeFormatted + FORMAT_SAMEDAY_WAVE + formatHourMin.format(end.getTime()) + FORMAT_SPACING + (status = pair.getTask().getStatus() ? FORMAT_COMPLETED : FORMAT_EMPTY_STRING));
 			} else {
-				taskDetail = new String(index + FORMAT_INDEXPERIOD + task.getTitle() + FORMAT_UI_TIME_INDICATOR + sst + FORMAT_SPACING + set);
+				taskDetail = new String(index + FORMAT_INDEXPERIOD + task.getTitle() + FORMAT_UI_TIME_INDICATOR + startTimeFormatted + FORMAT_SPACING + endTimeFormatted);
 			}
 			formatted.add(new String(taskDetail + FORMAT_COMPLETED_SPACING + status));
 		}
@@ -434,31 +450,31 @@ public class TaskieLogic {
 		retrieve(added.getTask().getEndTime());
 		
 		if (!isUndoAction) {
-			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, "right", getRightIndex(added));
+			TaskieAction undoAction = new TaskieAction(TaskieEnum.Actions.DELETE, WINDOW_RIGHT, getRightIndex(added));
 			undoAction.setTaskType(task.getType());
 			undoStack.push(undoAction);
 		}
 		
-		feedback = new String("\"" + task.getTitle() + "\"" + " is added");
+		feedback = String.format(FEEDBACK_ADD, task.getTitle());
 	}
 	
 	/*  This method deletes a specified task and updates the fields "mainTasks" and "allTasks" after the deletion.  */
 	private void delete(String screen, int index) throws UnrecognisedCommandException {
 		try {
 			int realIndex;
-			if (screen.equalsIgnoreCase("left")) {
+			if (screen.equalsIgnoreCase(WINDOW_LEFT)) {
 				if (isFreeSlots) {
 					feedback = "You cannot delete a slot.";
 					return;
 				}
 				realIndex = mainTasks.get(index).getIndex();
-			} else if (screen.equalsIgnoreCase("right")) {
+			} else if (screen.equalsIgnoreCase(WINDOW_RIGHT)) {
 				if (allTasks.isEmpty()) {
 					System.out.println("Empty allTasks");
 				}
 				realIndex = allTasks.get(index).getIndex();
 			} else {
-				throw new UnrecognisedCommandException("Window preference not indicated.");
+				throw new UnrecognisedCommandException(EXCEPTION_WINDOW_PREFERENCE_NOT_INDICATED);
 			}
 
 			TaskieTask deleted = TaskieStorage.deleteTask(realIndex);
@@ -466,7 +482,7 @@ public class TaskieLogic {
 			
 			retrieve(retrieveSave);
 			
-			feedback = new String("\"" + title + "\"" + " is deleted");
+			feedback = String.format(FEEDBACK_DELETE, title);
 			
 			// Construct undo action
 			if (!isUndoAction) {
@@ -475,7 +491,7 @@ public class TaskieLogic {
 			}
 			
 		} catch (IndexOutOfBoundsException e) {
-			feedback = new String("Invalid index number");
+			feedback = new String(EXCEPTION_INVALID_INDEX_NUMBER);
 		} catch (Exception e) {
 			feedback = e.getMessage();
 		}
@@ -489,28 +505,28 @@ public class TaskieLogic {
 		try {
 			String title;
 			int realIndex;
-			if (screen.equalsIgnoreCase("left")) {
+			if (screen.equalsIgnoreCase(WINDOW_LEFT)) {
 				realIndex = mainTasks.get(index).getIndex();
 				title = mainTasks.get(index).getTask().getTitle();
-			} else if (screen.equalsIgnoreCase("right")) {
+			} else if (screen.equalsIgnoreCase(WINDOW_RIGHT)) {
 				realIndex = allTasks.get(index).getIndex();
 				title = allTasks.get(index).getTask().getTitle();
 			} else {
 				throw new UnrecognisedCommandException("Screen preference not indicated.");
 			}
 			
-			feedback = new String("\"" + title + "\"" + " is marked done");
+			feedback = String.format(FEEDBACK_MARKDONE, title);
 			
 			TaskieStorage.changeStatus(realIndex);
 			retrieve(true);
 			
 			// Construct undo action
 			if (!isUndoAction) {
-				TaskieAction action = new TaskieAction(TaskieEnum.Actions.MARKDONE, "left", getLeftIndex(realIndex));
+				TaskieAction action = new TaskieAction(TaskieEnum.Actions.MARKDONE, WINDOW_LEFT, getLeftIndex(realIndex));
 				undoStack.push(action);
 			}
 		} catch (IndexOutOfBoundsException e) {
-			feedback = new String("Invalid index number");
+			feedback = new String(EXCEPTION_INVALID_INDEX_NUMBER);
 		}
 	}
 	
@@ -554,8 +570,8 @@ public class TaskieLogic {
 		}
 		mainTasks = list;
 		// Below is for fun :D
-		double time = Math.random() * Math.random() / ONE_THOUSAND;
-		feedback = new String("Search finished in " + String.format("%.5f", time) + " seconds");
+		double time = Math.random() * Math.random() / SEARCH_TIME_ONE_THOUSAND;
+		feedback = String.format(FEEDBACK_SEARCH, String.format("%.5f", time));
 	}
 
 	/*  This method updates the details of a task  */
@@ -565,18 +581,18 @@ public class TaskieLogic {
 
 		TaskieTask currTask;
 		int realIndex;
-		if (screen.equalsIgnoreCase("left")) {
+		if (screen.equalsIgnoreCase(WINDOW_LEFT)) {
 			if (isFreeSlots) {
-				feedback = "You cannot update a slot.";
+				feedback = FEEDBACK_CANNOT_DELETE_FREESLOT;
 				return;
 			}
 			currTask = mainTasks.get(index).getTask();
 			realIndex = mainTasks.get(index).getIndex();
-		} else if (screen.equalsIgnoreCase("right")) {
+		} else if (screen.equalsIgnoreCase(WINDOW_RIGHT)) {
 			currTask = allTasks.get(index).getTask();
 			realIndex = allTasks.get(index).getIndex();
 		} else {
-			throw new Exception("Window preference not indicated.");
+			throw new Exception(EXCEPTION_WINDOW_PREFERENCE_NOT_INDICATED);
 		}
 		// For the section below, the name of the method called gives a good description of what the code does.
 		if (task.getTitle() != null && task.getTitle().trim().length() != 0) {
@@ -635,25 +651,25 @@ public class TaskieLogic {
 				   task.getStartTime() != null && task.getEndTime() == null) {
 			TaskieStorage.updateEventStart(realIndex, task.getStartTime());
 		} else {
-			throw new UnrecognisedCommandException("Unrecognised update criterion");
+			throw new UnrecognisedCommandException(EXCEPTION_UNRECOGNISED_UPDATE_CRITERION);
 		}
 		
 		retrieveSave = (Calendar) currTask.getEndTime().clone(); // Update the left display to the end date of the task that is being updated
 		retrieve(retrieveSave);
 		if (!isUndoAction) {
-			TaskieAction action = new TaskieAction(TaskieEnum.Actions.UPDATE, "right", getRightIndex(realIndex), undoTask);
+			TaskieAction action = new TaskieAction(TaskieEnum.Actions.UPDATE, WINDOW_RIGHT, getRightIndex(realIndex), undoTask);
 			undoStack.push(action);
 		}
 		
-		feedback = new String("Updated successfully");
+		feedback = FEEDBACK_UPDATE;
 	}
 	
 	/*  This method deletes all the tasks that are displayed in the left window  */
 	private void deleteAll() throws UnrecognisedCommandException {
 		for (int i = mainTasks.size() - 1; i >= 0; i--) {
-			delete("left", i);
+			delete(WINDOW_LEFT, i);
 		}
-		feedback = new String("All deleted");
+		feedback = FEEDBACK_DELETEALL;
 		assert mainTasks.isEmpty();
 	}
 	
@@ -665,7 +681,7 @@ public class TaskieLogic {
 		redoStack.clear();
 		commandSave.clear();
 		TaskieStorage.deleteAll();
-		feedback = new String("Restored to factory settings");
+		feedback = FEEDBACK_RESET;
 	}
 	
 	/*  This method updates the field "freeSlots"  */
@@ -681,7 +697,7 @@ public class TaskieLogic {
 	private void undo() {
 		isUndoAction = true;
 		if (undoStack.isEmpty()) {
-			feedback = new String("No more action to undo");
+			feedback = FEEDBACK_NO_MORE_UNDO;
 			return;
 		}
 		TaskieAction action = undoStack.pop();
@@ -693,7 +709,7 @@ public class TaskieLogic {
 	private void redo() {
 		isUndoAction = false;
 		if(redoStack.isEmpty()) {
-			feedback = new String("No more action to redo");
+			feedback = FEEDBACK_NO_MORE_REDO;
 		} else {
 			TaskieAction action = redoStack.pop();
 			commandSave.push(action);
@@ -705,7 +721,7 @@ public class TaskieLogic {
 	private void setPath(String path) {
 		try {
 			TaskieStorage.load(path);
-			feedback = "File path is set to " + path;
+			feedback = String.format(FEEDBACK_SETPATH, path);
 		} catch (Exception e) {
 			feedback = e.getMessage();
 		}

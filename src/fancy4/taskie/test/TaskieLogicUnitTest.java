@@ -1,4 +1,4 @@
-package fancy4.taskie.model;
+package fancy4.taskie.test;
 
 /**
  * 	@@author A0107360R
@@ -9,7 +9,11 @@ package fancy4.taskie.model;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class LogicTest {
+import fancy4.taskie.model.LogicOutput;
+import fancy4.taskie.model.TaskieLogic;
+import fancy4.taskie.model.UnrecognisedCommandException;
+
+public class TaskieLogicUnitTest {
 	
 	private TaskieLogic logic;
 	
