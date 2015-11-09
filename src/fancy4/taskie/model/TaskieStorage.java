@@ -22,16 +22,19 @@ public class TaskieStorage {
 	private static EventComparator ec = new EventComparator();
 	private static DeadlineComparator dc = new DeadlineComparator();
 	private static FloatComparator fc = new FloatComparator();
-
+	private static final String TASK_FILE_PATH_NAME = "taskFilePath.txt";
+	private static final String TASKIE_DATA_FOLDER_NAME = "TaskieData";
+	private static final String TASK_LIST_FILE_NAME = "taskList.json";
+	private static final String INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE = "Ooops! index out of the bonds!";
 	public static void load(String pathName) throws Exception {
 		String currentPath = new String();
-		taskFilePath = new File("taskFilePath.txt");
+		taskFilePath = new File(TASK_FILE_PATH_NAME);
 		File existPath = null;
 		if (taskFilePath.exists()) {
 			BufferedReader reader = new BufferedReader(new FileReader(taskFilePath));
 			currentPath = reader.readLine();
 			if (currentPath == null || currentPath.trim().length() == 0) {
-				existPath = new File("TaskieData");
+				existPath = new File(TASKIE_DATA_FOLDER_NAME);
 				FileWriter writer = new FileWriter(taskFilePath);
 				writer.write(existPath.getPath());
 				writer.flush();
@@ -41,7 +44,7 @@ public class TaskieStorage {
 			}
 		} else {
 			taskFilePath.createNewFile();
-			existPath = new File("TaskieData");
+			existPath = new File(TASKIE_DATA_FOLDER_NAME);
 			FileWriter writer = new FileWriter(taskFilePath);
 			writer.write(existPath.getPath());
 			writer.flush();
@@ -59,13 +62,13 @@ public class TaskieStorage {
 			if (!userPath.exists()) {
 				userPath.mkdir();
 			}
-			folder = new File(pathName + "/TaskieData");
+			folder = new File(pathName + "/" + TASKIE_DATA_FOLDER_NAME);
 			if (!folder.exists()) {
 				folder.mkdir();
 
 			}
 		}
-		taskList = new File(folder, "/taskList.json");
+		taskList = new File(folder, "/" + TASK_LIST_FILE_NAME);
 		if (existPath.exists()) {
 			if ((existPath != null) && !existPath.equals(folder)) {
 				existPath.renameTo(folder);
@@ -130,7 +133,7 @@ public class TaskieStorage {
 	public static TaskieTask deleteTask(int index) throws IndexOutOfBoundsException {
 		// 0-based index
 		if (index >= allTasks.size()) {
-			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
+			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
 		} else {
 			TaskieTask deletedTask = allTasks.remove(index);
 			if (TaskieTask.isEvent(deletedTask)) {
@@ -180,6 +183,9 @@ public class TaskieStorage {
 		if (start.after(end)) {
 			throw new Exception("end time should equals or after start time");
 		}
+		if (start == null || end == null){
+			throw new NullPointerException("start time or end time cannot be null");
+		}
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 		for (TaskieTask task : allTasks) {
 			if (TaskieTask.isEvent(task)) {
@@ -210,7 +216,7 @@ public class TaskieStorage {
 	public static ArrayList<IndexTaskPair> searchTask(boolean status) {
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 		for (TaskieTask task : allTasks) {
-			if (task.getStatus() == status) {// fix bug
+			if (task.getStatus() == status) {
 				IndexTaskPair pair = new IndexTaskPair(allTasks.indexOf(task), task);
 				searchResult.add(pair);
 			}
@@ -221,7 +227,7 @@ public class TaskieStorage {
 	public static ArrayList<TaskieTask> changeStatus(int index) throws IndexOutOfBoundsException {
 		// 0-based index
 		if (index >= allTasks.size()) {
-			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
+			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
 		} else {
 			TaskieTask task = allTasks.get(index);
 			boolean currentStatus = task.getStatus();
@@ -238,7 +244,7 @@ public class TaskieStorage {
 
 	public static ArrayList<TaskieTask> updateTaskTitle(int index, String title) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
-			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
+			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
 		} else {
 			TaskieTask task = allTasks.get(index);
 			task.setTitle(title);
@@ -251,7 +257,7 @@ public class TaskieStorage {
 	public static ArrayList<TaskieTask> updateTaskPriority(int index, TaskieEnum.TaskPriority priority)
 			throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
-			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
+			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
 		} else {
 			TaskieTask task = allTasks.get(index);
 			if (TaskieTask.isEvent(task)) {
@@ -270,7 +276,7 @@ public class TaskieStorage {
 	public static ArrayList<TaskieTask> updateTaskDescription(int index, String description)
 			throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
-			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
+			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
 		} else {
 			TaskieTask task = allTasks.get(index);
 			task.setDescription(description);
@@ -283,7 +289,7 @@ public class TaskieStorage {
 	public static ArrayList<TaskieTask> updateFloatToDeadline(int index, Calendar end)
 			throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
-			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
+			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
 		} else {
 			TaskieTask task = allTasks.get(index);
 			floatTaskList.remove(task);
@@ -297,7 +303,7 @@ public class TaskieStorage {
 
 	public static ArrayList<TaskieTask> updateFloatToEvent(int index, Calendar start, Calendar end) throws Exception {
 		if (index >= allTasks.size()) {
-			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
+			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
 		} else {
 			TaskieTask task = allTasks.get(index);
 			floatTaskList.remove(task);
@@ -315,7 +321,7 @@ public class TaskieStorage {
 
 	public static ArrayList<TaskieTask> updateEventDeadlineToFloat(int index) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
-			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
+			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
 		} else {
 			TaskieTask task = allTasks.get(index);
 			if (TaskieTask.isEvent(task)) {
@@ -333,7 +339,7 @@ public class TaskieStorage {
 
 	public static ArrayList<TaskieTask> updateEventToDeadline(int index) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
-			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
+			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
 		} else {
 			TaskieTask task = allTasks.get(index);
 			eventTaskList.remove(task);
@@ -348,7 +354,7 @@ public class TaskieStorage {
 
 	public static ArrayList<TaskieTask> updateDeadlineToEvent(int index, Calendar start) throws Exception {
 		if (index >= allTasks.size()) {
-			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
+			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
 		} else {
 			TaskieTask task = allTasks.get(index);
 			deadlineTaskList.remove(task);
@@ -367,7 +373,7 @@ public class TaskieStorage {
 	public static ArrayList<TaskieTask> updateEventDeadlineEnd(int index, Calendar end)
 			throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
-			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
+			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
 		} else {
 			TaskieTask task = allTasks.get(index);
 			task.setEndTime(end);
@@ -379,7 +385,7 @@ public class TaskieStorage {
 
 	public static ArrayList<TaskieTask> updateEventStart(int index, Calendar start) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
-			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
+			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
 		} else {
 			TaskieTask task = allTasks.get(index);
 			if (TaskieTask.isEvent(task)) {
@@ -394,7 +400,7 @@ public class TaskieStorage {
 	public static ArrayList<TaskieTask> updateEventStartEnd(int index, Calendar start, Calendar end)
 			throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
-			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
+			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
 		} else {
 			TaskieTask task = allTasks.get(index);
 			if (TaskieTask.isEvent(task)) {
@@ -409,7 +415,7 @@ public class TaskieStorage {
 
 	public static String viewTaskDescription(int index, TaskieEnum.TaskType type) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
-			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
+			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
 		} else {
 			String description;
 			description = allTasks.get(index).getDescription();
@@ -419,7 +425,7 @@ public class TaskieStorage {
 
 	public static void editTaskDescription(int index, String description) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
-			throw new IndexOutOfBoundsException("Ooops! index out of the bonds!");
+			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
 		} else {
 			String oldDescription = allTasks.get(index).getDescription();
 			String newDescription = oldDescription + " " + description;
