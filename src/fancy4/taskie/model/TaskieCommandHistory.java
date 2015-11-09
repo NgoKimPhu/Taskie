@@ -27,6 +27,10 @@ public class TaskieCommandHistory {
 		return history.get(pointer);
 	}
 	
+	public String getCommand(int index) {
+		return history.get(index);
+	}
+	
 	
 	public int getSize() {
 		return history.size();

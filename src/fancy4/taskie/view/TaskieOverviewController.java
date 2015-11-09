@@ -64,6 +64,7 @@ public class TaskieOverviewController {
 	private TaskieCommandHistory cmdHistory;
 	private ArrayList<String> helpList;
 	private boolean newestCommandReached;
+	private boolean enterPressed;
 
 	// ================================================================
 	// Constants
@@ -106,6 +107,7 @@ public class TaskieOverviewController {
 		// Construct the TaskieCommandHistory to keep track of commands typed in by user
 		cmdHistory = new TaskieCommandHistory();
 		newestCommandReached = false;
+		enterPressed = false;
 
 		obeservableMainList = FXCollections.observableArrayList();
 		createTree(new ArrayList<String>());
@@ -236,14 +238,19 @@ public class TaskieOverviewController {
 		String input;
 		String response;
 		input = textInput.getText();  
-		cmdHistory.addCommand(input);
-		cmdHistory.setPointer(cmdHistory.getSize());
+
 
 		try {
 			if (input.equals("help")) {
 				showHelp();
 			}
 			newestCommandReached = false;
+			enterPressed = true;
+			cmdHistory.addCommand(input);
+			cmdHistory.setPointer(cmdHistory.getSize());
+			System.out.println("ENTER");
+			System.out.println("pointer: " + cmdHistory.getPointer());
+			System.out.println("size: " + cmdHistory.getSize());
 			logicOut = TaskieLogic.logic().execute(input);
 			populate(logicOut.getMain(), logicOut.getAll());
 			response = logicOut.getFeedback();
@@ -274,6 +281,7 @@ public class TaskieOverviewController {
 			return;
 		} else {
 			newestCommandReached = false;
+			enterPressed = false;
 			cmdHistory.decrementPointer();
 			textInput.setText(cmdHistory.getCommand());
 			textInput.positionCaret(MAX_INT);
@@ -292,10 +300,17 @@ public class TaskieOverviewController {
 			textInput.clear();
 			return;
 		} else {
-			newestCommandReached = false;
-			cmdHistory.incrementPointer();
-			textInput.setText(cmdHistory.getCommand());
-			textInput.positionCaret(Integer.MAX_VALUE);
+			if (enterPressed) {
+				textInput.setText(cmdHistory.getCommand(cmdHistory.getPointer() - 1));
+				textInput.positionCaret(Integer.MAX_VALUE);
+				return;
+			} else {
+				newestCommandReached = false;
+
+				cmdHistory.incrementPointer();
+				textInput.setText(cmdHistory.getCommand());
+				textInput.positionCaret(Integer.MAX_VALUE);
+			}
 		}
 
 	}
