@@ -100,8 +100,6 @@ public class TaskieStorage {
 		}
 		FileHandler.clearFile(taskFilePath);
 		FileWriter writer = new FileWriter(taskFilePath, true);
-		System.out.println("path:");
-		System.out.println(folder.getPath());
 		writer.write(folder.getPath());
 		writer.close();
 
