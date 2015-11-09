@@ -21,12 +21,12 @@
                            <children>
                               <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="400.0">
                                  <children>
-                                    <Label fx:id="mainLabel" layoutX="12.0" layoutY="-5.0" prefHeight="40.0" prefWidth="388.0" styleClass="label-big" stylesheets="@Theme.css" text="Main" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="12.0" AnchorPane.rightAnchor="-12.0" AnchorPane.topAnchor="-5.0">
+                                    <Label fx:id="mainLabel" layoutX="12.0" layoutY="3.0" prefHeight="40.0" prefWidth="388.0" styleClass="label-big" stylesheets="@Theme.css" text="Main" AnchorPane.bottomAnchor="17.0" AnchorPane.leftAnchor="12.0" AnchorPane.rightAnchor="-12.0" AnchorPane.topAnchor="3.0">
                                        <font>
                                           <Font size="33.0" />
                                        </font>
                                     </Label>
-                                    <Label fx:id="mainListFeedbackLabel" layoutX="13.0" layoutY="24.0" minHeight="-Infinity" prefHeight="30.0" prefWidth="1000.0" text="Label" AnchorPane.bottomAnchor="-3.0" AnchorPane.leftAnchor="13.0" AnchorPane.rightAnchor="-13.0" AnchorPane.topAnchor="24.0" />
+                                    <Label fx:id="mainListFeedbackLabel" layoutX="13.0" layoutY="29.0" minHeight="-Infinity" prefHeight="23.0" prefWidth="400.0" text="Label" AnchorPane.bottomAnchor="-2.0" AnchorPane.leftAnchor="13.0" AnchorPane.rightAnchor="-13.0" AnchorPane.topAnchor="29.0" />
                                  </children>
                               </AnchorPane>
                               <AnchorPane layoutX="14.0" layoutY="50.0" minWidth="-Infinity" prefHeight="490.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0">

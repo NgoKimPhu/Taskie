@@ -5,7 +5,6 @@ import fancy4.taskie.model.LogicOutput;
 import fancy4.taskie.model.TaskieCommandHistory;
 import fancy4.taskie.model.TaskieLogic;
 import fancy4.taskie.model.UnrecognisedCommandException;
-
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,15 +16,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.util.Callback;
-
 import java.util.*;
-import java.io.IOException;
+
 
 
 //@@author A0130221H
+
 public class TaskieOverviewController {
 	// ================================================================
 	// FXML Fields
