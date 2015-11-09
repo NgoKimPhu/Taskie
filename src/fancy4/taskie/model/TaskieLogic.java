@@ -16,6 +16,12 @@ import java.util.Date;
 public class TaskieLogic {
 
 	private static TaskieLogic logic;
+	
+	private final String HEADLINE_NO_TASK_GENERAL = new String("There is no task. Feed me some, or take a nap.");
+	private final String HEADLINE_NO_TASK_SEARCH = new String("Your search did not match any tasks.");
+	private final String HEADLINE_NO_TASK_MARKDONE = new String("There is no completed task.");
+	
+	private final String HEADLINE_NO_FREESLOTS = new String("There is no free slots. Take some break.");
 
 	private boolean isFreeSlots, isMarkdone, isSearch, isView, isUndoAction;
 	private Stack<TaskieAction> commandSave, undoStack, redoStack;
@@ -82,32 +88,33 @@ public class TaskieLogic {
 				redoStack.clear();
 			}
 			takeAction(action);
+			getFreeSlots(action);
 			// Assemble the output: feedback, left screen output, right screen output
 			return new LogicOutput(feedback, getMain(), getAll());
 	}
 
-	/*	The output to left window	*/
+	/*	This method generates the output to the left window	*/
 	private ArrayList<String> getMain() {
 		ArrayList<String> main = new ArrayList<String>();
 		String headline, number, date, floating;
-		if (isFreeSlots) {
+		if (isFreeSlots) {	// Customised headline for freeslots
 			main = format(freeSlots);
 			int size = main.size();
 			if (size == 0) {
-				headline = "There is no free slots. Take some break.";
+				headline = HEADLINE_NO_FREESLOTS;
 			} else {
 				number = size == 1 ? "is one free slot" : "are " + size + " free slots";
 				headline = new String("You have " + number + " in the next seven days.");
 			}
 		} else {
 			int size = mainTasks.size();
-			if (mainTasks.isEmpty()) {
+			if (mainTasks.isEmpty()) {	
 				if (isMarkdone) {
-					headline = new String("There is no completed task.");
+					headline = HEADLINE_NO_TASK_MARKDONE;
 				} else if (isSearch) {
-					headline = new String("Your search did not match any tasks.");
+					headline = HEADLINE_NO_TASK_SEARCH;
 				} else {
-					headline = new String("There is no task. Feed me some, or take a nap.");
+					headline = HEADLINE_NO_TASK_GENERAL;
 				}
 			} else {
 				date = new String();
@@ -140,7 +147,7 @@ public class TaskieLogic {
 	}
 	
 	
-	/*	The output to right window
+	/*	This is the output to the right window
 	 *    the "all" format:
 	 *		all is an ArrayList<ArrayList<String>>. all.size() == 4
 	 *		The four elements are:
@@ -229,7 +236,6 @@ public class TaskieLogic {
 				redo();
 				return;
 			case FREESLOT:
-				getFreeSlots();
 				return;
 			case SETPATH:
 				setPath((String)action.getSearch());
@@ -247,18 +253,16 @@ public class TaskieLogic {
 		} catch (Exception e) {
 			feedback = e.getMessage();
 		}
-		if (!action.getType().equals(TaskieEnum.Actions.FREESLOT)) {
-			isFreeSlots = false;
-		}
 	}
 
 	
 	
 	/*****
-	 * Below are auxiliary methods.
-	 * 
+	 * Below are the auxiliary methods:
+	 *	  format, retrieveAllTasks, retrieve, getRightIndex, getLeftIndex, exit
 	 * 
 	 */
+	/*	This method converts a IndexTaskPair list to a list of String which is suitable for displaying	*/
 	private ArrayList<String> format(int index, ArrayList<IndexTaskPair> list) {
 		ArrayList<String> formatted = new ArrayList<String>();
 		
@@ -300,6 +304,7 @@ public class TaskieLogic {
 		return formatted;
 	}
 	
+	/*	This method converts a CalendarPair list to a list of String which is suitable for displaying	*/
 	private ArrayList<String> format(ArrayList<CalendarPair> list) {
 		ArrayList<String> slots = new ArrayList<String>();
 		for (int i = 1; i <= list.size(); i++) {
@@ -308,6 +313,7 @@ public class TaskieLogic {
 		return slots;
 	}	
 	
+	/*	This method updates the field "allTasks", excluding the completed tasks  */
 	private void retrieveAllTasks() {
 		allTasks.clear();
 		ArrayList<TaskieTask> complete = TaskieStorage.displayAllTasks();
@@ -319,6 +325,7 @@ public class TaskieLogic {
 		Collections.sort(allTasks);
 	}
 
+	/*	This method updates the field "mainTasks" to the list of all tasks on the "day" as specified  */
 	private void retrieve(Calendar day) throws Exception {
 		mainTasks.clear();
 		retrieveAllTasks();
@@ -342,16 +349,19 @@ public class TaskieLogic {
 		Collections.sort(mainTasks);
 	}
 	
+	/*	This method updates the field "mainTasks" to the list of completed tasks  */
 	private void retrieve(boolean status) throws Exception {
 		retrieveAllTasks();
 		mainTasks = primarySearch(true);
 		Collections.sort(mainTasks);
 	}
 	
+	/*  This method returns the displayed index in the right window of an IndexTaskPair in "allTasks"   */
 	private int getRightIndex(IndexTaskPair pair) {
 		return getRightIndex(pair.getIndex());
 	}
 	
+	/*  This method returns the displayed index in the right window given the task's realIndex   */
 	private int getRightIndex(int realIndex) {
 		for (int i = 0; i < allTasks.size(); i++) {
 			if (realIndex == allTasks.get(i).getIndex()) {
@@ -361,6 +371,7 @@ public class TaskieLogic {
 		return -1;
 	}
 	
+	/*  This method returns the displayed index in the left window given the task's realIndex   */
 	private int getLeftIndex(int realIndex) {
 		for (int i = 0; i < mainTasks.size(); i++) {
 			if (realIndex == mainTasks.get(i).getIndex()) {
@@ -382,6 +393,9 @@ public class TaskieLogic {
 	 * @throws Exception 
 	 * 
 	 */
+	/*  This method adds a new task and updates the fields "mainTasks" and "allTasks".
+	 *  "mainTasks" will be updated to the list of tasks that has the same end date as the new task,
+	 *  or to the list of all floating tasks if the new task is floating.  */
 	private void add(TaskieTask task) throws Exception {
 		IndexTaskPair added = TaskieStorage.addTask(task);
 		assert task.getType().equals(added.getTask().getType());
@@ -397,6 +411,7 @@ public class TaskieLogic {
 		feedback = new String("\"" + task.getTitle() + "\"" + " is added");
 	}
 	
+	/*  This method deletes a specified task and updates the fields "mainTasks" and "allTasks" after the deletion.  */
 	private void delete(String screen, int index) throws UnrecognisedCommandException {
 		try {
 			int realIndex;
@@ -435,6 +450,8 @@ public class TaskieLogic {
 		}
 	}
 	
+	/*  This method marks a specified task as completed.
+	 * 	It sets the flag "isMarkdone" to true, and removes the completed task from "allTasks".  */
 	private void markdone(String screen, int index) throws Exception {
 		isMarkdone = true;
 		
@@ -466,6 +483,7 @@ public class TaskieLogic {
 		}
 	}
 	
+	/*  This method updates the field "mainTasks" with the search result  */
 	private void search(TaskieAction action) {
 		try {
 			isSearch = true;
@@ -478,6 +496,7 @@ public class TaskieLogic {
 		}
 	}
 	
+	/*  This method searches for and returns the list of the tasks that contains certain search key  */
 	private ArrayList<IndexTaskPair> primarySearch(Object searchKey) throws Exception {
 		ArrayList<IndexTaskPair> indexTaskList;
 		if (searchKey instanceof String) {
@@ -487,7 +506,13 @@ public class TaskieLogic {
 			isSearch = searchKey.equals("") ? false : true;
 			isView = !isSearch;
 		} else if (searchKey instanceof Calendar) {
-			indexTaskList = TaskieStorage.searchTask((Calendar) searchKey, (Calendar) searchKey);
+			Calendar start, end, key;
+			key = (Calendar) searchKey;
+			start = new Calendar.Builder().setDate(key.get(Calendar.YEAR), 
+					key.get(Calendar.MONTH), key.get(Calendar.DATE)).build();
+			end = (Calendar) start.clone();
+			end.add(Calendar.DATE, 1);
+			indexTaskList = TaskieStorage.searchTask((Calendar) start, (Calendar) end);
 		} else if (searchKey instanceof Integer) {
 			indexTaskList = TaskieStorage.searchTask(
 					(TaskieEnum.TaskPriority) searchKey);
@@ -500,6 +525,7 @@ public class TaskieLogic {
 		return indexTaskList;
 	}
 
+	/*  This method updates the details of a task  */
 	private void update(String screen, int index, TaskieTask task) throws Exception {
 		TaskieTask undoTask = new TaskieTask((String)null);
 		Calendar startTime, endTime;
@@ -589,6 +615,7 @@ public class TaskieLogic {
 		feedback = new String("Updated successfully");
 	}
 	
+	/*  This method deletes all the tasks that are displayed in the left window  */
 	private void deleteAll() throws UnrecognisedCommandException {
 		for (int i = mainTasks.size() - 1; i >= 0; i--) {
 			delete("left", i);
@@ -597,6 +624,7 @@ public class TaskieLogic {
 		assert mainTasks.isEmpty();
 	}
 	
+	/*  This method clears all the data and sets the software to its initial state  */
 	private void reset() {
 		allTasks.clear();
 		mainTasks.clear();
@@ -607,11 +635,16 @@ public class TaskieLogic {
 		feedback = new String("Restored to factory settings");
 	}
 	
-	private void getFreeSlots() {
-		isFreeSlots = true;
+	/*  This method updates the field "freeSlots"  */
+	private void getFreeSlots(TaskieAction action) {
 		freeSlots = TaskieStorage.getFreeSlots();
+		if (action.getType().equals(TaskieEnum.Actions.DELETE)) {
+			return;
+		}
+		isFreeSlots = action.getType().equals(TaskieEnum.Actions.FREESLOT) ? true : false;
 	}
 	
+	/*  This method undoes the latest action  */
 	private void undo() {
 		isUndoAction = true;
 		if (undoStack.isEmpty()) {
@@ -623,6 +656,7 @@ public class TaskieLogic {
 		takeAction(action);
 	}
 	
+	/*  This method redoes the last action which has been undone  */
 	private void redo() {
 		isUndoAction = false;
 		if(redoStack.isEmpty()) {
@@ -631,10 +665,10 @@ public class TaskieLogic {
 			TaskieAction action = redoStack.pop();
 			commandSave.push(action);
 			takeAction(action);
-		} 
-		
+		}
 	}
 	
+	/*  This method changes the directory of the saved tasks file  */
 	private void setPath(String path) {
 		try {
 			TaskieStorage.load(path);
