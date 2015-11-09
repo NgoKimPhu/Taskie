@@ -15,7 +15,8 @@ import java.util.*;
  */
 public final class TaskieParser {
 	private static final String MESSAGE_INVALID_COMMAND_FORMAT = "invalid command format : %1$s";
-	private static final String PATTERN_INVALID_PATH_CHARACTERS = "[^A-Za-z0-9 /.\\[\\]\\(\\)~]| $|.$";
+	private static final String PATTERN_INVALID_PATH_CHARACTERS = 
+			"[^A-Za-z0-9 /.:\\\\\\[\\]\\(\\)~]| $|\\.$";
 	private static final String PATTERN_DONE = "(marked )?done|finished";
 	private static final String PATTERN_UNDONE = "(marked )?(not |un)(done|finished)|pending";
 	private static final String PATTERN_COMMAND_DELIMITER = "\\s+|(?<=[+-])(?=\\w)";

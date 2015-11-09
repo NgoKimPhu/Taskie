@@ -225,7 +225,8 @@ class TimeDetector {
 	 */
 	private void setDate(Calendar time, int groupOffset) {
 		if (matcher.group(groupOffset) != null) { // (today|tomorrow|tmr)
-			if (!matcher.group(groupOffset).contains("today")) {
+			if (matcher.group(groupOffset).contains("tmr") || 
+					matcher.group(groupOffset).contains("tomorrow")) {
 				time.add(Calendar.DATE, 1);
 			}
 		} else {
