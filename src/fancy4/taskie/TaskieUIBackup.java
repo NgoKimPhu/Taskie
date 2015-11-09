@@ -19,7 +19,7 @@ public class TaskieUIBackup {
 	}
 	
 	public static void initialise() {
-		TaskieLogic.logic().initialise();
+		TaskieLogic.getInstance().initialise();
 		sc = new Scanner(System.in);
 	}
 	
@@ -28,7 +28,7 @@ public class TaskieUIBackup {
 			String command = "pizza";
 			LogicOutput screen;
 			try {
-				screen = TaskieLogic.logic().execute(command);
+				screen = TaskieLogic.getInstance().execute(command);
 				String output = screen.getMain().get(0).toString();
 				//System.out.println(output);
 				System.out.println(output.equals("1.   --    --   pizza"));

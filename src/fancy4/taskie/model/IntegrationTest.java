@@ -18,14 +18,14 @@ public class IntegrationTest {
 
 	@Test
 	public void testAddFloat() throws UnrecognisedCommandException {
-		TaskieLogic.logic().execute("reset");
+		TaskieLogic.getInstance().execute("reset");
 		try {
 			TaskieStorage.load("unit/");
 			TaskieStorage.deleteAll();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
-		TaskieLogic.logic().execute("finish tutorial");
+		TaskieLogic.getInstance().execute("finish tutorial");
 		assertEquals(TaskieStorage.displayFloatTask().size(), 1);
 	}
 	
@@ -36,7 +36,7 @@ public class IntegrationTest {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
-		TaskieLogic.logic().execute("finish ps");
+		TaskieLogic.getInstance().execute("finish ps");
 		assertEquals(TaskieStorage.displayFloatTask().size(), 2);
 	}
 	
@@ -47,7 +47,7 @@ public class IntegrationTest {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
-		TaskieLogic.logic().execute("finish hw by tmr 9pm");
+		TaskieLogic.getInstance().execute("finish hw by tmr 9pm");
 		assertEquals(TaskieStorage.displayEventDeadline().size(), 1);
 	}
 	
@@ -58,7 +58,7 @@ public class IntegrationTest {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
-		TaskieLogic.logic().execute("del 1");
+		TaskieLogic.getInstance().execute("del 1");
 		assertEquals(TaskieStorage.displayFloatTask().size(), 1);
 	}
 	
@@ -70,7 +70,7 @@ public class IntegrationTest {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
-		LogicOutput out = TaskieLogic.logic().execute("view");
+		LogicOutput out = TaskieLogic.getInstance().execute("view");
 		assertEquals(0, out.getMain().size());
 		assertEquals(0, out.getAll().size());
 	}

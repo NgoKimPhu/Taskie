@@ -110,7 +110,7 @@ public class TaskieOverviewController {
 		setupTreeCell();
 
 		try {
-			logicOut = TaskieLogic.logic().execute(VIEW_COMMAND);
+			logicOut = TaskieLogic.getInstance().execute(VIEW_COMMAND);
 			populate(logicOut.getMain(), logicOut.getAll());
 		} catch (UnrecognisedCommandException e) {
 			// catch the exception thrown by logic
@@ -229,7 +229,7 @@ public class TaskieOverviewController {
 		cmdHistory.setPointer(cmdHistory.getSize());
 
 		try {
-			logicOut = TaskieLogic.logic().execute(input);
+			logicOut = TaskieLogic.getInstance().execute(input);
 			populate(logicOut.getMain(), logicOut.getAll());
 			response = logicOut.getFeedback();
 			feedbackLabel.setText(response);

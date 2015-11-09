@@ -53,7 +53,7 @@ public class MainApp extends Application {
     // Methods
     // ================================================================
 	public MainApp() {
-		TaskieLogic.logic().initialise();
+		TaskieLogic.getInstance().initialise();
 	}
 
 	@Override

@@ -32,7 +32,7 @@ public class TaskieLogic {
 
 	private final Logger log = Logger.getLogger(TaskieLogic.class.getName() );
 	
-	public static TaskieLogic logic() {
+	public static TaskieLogic getInstance() {
 		if (logic == null) {
 			logic = new TaskieLogic();
 		}
