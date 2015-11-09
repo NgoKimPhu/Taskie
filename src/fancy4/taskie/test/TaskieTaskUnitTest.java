@@ -18,7 +18,7 @@ public class TaskieTaskUnitTest {
 		try{
 			TaskieTask task = new TaskieTask("test", start, end);
 		}catch(Exception e){
-			assertEquals("start time should not after end time.", e.getMessage());
+			assertEquals("Start time should not after end time.", e.getMessage());
 			System.out.println(e.getMessage());
 		}
 	}
@@ -45,7 +45,7 @@ public class TaskieTaskUnitTest {
 			TaskieTask task = new TaskieTask("test");
 			task.setToEvent(start, end);
 		}catch(Exception e){
-			assertEquals("start time should not after end time.", e.getMessage());
+			assertEquals("Start time should not after end time.", e.getMessage());
 			System.out.println(e.getMessage());
 		}
 	}
