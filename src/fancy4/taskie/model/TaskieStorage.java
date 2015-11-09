@@ -26,6 +26,16 @@ public class TaskieStorage {
 	private static final String TASKIE_DATA_FOLDER_NAME = "TaskieData";
 	private static final String TASK_LIST_FILE_NAME = "taskList.json";
 	private static final String INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE = "Ooops! index out of the bonds!";
+	private static final String START_AFTER_END_EXCEPTION_MESSAGE = "Start time should not after end time.";
+	private static final String NULL_STRAT_END_EXCEPTION_MESSAGE = "Start time or end time cannot be null";
+	
+	/**
+     * There is the method to load/create file from the user specified path.
+     * @param pathName
+     * 		The path specified by user in a string format.
+     * @return NULL
+     * @throws FileNotFoundException, IOException
+     */
 	public static void load(String pathName) throws Exception {
 		String currentPath = new String();
 		taskFilePath = new File(TASK_FILE_PATH_NAME);
@@ -58,10 +68,11 @@ public class TaskieStorage {
 			}
 		} else {
 			File userPath = new File(pathName);
-			//the path is not exist, create new path
+			// the path is not exist, create new path
 			if (!userPath.exists()) {
 				userPath.mkdir();
 			}
+			// create data folder under that path
 			folder = new File(pathName + "/" + TASKIE_DATA_FOLDER_NAME);
 			if (!folder.exists()) {
 				folder.mkdir();
@@ -112,7 +123,14 @@ public class TaskieStorage {
 		return floatTaskList;
 	}
 
-	// add task
+	/**
+     * There is a method to add a task into the task list.
+     * @param task
+     * 		A TaskieTask object which is going to be added.
+     * @return 
+     * 		An IndexTaskPair object which contains the task and its position
+     * 		in allTasks ArrayList.
+     */
 	public static IndexTaskPair addTask(TaskieTask task) {
 		allTasks.add(task);
 		int index = allTasks.indexOf(task);
@@ -129,7 +147,14 @@ public class TaskieStorage {
 		rewriteFile();
 		return new IndexTaskPair(index, task);
 	}
-
+	
+	/**
+     * There is a method to delete a task from the task list.
+     * @param index
+     * 		A integer index which indicates the task which is going to be deleted.
+     * @return 
+     * 		An TaskieTask object which is deleted from the task lists.
+     */
 	public static TaskieTask deleteTask(int index) throws IndexOutOfBoundsException {
 		// 0-based index
 		if (index >= allTasks.size()) {
@@ -149,7 +174,11 @@ public class TaskieStorage {
 
 	}
 
-	// delete all,return value index 0--eventDeadlineTask, 1--floatTask
+	/**
+     * This is a method to delete all tasks from the task list.
+     * @return 
+     * 		An Empty ArrayList.
+     */
 	public static ArrayList<TaskieTask> deleteAll() {
 		FileHandler.clearFile(taskList);
 		allTasks = new ArrayList<TaskieTask>();
@@ -159,7 +188,15 @@ public class TaskieStorage {
 		return allTasks;
 	}
 
-	// if you want to search all the tasks contains the key words, search twice
+	
+	/**
+     * This is method to search tasks which contains keywords from the task list.
+     * @param keyWords
+     * 		An ArrayList of all the key words.
+     * @return 
+     * 		An ArrayList of IndexTaskPair objects which indicates the resulting 
+     * 		tasks and their indices.
+     */
 	public static ArrayList<IndexTaskPair> searchTask(ArrayList<String> keyWords) {
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 		for (TaskieTask task : allTasks) {
@@ -178,13 +215,20 @@ public class TaskieStorage {
 		return searchResult;
 	}
 
-	// search tasks based on time specification
+	/**
+     * This is method to search tasks within a period of time from the task list.
+     * @param start end
+     * 		Two calendar objects which indicate a period of time
+     * @return 
+     * 		An ArrayList of IndexTaskPair objects which indicates the resulting 
+     * 		tasks and their indices.
+     */
 	public static ArrayList<IndexTaskPair> searchTask(Calendar start, Calendar end) throws Exception {
 		if (start.after(end)) {
-			throw new Exception("end time should equals or after start time");
+			throw new Exception(START_AFTER_END_EXCEPTION_MESSAGE);
 		}
 		if (start == null || end == null){
-			throw new NullPointerException("start time or end time cannot be null");
+			throw new NullPointerException(NULL_STRAT_END_EXCEPTION_MESSAGE);
 		}
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 		for (TaskieTask task : allTasks) {
@@ -202,6 +246,14 @@ public class TaskieStorage {
 		return searchResult;
 	}
 
+	/**
+     * This is method to search tasks with certain priority from the task list.
+     * @param priority
+     * 		An enumerator which indicates the prority.
+     * @return 
+     * 		An ArrayList of IndexTaskPair objects which indicates the resulting 
+     * 		tasks and their indices.
+     */
 	public static ArrayList<IndexTaskPair> searchTask(TaskieEnum.TaskPriority priority) {
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 		for (TaskieTask task : allTasks) {
@@ -213,6 +265,14 @@ public class TaskieStorage {
 		return searchResult;
 	}
 
+	/**
+     * This is method to search tasks with certain status from the task list.
+     * @param status
+     * 		A boolean indicates the task status
+     * @return 
+     * 		An ArrayList of IndexTaskPair objects which indicates the resulting 
+     * 		tasks and their indices.
+     */
 	public static ArrayList<IndexTaskPair> searchTask(boolean status) {
 		ArrayList<IndexTaskPair> searchResult = new ArrayList<IndexTaskPair>();
 		for (TaskieTask task : allTasks) {
@@ -224,6 +284,14 @@ public class TaskieStorage {
 		return searchResult;
 	}
 
+	/**
+     * This is method to change the status of a task.
+     * @param index
+     * 		An integer index which indicates the task which is going to be modified.
+     * @return 
+     * 		An ArrayList of all TaskieTask objects in task list.
+     * @throws IndexOutOfBoundsException
+     */
 	public static ArrayList<TaskieTask> changeStatus(int index) throws IndexOutOfBoundsException {
 		// 0-based index
 		if (index >= allTasks.size()) {
@@ -242,6 +310,14 @@ public class TaskieStorage {
 		}
 	}
 
+	/**
+     * This is method to change the title of a task.
+     * @param index
+     * 		An integer index which indicates the task which is going to be modified.
+     * @return 
+     * 		An ArrayList of all TaskieTask objects in task list.
+     * @throws IndexOutOfBoundsException
+     */
 	public static ArrayList<TaskieTask> updateTaskTitle(int index, String title) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
 			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
@@ -254,6 +330,14 @@ public class TaskieStorage {
 		}
 	}
 
+	/**
+     * This is method to change the priority of a task.
+     * @param index
+     * 		An integer index which indicates the task which is going to be modified.
+     * @return 
+     * 		An ArrayList of all TaskieTask objects in task list.
+     * @throws IndexOutOfBoundsException
+     */
 	public static ArrayList<TaskieTask> updateTaskPriority(int index, TaskieEnum.TaskPriority priority)
 			throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
@@ -273,6 +357,14 @@ public class TaskieStorage {
 		}
 	}
 
+	/**
+     * This is method to change the description of a task. 
+     * @param index
+     * 		An integer index which indicates the task which is going to be modified.
+     * @return 
+     * 		An ArrayList of all TaskieTask objects in task list.
+     * @throws IndexOutOfBoundsException
+     */
 	public static ArrayList<TaskieTask> updateTaskDescription(int index, String description)
 			throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
@@ -285,7 +377,14 @@ public class TaskieStorage {
 		}
 	}
 
-	// index 0-eventdeadline 1-float
+	/**
+     * This is method to change a float task into a deadline task.
+     * @param index
+     * 		An integer index which indicates the task which is going to be modified.
+     * @return 
+     * 		An ArrayList of all TaskieTask objects in task list.
+     * @throws IndexOutOfBoundsException
+     */
 	public static ArrayList<TaskieTask> updateFloatToDeadline(int index, Calendar end)
 			throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
@@ -300,7 +399,15 @@ public class TaskieStorage {
 			return allTasks;
 		}
 	}
-
+	
+	/**
+     * This is method to change a floating task into a event.
+     * @param index
+     * 		An integer index which indicates the task which is going to be modified.
+     * @return 
+     * 		An ArrayList of all TaskieTask objects in task list.
+     * @throws IndexOutOfBoundsException
+     */
 	public static ArrayList<TaskieTask> updateFloatToEvent(int index, Calendar start, Calendar end) throws Exception {
 		if (index >= allTasks.size()) {
 			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
@@ -318,7 +425,15 @@ public class TaskieStorage {
 			return allTasks;
 		}
 	}
-
+	
+	/**
+     * This is method to change an event or a deadline task into a float task.
+     * @param index
+     * 		An integer index which indicates the task which is going to be modified.
+     * @return 
+     * 		An ArrayList of all TaskieTask objects in task list.
+     * @throws IndexOutOfBoundsException
+     */
 	public static ArrayList<TaskieTask> updateEventDeadlineToFloat(int index) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
 			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
@@ -336,7 +451,15 @@ public class TaskieStorage {
 			return allTasks;
 		}
 	}
-
+	
+	/**
+     * This is method to change an event into a deadline task.
+     * @param index
+     * 		An integer index which indicates the task which is going to be modified.
+     * @return 
+     * 		An ArrayList of all TaskieTask objects in task list.
+     * @throws IndexOutOfBoundsException
+     */
 	public static ArrayList<TaskieTask> updateEventToDeadline(int index) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
 			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
@@ -351,7 +474,15 @@ public class TaskieStorage {
 		}
 
 	}
-
+	
+	/**
+     * This is method to change a deadline task into an event .
+     * @param index
+     * 		An integer index which indicates the task which is going to be modified.
+     * @return 
+     * 		An ArrayList of all TaskieTask objects in task list.
+     * @throws IndexOutOfBoundsException
+     */
 	public static ArrayList<TaskieTask> updateDeadlineToEvent(int index, Calendar start) throws Exception {
 		if (index >= allTasks.size()) {
 			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
@@ -370,6 +501,14 @@ public class TaskieStorage {
 		}
 	}
 
+	/**
+     * This is method to change the end time of an event or a deadline task without changing its type .
+     * @param index
+     * 		An integer index which indicates the task which is going to be modified.
+     * @return 
+     * 		An ArrayList of all TaskieTask objects in task list.
+     * @throws IndexOutOfBoundsException
+     */
 	public static ArrayList<TaskieTask> updateEventDeadlineEnd(int index, Calendar end)
 			throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
@@ -382,7 +521,15 @@ public class TaskieStorage {
 			return allTasks;
 		}
 	}
-
+	
+	/**
+     * This is method to change the start time of an event without changing its type .
+     * @param index
+     * 		An integer index which indicates the task which is going to be modified.
+     * @return 
+     * 		An ArrayList of all TaskieTask objects in task list.
+     * @throws IndexOutOfBoundsException
+     */
 	public static ArrayList<TaskieTask> updateEventStart(int index, Calendar start) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
 			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
@@ -397,6 +544,14 @@ public class TaskieStorage {
 		}
 	}
 
+	/**
+     * This is method to change the start time and end time of an event without changing its type .
+     * @param index
+     * 		An integer index which indicates the task which is going to be modified.
+     * @return 
+     * 		An ArrayList of all TaskieTask objects in task list.
+     * @throws IndexOutOfBoundsException
+     */
 	public static ArrayList<TaskieTask> updateEventStartEnd(int index, Calendar start, Calendar end)
 			throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
@@ -412,7 +567,15 @@ public class TaskieStorage {
 			return allTasks;
 		}
 	}
-
+	
+	/**
+     * This is method to get the description of a certain task.
+     * @param index
+     * 		An integer index which indicates the task which is going to be view.
+     * @return 
+     * 		A Sting which is the description of the task.
+     * @throws IndexOutOfBoundsException
+     */
 	public static String viewTaskDescription(int index, TaskieEnum.TaskType type) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
 			throw new IndexOutOfBoundsException(INDEX_OUT_OF_BOUNDARY_EXCEPTION_MESSAGE);
@@ -422,6 +585,7 @@ public class TaskieStorage {
 			return description;
 		}
 	}
+	
 
 	public static void editTaskDescription(int index, String description) throws IndexOutOfBoundsException {
 		if (index >= allTasks.size()) {
@@ -434,8 +598,9 @@ public class TaskieStorage {
 		}
 	}
 
-	// get the free slot in seven days start from current time. 00:00-06:00 is
-	// auto blocked
+	/* get the free slot in seven days start from current time. 00:00-06:00 is
+	   auto blocked
+	 */
 	public static ArrayList<CalendarPair> getFreeSlots() {
 		ArrayList<CalendarPair> slots = new ArrayList<CalendarPair>();
 		CalendarPair slot;
@@ -541,7 +706,15 @@ public class TaskieStorage {
 class FileHandler {
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 	private static Logger logger = Logger.getLogger(FileHandler.class.getName());
-
+	
+	/**
+     * This is method to read JSON objects from a file
+     * @param file
+     * 		The file which is going to be read
+     * @return 
+     * 		A HashMap object contains all tasks list, all events list, 
+     * 		all deadline tasks list, all floating tasks list
+     */
 	public static HashMap<String, ArrayList<TaskieTask>> readFile(File file) {
 		String line = new String();
 		ArrayList<TaskieTask> events = new ArrayList<TaskieTask>();
@@ -644,9 +817,14 @@ class FileHandler {
 		return fileContent;
 	}
 
-	// Write content in to a file.
+	/**
+     * This is method to write JSON objects a file
+     * @param file, task
+     * 		The file which is being written and the task data which is going 
+     * 		to be written into the file.
+     * @return NULL
+     */
 	public static void writeFile(File file, TaskieTask task) {
-		// String fileName = file.getName();
 		if (TaskieTask.isEvent(task)) {
 			try {
 				FileWriter writer = new FileWriter(file, true);
