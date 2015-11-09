@@ -432,6 +432,8 @@ public class TaskieStorage {
 	// auto blocked
 	public static ArrayList<CalendarPair> getFreeSlots() {
 		ArrayList<CalendarPair> slots = new ArrayList<CalendarPair>();
+		CalendarPair slot;
+		
 		Calendar currentEndOfDay = Calendar.getInstance();
 		currentEndOfDay.set(Calendar.HOUR_OF_DAY, 0);
 		currentEndOfDay.set(Calendar.MINUTE, 0);
@@ -448,32 +450,35 @@ public class TaskieStorage {
 		Calendar currentEnd = Calendar.getInstance().after(currentSixAM) ? Calendar.getInstance() : currentSixAM;
 
 		for (TaskieTask task : eventTaskList) {
-			while (currentEndOfDay.before(sixDaysLater) && currentEndOfDay.before(task.getStartTime())) {
-				if (currentEnd.before(currentEndOfDay)) {
-					CalendarPair slot = new CalendarPair(currentEnd, currentEndOfDay);
-					slots.add(slot);
+			if (!TaskieTask.isDone(task)) {
+				while (currentEndOfDay.before(sixDaysLater) && 
+					   currentEndOfDay.before(task.getStartTime())) {
+					if (currentEnd.before(currentEndOfDay)) {
+						slot = new CalendarPair(currentEnd, currentEndOfDay);
+						slots.add(slot);
+					}
+					currentEndOfDay.add(Calendar.DATE, 1);
+					currentSixAM.add(Calendar.DATE, 1);
+					currentEnd = currentEnd.after(currentSixAM) ? currentEnd : currentSixAM;
 				}
-				currentEndOfDay.add(Calendar.DATE, 1);
-				currentSixAM.add(Calendar.DATE, 1);
-				currentEnd = currentEnd.after(currentSixAM) ? currentEnd : currentSixAM;
-			}
-			if (currentEndOfDay.after(sixDaysLater)) {
-				break;
-			}
-			if (task.getEndTime().after(currentEnd)) {
-				if (task.getStartTime().after(currentEnd)) {
-					CalendarPair slot = new CalendarPair(currentEnd, task.getStartTime());
-					slots.add(slot);
-					currentEnd = task.getEndTime();
-				} else {
-					currentEnd = task.getEndTime();
+				
+				if (currentEndOfDay.after(sixDaysLater)) {
+					break;
+				} else if (task.getEndTime().after(currentEnd)) {
+					if (task.getStartTime().after(currentEnd)) {
+						slot = new CalendarPair(currentEnd, task.getStartTime());
+						slots.add(slot);
+						currentEnd = task.getEndTime();
+					} else {
+						currentEnd = task.getEndTime();
+					}
 				}
 			}
 		}
 
 		while (currentEndOfDay.before(sixDaysLater)) {
 			if (currentEnd.before(currentEndOfDay)) {
-				CalendarPair slot = new CalendarPair(currentEnd, currentEndOfDay);
+				slot = new CalendarPair(currentEnd, currentEndOfDay);
 				slots.add(slot);
 			}
 			currentEndOfDay.add(Calendar.DATE, 1);
