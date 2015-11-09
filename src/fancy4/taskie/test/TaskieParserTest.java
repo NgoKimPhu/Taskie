@@ -1,10 +1,14 @@
 // @@author A0126586W
-package fancy4.taskie.model;
+package fancy4.taskie.test;
 import static org.junit.Assert.*;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import fancy4.taskie.model.TaskieAction;
+import fancy4.taskie.model.TaskieEnum;
+import fancy4.taskie.model.TaskieParser;
 
 /**
  *  @author Ngo Kim Phu
