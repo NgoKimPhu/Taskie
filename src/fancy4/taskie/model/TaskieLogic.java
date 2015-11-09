@@ -296,7 +296,7 @@ public class TaskieLogic {
 			status = pair.getTask().getStatus() ? "Completed" : "";
 			
 			if (isSameDay) {
-				taskDetail = new String(index + ".  " + task.getTitle() + "-time " + sst + " ~ " + sdf2.format(et.getTime()) + "  " + (status = pair.getTask().getStatus() ? "Completed" : ""));
+				taskDetail = new String(index + ".  " + task.getTitle() + "-time " + "  " + sst + " ~ " + sdf2.format(et.getTime()) + "  " + (status = pair.getTask().getStatus() ? "Completed" : ""));
 			} else {
 				taskDetail = new String(index + ".  " + task.getTitle() + "-time " + sst + "  " + set);
 			}
