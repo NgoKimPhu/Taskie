@@ -4,7 +4,7 @@ package fancy4.taskie.model;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-class CalendarPair {
+public class CalendarPair {
 	private Calendar start;
 	private Calendar end;
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
