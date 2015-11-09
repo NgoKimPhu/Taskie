@@ -1,13 +1,14 @@
-# main
+# Taskie
 CS2103 project team w13-1j
+Taskie is great task management tool. It help you to manage you daily tasks easily and improve your efficiency.
+Taskie is compatible for both Windows and Mac OSX.
+Taskie supports three types of tasks which are events(tasks with start and end time), deadline tasks(tasks with only end time) and floating tasks(tasks without time specification).
+Please feel free to download and use it.
 
-# Notice
-1. **Please do not commit on files in bin/**: can cause a lot of conflicts.
-2. **Use command line for commit**:
-   * git add ....
-   * git status
-   * git commit -m "..."
-   * git fetch
-   * git rebase -i origin/master
-     * git rebase --continue
-   * git push
+**Want to use Taskie?**
+* [Download the latest release]()
+* [**User Guide**](docs/User-Guide.md)
+
+**Want to contribute to Taskie?**
+* [**Developer Guide**]
+
