@@ -247,7 +247,7 @@ public class TaskieStorage {
 	/**
      * This is method to search tasks with certain priority from the task list.
      * @param priority
-     * 		An enumerator which indicates the prority.
+     * 		An enumerator which indicates the priority.
      * @return 
      * 		An ArrayList of IndexTaskPair objects which indicates the resulting 
      * 		tasks and their indices.
