@@ -41,12 +41,7 @@ public class TaskieLogic {
 
 	/* Constructor */
 	protected TaskieLogic() {
-		undoStack = new Stack<TaskieAction>();
-		redoStack = new Stack<TaskieAction>();
-		commandSave = new Stack<TaskieAction>();
-		allTasks = new ArrayList<IndexTaskPair>();
-		freeSlots = new ArrayList<CalendarPair>();
-		mainTasks = new ArrayList<IndexTaskPair>();
+		initialise();
 	}
 	
 	
@@ -56,7 +51,13 @@ public class TaskieLogic {
 	 * initialise, execute, getMain, getAll, takeAction
 	 * 
 	 */
-	public void initialise() {
+	private void initialise() {
+		undoStack = new Stack<TaskieAction>();
+		redoStack = new Stack<TaskieAction>();
+		commandSave = new Stack<TaskieAction>();
+		allTasks = new ArrayList<IndexTaskPair>();
+		freeSlots = new ArrayList<CalendarPair>();
+		mainTasks = new ArrayList<IndexTaskPair>();
 		try {
 			TaskieStorage.load("");
 			retrieve(retrieveSave);

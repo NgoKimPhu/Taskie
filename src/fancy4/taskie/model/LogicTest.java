@@ -7,48 +7,72 @@ package fancy4.taskie.model;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class LogicTest {
+	/*
+	public static TestSuite suite() {
+		return new TestSuite(LogicTest.class);
+	}
+	 */
+	@Test
+	public void testReset() throws UnrecognisedCommandException {
+		TaskieLogic logic = TaskieLogic.getInstance();
+		LogicOutput output = logic.execute("reset");
+		Assert.assertTrue(output.getAll().size() == 4);
+		for (int i = 0; i < 4; i++) {
+			Assert.assertTrue(output.getAll().get(i).isEmpty());
+		}
+		
+	}
 	
-	private static LogicOutput test;
-
+	@Test
+	public void testGetAll() throws UnrecognisedCommandException {
+		TaskieLogic logic = TaskieLogic.getInstance();
+		logic.execute("reset");
+		logic.execute("test1 0:00");
+		logic.execute("test2 tmr");
+		logic.execute("test3");
+		logic.execute("test4 today 23:58 to 23:59");
+	}
+	
 	@Test
 	public void testAdd() throws Exception {
-		TaskieLogic.logic().execute("reset");
-		TaskieLogic.logic().execute("pizza");
-		test = TaskieLogic.logic().execute("coffee");
-		assertArrayEquals(new String[]{"1.   --    --   coffee", "2.   --    --   pizza"},
-				test.getMain().toArray());
+		TaskieLogic logic = TaskieLogic.getInstance();
+		logic.execute("reset");
+		logic.execute("pizza");
+		LogicOutput output = logic.execute("presentation today");
+		String feedbackExpected = new String("\"presentation\" is added");
+		String task1 = new String("1. presentation 23:59");
+		ArrayList<String> allExpected = new ArrayList<String>();
+		Assert.assertTrue(output.getFeedback().equals(feedbackExpected));
+		Assert.assertTrue(output.getAll().size() == 2);
+		Assert.assertTrue(output.getAll().equals(allExpected));
 	}
 	
 	@Test
 	public void testUndo() throws Exception {
-		TaskieLogic.logic().execute("reset");
-		TaskieLogic.logic().execute("pizza");
-		TaskieLogic.logic().execute("coffee");
-		
-		test = TaskieLogic.logic().execute("undo");
-		assertArrayEquals(new String[]{"1.   --    --   pizza"}, test.getMain().toArray());
-		test = TaskieLogic.logic().execute("undo");
-		assertArrayEquals(new String[0], test.getMain().toArray());
-		// Boundary testing
-		TaskieLogic.logic().execute("undo");
-		test = TaskieLogic.logic().execute("undo");
-		assertEquals("No more action to undo", test.getFeedback());
+		TaskieLogic.getInstance().execute("reset");
+		TaskieLogic.getInstance().execute("pizza");
+		TaskieLogic.getInstance().execute("coffee");
+		Assert.assertTrue(true);
 	}
 	
 	@Test
 	public void testRedo() throws Exception {
-		TaskieLogic.logic().execute("reset");
-		TaskieLogic.logic().execute("pizza");
-		TaskieLogic.logic().execute("coffee");
+		TaskieLogic.getInstance().execute("reset");
+		TaskieLogic.getInstance().execute("pizza");
+		TaskieLogic.getInstance().execute("coffee");
+		Assert.assertTrue(true);
 		
-		test = TaskieLogic.logic().execute("redo");
-
-		// Boundary testing
-		test = TaskieLogic.logic().execute("redo");
-		assertEquals("No more action to redo", test.getFeedback());
 	}
 
 }
