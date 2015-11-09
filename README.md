@@ -6,9 +6,9 @@ Taskie supports three types of tasks which are events(tasks with start and end t
 Please feel free to download and use it.
 
 **Want to use Taskie?**
-* [Download the latest release]()
+* [Download the latest release](https://github.com/cs2103aug2015-w13-1j/main/releases)
 * [**User Guide**](docs/User-Guide.md)
 
 **Want to contribute to Taskie?**
-* [**Developer Guide**]
+* [**Developer Guide**](docs/Developer-Guide.md)
 
