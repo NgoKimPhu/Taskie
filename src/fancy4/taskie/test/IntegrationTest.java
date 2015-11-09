@@ -1,5 +1,5 @@
 // @@author A0126586W
-package fancy4.taskie.model;
+package fancy4.taskie.test;
 
 import static org.junit.Assert.*;
 
@@ -7,6 +7,11 @@ import java.util.ArrayList;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import fancy4.taskie.model.LogicOutput;
+import fancy4.taskie.model.TaskieLogic;
+import fancy4.taskie.model.TaskieStorage;
+import fancy4.taskie.model.UnrecognisedCommandException;
 
 public class IntegrationTest {
 
