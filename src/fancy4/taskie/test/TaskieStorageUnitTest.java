@@ -97,7 +97,6 @@ public class TaskieStorageUnitTest {
 		}
 		//not deleted
 		assertEquals(TaskieStorage.displayAllTasks().size(), 1);
-		
 	}
 
 }
