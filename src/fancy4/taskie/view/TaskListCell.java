@@ -31,7 +31,6 @@ class TaskListCell extends ListCell<String> {
 		if (!isEmpty()) {
 			if (s.contains(TIME_FLAG)) {
 				String time = s.substring(s.indexOf(TIME_FLAG) + TIME_STARTING_INDEX);
-				System.out.println(time);
 				String text = s.substring(STARTING_INDEX, s.indexOf(TIME_FLAG));
 				setGraphic(createTextFlow(text, TIME_PLACEHOLDER, time));	
 			} else {
